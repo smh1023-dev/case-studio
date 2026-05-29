@@ -259,8 +259,8 @@ async function radarRun(force){
 function radarRender(p){
   let h="";const ph=p.phrases;
   if(ph){h+='<div class="card"><div class="vh">오늘의 트렌드 문구</div>';
-    if(ph.trending)h+='<p class="why" style="margin:2px 0"><b>통하는</b> · '+ph.trending.map(esc).join(" / ')+'</p>';
-    if(ph.avoid)h+='<p class="why" style="margin:2px 0;color:var(--accent)"><b>피할것</b> · '+ph.avoid.map(esc).join(" / ')+'</p>';
+    if(ph.trending)h+='<p class="why" style="margin:2px 0"><b>통하는</b> · '+ph.trending.map(esc).join(" / ")+'</p>';
+    if(ph.avoid)h+='<p class="why" style="margin:2px 0;color:var(--accent)"><b>피할것</b> · '+ph.avoid.map(esc).join(" / ")+'</p>';
     if(ph.tip)h+='<p class="note">— '+esc(ph.tip)+'</p>';h+='</div>';}
   h+='<div class="grid">';
   (p.picks||[]).slice(0,5).forEach((it,i)=>{const u=safeUrl(it.url);
