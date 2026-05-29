@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<!--
+  CASE STUDIO — 통합 앱 (self-host용 단일 페이지)
+  탭 1) CASETiFY Radar : 매일 웹검색으로 베스트셀러 5 + 트렌드 문구 (Anthropic)
+  탭 2) Daily Studio   : Radar 기반 오마주 → 디자인 소재 + 포토샵 가이드 + HTML 초안 (Anthropic + OpenAI 이미지)
+  탭 3) Evaluate       : 목업 이미지 업로드 → 10기준 평가 + 수정 클릭순서 (Anthropic 비전)
+  탭 4) Reels          : 목업 이미지 업로드 → 유행 릴스 참조 4편 + 행동심리 기반 대본 (Anthropic 웹검색+비전)
+  ─ 키는 설정 탭에서 입력 → 이 브라우저 localStorage에만 저장. 코드/레포에 키 없음.
+  ─ GitHub Pages면 파일명을 index.html 로. 운영용은 서버리스 프록시 권장(키 노출 방지).
+-->
+<html lang="ko"><head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Case Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--ok:#2f7d4f;--card:#FBF9F2;
+    --hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);
+    --disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;min-height:100vh;}
+  .wrap{max-width:1160px;margin:0 auto;padding:24px 22px 90px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:26px;letter-spacing:-.02em;text-transform:uppercase;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  .tabbtn{font-family:var(--disp);font-weight:700;font-size:12.5px;letter-spacing:.02em;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:8px 13px;border-radius:999px;}
+  .tabbtn.active{background:var(--ink);color:var(--paper);}
+  section{display:none;animation:fade .3s ease;} section.on{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;}}
+  h2.sec{font-family:var(--disp);font-weight:800;font-size:clamp(26px,5vw,44px);letter-spacing:-.02em;margin:24px 0 4px;text-transform:uppercase;}
+  h2.sec em{font-style:normal;color:var(--accent);}
+  .lede{font-style:italic;color:var(--soft);max-width:70ch;margin:0 0 6px;font-size:15px;}
+
+  .bar{display:flex;gap:11px;flex-wrap:wrap;align-items:center;margin:16px 0;}
+  .btn{font-family:var(--disp);font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:999px;transition:transform .12s;}
+  .btn:hover{transform:translate(-1px,-1px);} .btn:active{transform:translate(1px,1px);} .btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;}
+  .btn.ghost{background:transparent;color:var(--ink);} .btn.sm{padding:6px 11px;font-size:11px;border-width:1.5px;}
+  .pill{font-family:var(--mono);font-size:11px;border:1.5px solid var(--ink);border-radius:999px;padding:6px 11px;}
+  .pill.ok{border-color:var(--ok);color:var(--ok);} .pill.bad{border-color:var(--accent);color:var(--accent);}
+  .spacer{flex:1;}
+  input,textarea{font-family:var(--mono);font-size:13px;border:1.5px solid var(--hair);border-radius:7px;padding:10px;background:#fff;width:100%;}
+  label{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:block;margin:0 0 6px;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:18px;}
+  .card{background:var(--card);border:1.5px solid var(--ink);border-radius:8px;padding:18px;box-shadow:var(--shadow);}
+  .card .idx{font-family:var(--disp);font-weight:800;font-size:11px;color:var(--accent);letter-spacing:.08em;}
+  .card .brandn{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:18px;margin:2px 0;}
+  .card .namen{font-style:italic;color:var(--soft);margin:0 0 8px;font-size:15px;}
+  .ar{display:flex;gap:8px;font-size:13px;line-height:1.4;margin:4px 0;}
+  .ar .k{font-family:var(--disp);font-weight:700;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;width:42px;flex:none;padding-top:2px;}
+  .why{font-style:italic;font-size:13.5px;margin:8px 0;}
+  .src{font-family:var(--disp);font-weight:700;font-size:12px;text-decoration:none;color:var(--ink);border-bottom:2px solid var(--accent);}
+  .src::after{content:"↗";}
+
+  .loading{display:none;align-items:center;gap:12px;padding:22px 0;color:var(--soft);font-family:var(--disp);font-weight:600;}
+  .loading.on{display:flex;}
+  .spin{width:20px;height:20px;border:3px solid var(--hair);border-top-color:var(--accent);border-radius:50%;animation:sp .9s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .err{border:1.5px solid var(--accent);border-radius:8px;padding:14px;background:#fff;color:var(--accent);font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin-top:12px;}
+
+  /* phone mockup */
+  .cases{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:18px;}
+  @media(max-width:760px){.cases{grid-template-columns:1fr;max-width:320px;margin-inline:auto;}.phrow{flex-direction:column;}}
+  .case{position:relative;aspect-ratio:1/2.05;border-radius:38px;overflow:hidden;box-shadow:0 22px 40px -20px rgba(0,0,0,.55);border:1px solid rgba(0,0,0,.08);}
+  .case .cam{position:absolute;top:18px;left:18px;width:54px;height:54px;border-radius:16px;background:rgba(0,0,0,.18);}
+  .case .gloss{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.3),rgba(255,255,255,0) 40%);mix-blend-mode:screen;pointer-events:none;}
+  .case .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 18px;}
+  .case .sym{font-family:var(--disp);font-weight:800;line-height:1;margin-bottom:10px;}
+  .case .word{font-family:var(--disp);font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:13px;}
+  .case .slogan{position:absolute;left:0;right:0;bottom:14%;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.28em;text-transform:uppercase;}
+  .vh{font-family:var(--disp);font-weight:800;font-size:15px;text-transform:uppercase;margin:0 0 8px;letter-spacing:.04em;}
+
+  /* steps + materials */
+  ol.steps{font-size:14px;line-height:1.6;padding-left:20px;} ol.steps li{margin:3px 0;}
+  .mats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .mat{border:1px solid var(--hair);border-radius:7px;padding:10px;background:#fff;}
+  .mat .mid{font-family:var(--disp);font-weight:800;font-size:11px;color:#fff;background:var(--ink);border-radius:3px;padding:2px 6px;display:inline-block;}
+  .mat .mnm{font-family:var(--disp);font-weight:700;font-size:12.5px;margin:6px 0 2px;}
+  .mat .mrole{font-size:11.5px;color:var(--soft);line-height:1.4;}
+  .mat .mimg{width:100%;aspect-ratio:1;border:1px dashed var(--hair);border-radius:5px;margin-top:7px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:var(--mono);font-size:9px;color:var(--soft);}
+  .mat .mimg img{width:100%;height:100%;object-fit:cover;}
+
+  /* scores */
+  .score{margin:7px 0;}
+  .score .lbl{display:flex;justify-content:space-between;font-family:var(--disp);font-size:12px;font-weight:700;}
+  .meter{height:8px;border:1px solid var(--ink);border-radius:4px;overflow:hidden;margin-top:3px;}
+  .meter i{display:block;height:100%;background:var(--accent);}
+  .listblock{margin:10px 0;} .listblock h4{font-family:var(--disp);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px;}
+  .listblock.del h4{color:var(--accent);} .listblock.emp h4{color:var(--ok);}
+  .listblock ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.5;}
+
+  .drop{border:2px dashed var(--hair);border-radius:10px;padding:26px;text-align:center;background:#fff;cursor:pointer;}
+  .drop.has{border-style:solid;border-color:var(--ink);padding:10px;}
+  .drop img{max-height:300px;max-width:100%;border-radius:6px;}
+  .reel{background:var(--card);border:1.5px solid var(--ink);border-radius:8px;padding:18px;box-shadow:var(--shadow);}
+  .reel .rt{font-family:var(--disp);font-weight:800;font-size:17px;}
+  .reel .hook{background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:12px;padding:8px 10px;border-radius:6px;margin:8px 0;}
+  .reel .meta{font-family:var(--mono);font-size:11px;color:var(--soft);margin:4px 0;}
+  .reel .blk{margin:8px 0;} .reel .blk h5{font-family:var(--disp);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 3px;color:var(--accent);}
+  .reel .blk p,.reel .blk li{font-size:13.5px;line-height:1.5;margin:2px 0;}
+  .note{font-family:var(--mono);font-size:11px;color:var(--soft);line-height:1.6;}
+  .note b{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Case&nbsp;Studio<span class="dot">.</span></div>
+    <nav>
+      <button class="tabbtn active" data-t="radar">Radar</button>
+      <button class="tabbtn" data-t="studio">Daily Studio</button>
+      <button class="tabbtn" data-t="eval">Evaluate</button>
+      <button class="tabbtn" data-t="reels">Reels</button>
+      <button class="tabbtn" data-t="set">설정</button>
+    </nav>
+  </div>
+
+  <!-- ============ RADAR ============ -->
+  <section id="radar" class="on">
+    <h2 class="sec">CASETiFY <em>Radar</em></h2>
+    <p class="lede">매일 1회 베스트셀러 5개를 찾아 링크 + 구도·색감·타이포·심볼·왜 트렌디를 분석하고, 오늘의 트렌드 문구도 보여줍니다.</p>
+    <div class="bar"><span class="pill" id="r-stat">—</span><button class="btn" id="r-run">오늘 분석</button><button class="btn ghost sm" id="r-force">강제 재분석</button></div>
+    <div class="loading" id="r-load"><div class="spin"></div><span>웹을 훑는 중…</span></div>
+    <div id="r-out"></div>
+  </section>
+
+  <!-- ============ DAILY STUDIO ============ -->
+  <section id="studio">
+    <h2 class="sec">Daily <em>Studio</em></h2>
+    <p class="lede">오늘의 Radar를 토대로 <b>오마주(복제 아님)</b> 컨셉을 만들고 → 디자인 소재(B/T/P/O/L) + Photoshop 클릭 가이드 + HTML 초안 3시안을 생성합니다. 소재는 OpenAI로 이미지까지 뽑을 수 있어요.</p>
+    <div class="bar"><span class="pill" id="s-stat">—</span><button class="btn" id="s-run">오늘 디자인 생성</button><button class="btn ghost sm" id="s-force">재생성</button></div>
+    <div class="loading" id="s-load"><div class="spin"></div><span>디자인을 그리는 중…</span></div>
+    <div id="s-out"></div>
+  </section>
+
+  <!-- ============ EVALUATE ============ -->
+  <section id="eval">
+    <h2 class="sec">Design <em>Evaluate</em></h2>
+    <p class="lede">완성한 목업 이미지를 올리면 10기준(브랜드성·저장욕구·구매욕구·색상·구도·타이포·여백·고급감·AI느낌)으로 채점하고 삭제·줄임·비움·강조 + Photoshop 수정 클릭순서를 줍니다.</p>
+    <div class="drop" id="e-drop">이미지를 클릭/드롭해서 업로드<input type="file" id="e-file" accept="image/*" hidden></div>
+    <div class="bar"><button class="btn" id="e-run" disabled>평가 실행</button></div>
+    <div class="loading" id="e-load"><div class="spin"></div><span>디자인을 뜯어보는 중…</span></div>
+    <div id="e-out"></div>
+  </section>
+
+  <!-- ============ REELS ============ -->
+  <section id="reels">
+    <h2 class="sec">Instagram <em>Reels</em></h2>
+    <p class="lede">목업 이미지를 올리면 지금 유행하는 릴스 포맷을 참조해 <b>릴스 4편</b> 기획 + 행동심리(후크·주의·욕구·행동) 기반 대본·샷리스트·캡션·오디오를 줍니다.</p>
+    <div class="drop" id="v-drop">이미지를 클릭/드롭해서 업로드<input type="file" id="v-file" accept="image/*" hidden></div>
+    <input id="v-ctx" placeholder="(선택) 브랜드 한 줄·타깃·강조점 입력" style="margin-top:10px">
+    <div class="bar"><button class="btn" id="v-run" disabled>릴스 4편 생성</button></div>
+    <div class="loading" id="v-load"><div class="spin"></div><span>유행 릴스를 참조하는 중…</span></div>
+    <div id="v-out"></div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="set">
+    <h2 class="sec">설정 · <em>Keys</em></h2>
+    <p class="lede">키는 이 브라우저(localStorage)에만 저장됩니다. 공용 PC 금지. 운영 배포 시엔 서버리스 프록시 권장.</p>
+    <div class="card" style="max-width:560px">
+      <label>Anthropic API Key (리서치·디자인·평가·릴스)</label>
+      <input id="ak" type="password" placeholder="sk-ant-..." autocomplete="off">
+      <label style="margin-top:14px">OpenAI API Key (소재 이미지 생성)</label>
+      <input id="ok" type="password" placeholder="sk-..." autocomplete="off">
+      <label style="margin-top:14px">Claude 모델 (필요시 수정)</label>
+      <input id="mdl" placeholder="claude-sonnet-4-20250514">
+      <div class="bar" style="margin-top:14px"><button class="btn" id="saveK">저장</button><span class="pill" id="k-stat">미저장</span></div>
+      <p class="note" style="margin-top:10px"><b>주의</b> · 브라우저에서 키로 직접 호출하므로 개인용으로만. 깃허브 레포엔 키가 들어가지 않습니다(런타임 입력). 진짜 보안이 필요하면 <b>/api</b> 서버리스 프록시로 키를 숨기세요.</p>
+    </div>
+  </section>
+
+  <p class="note" style="margin-top:40px;border-top:1px solid var(--hair);padding-top:14px">
+    <b>배포</b> · 이 파일을 <b>index.html</b>로 GitHub Pages/Vercel/Netlify에 올리면 됩니다. CSS만 쓰는 목업과 달리 이 앱은 키 입력 후 작동. "하루 1회"는 페이지를 연 날짜가 바뀌면 자동 1회 실행(닫혀 있을 땐 백그라운드 불가 → 진짜 무인 자동은 GitHub Actions cron 필요).
+  </p>
+</div>
+
+<script>
+/* ---------------- config / keys ---------------- */
+function ls_get(k){try{return localStorage.getItem(k)||"";}catch(e){return"";}}
+function ls_set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function ls_getJSON(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
+function ls_setJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+const MODEL=()=>ls_get("mdl")||"claude-sonnet-4-20250514";
+const $=id=>document.getElementById(id);
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+
+/* ---------------- tabs ---------------- */
+document.querySelectorAll(".tabbtn").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tabbtn").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("on"));
+  b.classList.add("active"); $(b.dataset.t).classList.add("on");
+});
+
+/* ---------------- settings ---------------- */
+function refreshKeyStat(){const a=ls_get("ak"),o=ls_get("ok");const p=$("k-stat");
+  if(a&&o){p.textContent="Anthropic+OpenAI 저장됨";p.className="pill ok";}
+  else if(a){p.textContent="Anthropic만 저장됨";p.className="pill ok";}
+  else{p.textContent="미저장";p.className="pill bad";}}
+$("ak").value=ls_get("ak"); $("ok").value=ls_get("ok"); $("mdl").value=ls_get("mdl");
+$("saveK").onclick=()=>{ls_set("ak",$("ak").value.trim());ls_set("ok",$("ok").value.trim());ls_set("mdl",$("mdl").value.trim());refreshKeyStat();};
+refreshKeyStat();
+
+/* ---------------- API helpers ---------------- */
+async function claude({user,images,useSearch,max_tokens=2200}){
+  const key=ls_get("ak"); if(!key) throw new Error("설정에서 Anthropic 키를 저장하세요.");
+  const content=[];
+  (images||[]).forEach(im=>content.push({type:"image",source:{type:"base64",media_type:im.mt,data:im.b64}}));
+  content.push({type:"text",text:user});
+  const base={model:MODEL(),max_tokens,messages:[{role:"user",content}]};
+  const headers={"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
+  async function go(withTools){
+    const body=Object.assign({},base);
+    if(withTools) body.tools=[{type:"web_search_20250305",name:"web_search"}];
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers,body:JSON.stringify(body)});
+    const d=await r.json(); if(d.error) throw new Error(d.error.message||"Anthropic 오류");
+    return (d.content||[]).map(b=>b.type==="text"?b.text:"").filter(Boolean).join("\n").trim();
+  }
+  if(useSearch){ try{ return await go(true); }catch(e){ if(/tool|web_search|not.*allow/i.test(e.message)) return await go(false); throw e; } }
+  return go(false);
+}
+async function openaiImage(prompt,size,transparent){
+  const key=ls_get("ok"); if(!key) throw new Error("설정에서 OpenAI 키를 저장하세요.");
+  const body={model:"gpt-image-1",prompt,size:size||"1024x1024",n:1}; if(transparent) body.background="transparent";
+  const r=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify(body)});
+  const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 오류");
+  const x=d.data&&d.data[0]; if(!x) throw new Error("이미지 없음");
+  return x.b64_json?("data:image/png;base64,"+x.b64_json):x.url;
+}
+function parseJSON(text,open,close){
+  let s=String(text).replace(/```json/gi,"").replace(/```/g,"").trim();
+  const a=s.indexOf(open),b=s.lastIndexOf(close); if(a!==-1&&b!==-1&&b>a)s=s.slice(a,b+1);
+  try{return JSON.parse(s);}catch(e){const last=s.lastIndexOf("}");if(open==="["&&last!==-1){try{return JSON.parse(s.slice(0,last+1)+"]");}catch(_){}}return null;}
+}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function safeUrl(u){u=String(u||"");return /^https?:\/\//i.test(u)?u:null;}
+function show(elm,on){elm.classList.toggle("on",on);}
+
+/* ================= TAB 1 · RADAR ================= */
+const R_PICK=`당신은 글로벌 폰케이스 트렌드 리서처이자 Paul Rand 관점 비평가입니다. 웹검색으로 지금 잘 팔리는 폰케이스 디자인/포맷 5개를 찾으세요. CASETiFY 우선(+BURGA·Velvet Caviar·Wildflower·Casely). 각 항목 실제 URL 포함. JSON 배열만, 한국어, 각 필드 14단어 이내. 키:{"brand","name","url","composition","color","typography","symbol","why"}`;
+const R_PHRASE=`웹검색으로 2026년 현재 폰케이스/굿즈에 쓰는 유행 문구·슬로건 트렌드를 조사. JSON만, 한국어: {"trending":["3개"],"avoid":["3개"],"tip":"한 줄"}`;
+async function radarRun(force){
+  const t=today(),k="csr:"+t;
+  if(!force){const c=ls_getJSON(k);if(c){radarRender(c);$("r-stat").textContent="오늘 완료 · "+t;$("r-stat").className="pill ok";return;}}
+  $("r-run").disabled=$("r-force").disabled=true; show($("r-load"),true); $("r-out").innerHTML="";
+  try{
+    const picks=parseJSON(await claude({user:R_PICK,useSearch:true}),"[","]");
+    if(!picks||!picks.length) throw new Error("5개 분석 해석 실패");
+    let phrases=null; try{phrases=parseJSON(await claude({user:R_PHRASE,useSearch:true}),"{","}");}catch(e){}
+    const payload={picks,phrases}; ls_setJSON(k,payload); radarRender(payload);
+    $("r-stat").textContent="오늘 완료 · "+t; $("r-stat").className="pill ok";
+  }catch(e){$("r-out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("r-load"),false);$("r-run").disabled=$("r-force").disabled=false;}
+}
+function radarRender(p){
+  let h="";const ph=p.phrases;
+  if(ph){h+='<div class="card"><div class="vh">오늘의 트렌드 문구</div>';
+    if(ph.trending)h+='<p class="why" style="margin:2px 0"><b>통하는</b> · '+ph.trending.map(esc).join(" / ')+'</p>';
+    if(ph.avoid)h+='<p class="why" style="margin:2px 0;color:var(--accent)"><b>피할것</b> · '+ph.avoid.map(esc).join(" / ')+'</p>';
+    if(ph.tip)h+='<p class="note">— '+esc(ph.tip)+'</p>';h+='</div>';}
+  h+='<div class="grid">';
+  (p.picks||[]).slice(0,5).forEach((it,i)=>{const u=safeUrl(it.url);
+    h+='<div class="card"><div class="idx">'+String(i+1).padStart(2,"0")+' / 05</div>'+
+      '<div class="brandn">'+esc(it.brand)+'</div><div class="namen">'+esc(it.name)+'</div>'+
+      '<div class="ar"><span class="k">구도</span><span>'+esc(it.composition)+'</span></div>'+
+      '<div class="ar"><span class="k">색감</span><span>'+esc(it.color)+'</span></div>'+
+      '<div class="ar"><span class="k">타이포</span><span>'+esc(it.typography)+'</span></div>'+
+      '<div class="ar"><span class="k">심볼</span><span>'+esc(it.symbol)+'</span></div>'+
+      '<p class="why">'+esc(it.why)+'</p>'+
+      (u?'<a class="src" href="'+esc(u)+'" target="_blank" rel="noopener">출처 보기</a>':'')+'</div>';
+  });
+  h+='</div>'; $("r-out").innerHTML=h;
+}
+$("r-run").onclick=()=>radarRun(false); $("r-force").onclick=()=>radarRun(true);
+
+/* ================= TAB 2 · DAILY STUDIO ================= */
+const S_PROMPT=ctx=>`당신은 CASETiFY 분석가 + Paul Rand 그래픽 디렉터입니다. 아래 오늘의 베스트셀러 분석을 보고 "복제하지 말고 원리만" 추출해, Y2K·트렌디하지만 절제된 퍼스널 폰케이스(흑+크림 고정 + 포인트 1색, 심볼 ✶ + 워드마크) 디자인을 만드세요.
+[오늘의 분석]\n${ctx}\n
+JSON만 출력(한국어). 형식:
+{"concept":"한 문단 컨셉",
+ "palette":["#hex","#hex","#hex"],
+ "symbol":"심볼 설명",
+ "symbolChar":"화면표시용 한 글자/기호 (예: ✶)",
+ "slogan":"짧은 영문 슬로건",
+ "versions":[{"name":"Minimal","bg":"#hex","textColor":"#hex","note":"배치/여백 한 줄"},
+             {"name":"Premium","bg":"#hex","textColor":"#hex","note":"…"},
+             {"name":"Signature","bg":"#hex","textColor":"#hex","note":"…"}],
+ "materials":[{"id":"B2","name":"…","role":"…","midjourney":"…","flux":"…","transparent":false}, …총 6~8개 핵심],
+ "photoshop":["1. …","2. …", … 클릭 단위 12~20단계]}`;
+async function studioRun(force){
+  const t=today(),k="std:"+t;
+  if(!force){const c=ls_getJSON(k);if(c){studioRender(c);$("s-stat").textContent="오늘 완료 · "+t;$("s-stat").className="pill ok";return;}}
+  $("s-run").disabled=$("s-force").disabled=true; show($("s-load"),true); $("s-out").innerHTML="";
+  try{
+    const radar=ls_getJSON("csr:"+t);
+    const ctx=radar?JSON.stringify(radar.picks).slice(0,1400):"(오늘 Radar 없음 — 일반 트렌드 기준)";
+    const data=parseJSON(await claude({user:S_PROMPT(ctx),max_tokens:3500}),"{","}");
+    if(!data) throw new Error("디자인 JSON 해석 실패");
+    ls_setJSON(k,data); studioRender(data);
+    $("s-stat").textContent="오늘 완료 · "+t; $("s-stat").className="pill ok";
+  }catch(e){$("s-out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("s-load"),false);$("s-run").disabled=$("s-force").disabled=false;}
+}
+function studioRender(d){
+  const sym=esc(d.symbolChar||"✶"), slo=esc(d.slogan||"");
+  let h='<div class="card"><div class="vh">컨셉</div><p class="why">'+esc(d.concept)+'</p>'+
+    '<p class="note">팔레트 · '+(d.palette||[]).map(c=>'<span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:'+esc(c)+';vertical-align:-1px;margin:0 3px"></span>'+esc(c)).join(" ")+'</p>'+
+    '<p class="note">심볼 · '+esc(d.symbol)+' · 슬로건 · '+slo+'</p></div>';
+  h+='<div class="vh" style="margin-top:18px">HTML 초안 3시안</div><div class="cases">';
+  (d.versions||[]).forEach(v=>{const bg=esc(v.bg||"#222"),tc=esc(v.textColor||"#fff");
+    h+='<div><div class="case" style="background:'+bg+'"><div class="cam"></div>'+
+      '<div class="face"><div class="sym" style="font-size:54px;color:'+tc+'">'+sym+'</div>'+
+      '<div class="word" style="color:'+tc+'">YOUR NAME</div></div>'+
+      '<div class="slogan" style="color:'+tc+'">'+slo+'</div><div class="gloss"></div></div>'+
+      '<p class="vh" style="margin-top:8px">'+esc(v.name)+'</p><p class="note">'+esc(v.note)+'</p></div>';
+  });
+  h+='</div>';
+  h+='<div class="vh" style="margin-top:20px">디자인 소재 (OpenAI로 이미지 생성)</div><div class="mats" id="s-mats">';
+  (d.materials||[]).forEach((m,i)=>{h+='<div class="mat" id="smat-'+i+'"><span class="mid">'+esc(m.id)+'</span>'+
+    '<div class="mnm">'+esc(m.name)+'</div><div class="mrole">'+esc(m.role)+'</div>'+
+    '<div class="mimg" id="smimg-'+i+'">미생성</div>'+
+    '<button class="btn sm" style="margin-top:7px" onclick="genMat('+i+')">이미지 생성</button></div>';});
+  h+='</div>';
+  h+='<div class="vh" style="margin-top:20px">Photoshop 작업지시서</div><ol class="steps">'+
+    (d.photoshop||[]).map(s=>'<li>'+esc(String(s).replace(/^\d+\.\s*/,""))+'</li>').join("")+'</ol>';
+  $("s-out").innerHTML=h;
+  window.__mats=d.materials||[];
+}
+async function genMat(i){
+  const m=window.__mats[i]; const box=$("smimg-"+i); if(!m)return;
+  box.textContent="생성 중…";
+  try{const prompt=(m.flux||m.midjourney||m.name)+(m.transparent?" Isolated on a transparent background.":"");
+    const url=await openaiImage(prompt,m.transparent?"1024x1024":"1024x1536",!!m.transparent);
+    box.innerHTML='<img src="'+url+'">';
+    const a=document.createElement("a");a.href=url;a.download=m.id+".png";a.textContent="다운로드";a.className="src";a.style.display="block";a.style.marginTop="6px";
+    $("smat-"+i).appendChild(a);
+  }catch(e){box.textContent="실패: "+e.message;}
+}
+$("s-run").onclick=()=>studioRun(false); $("s-force").onclick=()=>studioRun(true);
+
+/* ================= image upload util ================= */
+function fileToB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res({b64:String(r.result).split(",")[1],mt:file.type||"image/png",url:r.result});r.onerror=rej;r.readAsDataURL(file);});}
+function wireDrop(dropId,fileId,onPick){
+  const drop=$(dropId),file=$(fileId);
+  drop.onclick=()=>file.click();
+  drop.ondragover=e=>{e.preventDefault();}; drop.ondrop=async e=>{e.preventDefault();if(e.dataTransfer.files[0])onPick(await fileToB64(e.dataTransfer.files[0]),drop);};
+  file.onchange=async()=>{if(file.files[0])onPick(await fileToB64(file.files[0]),drop);};
+}
+
+/* ================= TAB 3 · EVALUATE ================= */
+let E_IMG=null;
+wireDrop("e-drop","e-file",(img,drop)=>{E_IMG=img;drop.classList.add("has");drop.innerHTML='<img src="'+img.url+'">';$("e-run").disabled=false;});
+const E_PROMPT=`업로드된 폰케이스 목업 디자인을 평가하세요. 10점 만점 9기준. JSON만(한국어):
+{"scores":{"브랜드성":n,"저장욕구":n,"구매욕구":n,"색상":n,"구도":n,"타이포":n,"여백":n,"고급감":n,"AI느낌제거":n},
+ "total":n.n,
+ "delete":["삭제할 것 …"],"reduce":["줄일 것 …"],"empty":["비울 것 …"],"emphasize":["강조할 것 …"],
+ "photoshop":["수정 클릭 순서 1.…","2.…", …]}`;
+$("e-run").onclick=async()=>{
+  if(!E_IMG)return; $("e-run").disabled=true; show($("e-load"),true); $("e-out").innerHTML="";
+  try{const data=parseJSON(await claude({user:E_PROMPT,images:[E_IMG],max_tokens:2500}),"{","}");
+    if(!data)throw new Error("평가 JSON 해석 실패"); evalRender(data);
+  }catch(e){$("e-out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("e-load"),false);$("e-run").disabled=false;}
+};
+function evalRender(d){
+  let h='<div class="card"><div class="vh">종합 '+esc(d.total)+' / 10</div>';
+  Object.entries(d.scores||{}).forEach(([k,v])=>{const n=Math.max(0,Math.min(10,+v||0));
+    h+='<div class="score"><div class="lbl"><span>'+esc(k)+'</span><span>'+n+'</span></div><div class="meter"><i style="width:'+(n*10)+'%"></i></div></div>';});
+  h+='</div>';
+  const block=(cls,title,arr)=>arr&&arr.length?'<div class="listblock '+cls+'"><h4>'+title+'</h4><ul>'+arr.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>':"";
+  h+='<div class="card">'+block("del","삭제할 것",d.delete)+block("","줄일 것",d.reduce)+block("emp","비울 것",d.empty)+block("emp","강조할 것",d.emphasize)+'</div>';
+  if(d.photoshop)h+='<div class="card"><div class="vh">Photoshop 수정 클릭 순서</div><ol class="steps">'+d.photoshop.map(s=>'<li>'+esc(String(s).replace(/^\d+\.\s*/,""))+'</li>').join("")+'</ol></div>';
+  $("e-out").innerHTML=h;
+}
+
+/* ================= TAB 4 · REELS ================= */
+let V_IMG=null;
+wireDrop("v-drop","v-file",(img,drop)=>{V_IMG=img;drop.classList.add("has");drop.innerHTML='<img src="'+img.url+'">';$("v-run").disabled=false;});
+const V_PROMPT=ctx=>`당신은 숏폼 콘텐츠 전략가입니다. 웹검색으로 지금 유행하는 인스타그램 릴스 포맷/편집/오디오 트렌드를 참조하세요. 업로드된 폰케이스 목업을 홍보할 릴스 4편을 기획하세요. 행동심리(후크 3초·주의·욕구·사회적증거·희소성·행동유도 CTA)를 적용. 컨텍스트:${ctx||"없음"}.
+JSON 배열만(한국어), 4개. 각 객체:
+{"title":"릴스 제목","format":"참조한 유행 포맷","hook":"첫 3초 후크 멘트","script":["비트별 대본 4~6줄"],"shots":["샷/장면 3~5"],"caption":"캡션+해시태그","audio":"추천 오디오/사운드 방향","cta":"행동유도 한 줄","psychology":"왜 작동하는지 행동심리 근거 한 줄"}`;
+$("v-run").onclick=async()=>{
+  if(!V_IMG)return; $("v-run").disabled=true; show($("v-load"),true); $("v-out").innerHTML="";
+  try{const data=parseJSON(await claude({user:V_PROMPT($("v-ctx").value.trim()),images:[V_IMG],useSearch:true,max_tokens:3800}),"[","]");
+    if(!data||!data.length)throw new Error("릴스 JSON 해석 실패"); reelsRender(data);
+  }catch(e){$("v-out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("v-load"),false);$("v-run").disabled=false;}
+};
+function reelsRender(arr){
+  let h='<div class="grid">';
+  arr.slice(0,4).forEach((r,i)=>{
+    h+='<div class="reel"><div class="idx" style="font-family:var(--disp);font-weight:800;font-size:11px;color:var(--accent)">REEL '+(i+1)+'</div>'+
+      '<div class="rt">'+esc(r.title)+'</div><div class="meta">포맷 · '+esc(r.format)+'</div>'+
+      '<div class="hook">HOOK · '+esc(r.hook)+'</div>'+
+      '<div class="blk"><h5>대본</h5>'+(r.script||[]).map(s=>'<p>'+esc(s)+'</p>').join("")+'</div>'+
+      '<div class="blk"><h5>샷</h5><ul>'+(r.shots||[]).map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>'+
+      '<div class="blk"><h5>오디오</h5><p>'+esc(r.audio)+'</p></div>'+
+      '<div class="blk"><h5>캡션</h5><p>'+esc(r.caption)+'</p></div>'+
+      '<div class="blk"><h5>CTA</h5><p>'+esc(r.cta)+'</p></div>'+
+      '<div class="blk"><h5>왜 작동하나 (행동심리)</h5><p>'+esc(r.psychology)+'</p></div></div>';
+  });
+  h+='</div>'; $("v-out").innerHTML=h;
+}
+
+/* ---------------- auto run radar on new day ---------------- */
+window.addEventListener("DOMContentLoaded",()=>{
+  const t=today(); const cached=ls_getJSON("csr:"+t);
+  if(cached){radarRender(cached);$("r-stat").textContent="오늘 완료 · "+t;$("r-stat").className="pill ok";}
+  else{$("r-stat").textContent="새 분석 필요 · "+t;$("r-stat").className="pill bad"; if(ls_get("ak")) radarRun(false);}
+});
+</script>
+</body></html>
