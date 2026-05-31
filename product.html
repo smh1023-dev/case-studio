@@ -466,10 +466,17 @@ async function fluxKontext(prompt, imageUrl){
   return img.url;
 }
 
-/* OpenAI 이미지 생성 (gpt-image-1 → 실패 시 dall-e-3 폴백) → dataURL */
+/* http(s) 이미지 URL → dataURL (CORS 허용 시) */
+async function urlToDataURL(url){
+  const r=await fetch(url); const b=await r.blob();
+  return await new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=rej; fr.readAsDataURL(b); });
+}
+/* OpenAI 이미지 생성 (gpt-image-1 → 실패 시 dall-e-3 폴백) → dataURL(가능하면) */
 async function openaiImage(prompt, size, transparent){
   const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
   size=size||"1024x1024";
+  let gErr="";
+  // 1) gpt-image-1 (b64 · 투명 지원 · 조직 인증 필요할 수 있음)
   try{
     const body={model:"gpt-image-1",prompt,size,quality:"high",n:1};
     if(transparent){ body.background="transparent"; body.output_format="png"; }
@@ -477,16 +484,19 @@ async function openaiImage(prompt, size, transparent){
       headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify(body)});
     const d=await r.json();
     if(r.ok && d.data && d.data[0] && d.data[0].b64_json) return "data:image/png;base64,"+d.data[0].b64_json;
-    throw new Error((d.error&&d.error.message)||("HTTP "+r.status));
-  }catch(e){
-    const dsz=(size==="1024x1536")?"1024x1792":(size==="1536x1024")?"1792x1024":"1024x1024"; // dall-e-3 사이즈 매핑
-    const r2=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-      body:JSON.stringify({model:"dall-e-3",prompt,size:dsz,n:1,response_format:"b64_json",quality:"hd"})});
-    const d2=await r2.json();
-    if(r2.ok && d2.data && d2.data[0] && d2.data[0].b64_json) return "data:image/png;base64,"+d2.data[0].b64_json;
-    throw new Error("OpenAI 이미지 생성 실패: "+((d2.error&&d2.error.message)||e.message||("HTTP "+r2.status)));
+    gErr=(d.error&&d.error.message)||("HTTP "+r.status);
+  }catch(e){ gErr=e.message; }
+  // 2) dall-e-3 폴백 (response_format 미사용 → url/b64 모두 처리)
+  const dsz=(size==="1024x1536")?"1024x1792":(size==="1536x1024")?"1792x1024":"1024x1024";
+  const r2=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:"dall-e-3",prompt,size:dsz,n:1,quality:"hd"})});
+  const d2=await r2.json();
+  if(r2.ok && d2.data && d2.data[0]){
+    if(d2.data[0].b64_json) return "data:image/png;base64,"+d2.data[0].b64_json;
+    if(d2.data[0].url){ try{ return await urlToDataURL(d2.data[0].url); }catch(e){ return d2.data[0].url; } }
   }
+  throw new Error("OpenAI 이미지 생성 실패: "+((d2.error&&d2.error.message)||gErr||("HTTP "+r2.status)));
 }
 /* dataURL → Blob (멀티파트 업로드용) */
 function dataUrlToBlob(durl){ const p=durl.split(","); const mime=(p[0].match(/data:(.*?);/)||[])[1]||"image/png"; const bin=atob(p[1]); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return new Blob([u],{type:mime}); }
@@ -899,7 +909,7 @@ JSON만: {"logoType":"combination|symbol|wordmark","fontFamily":"위 목록 중 
     let symbolUrl=null;
     if(type!=="wordmark"){
       $("lgMsg").textContent="심볼 생성 중… (OpenAI)";
-      symbolUrl=await openaiImage((L.symbolPrompt||"minimal vector logo mark")+" Single bold solid vector logo mark, centered, iconic, premium, flat. ABSOLUTELY NO text, no letters, no numbers, no words, no watermark. Transparent background.", "1024x1024", true);
+      symbolUrl=await openaiImage((L.symbolPrompt||"minimal vector logo mark")+" Single bold solid vector logo mark, centered, iconic, premium, flat. ABSOLUTELY NO text, no letters, no numbers, no words, no watermark. Plain solid WHITE background, isolated, easy to cut out.", "1024x1024", true);
     }
     // 3) 워드마크 SVG — symbol 타입이면 생략
     const wordSVG = (type!=="symbol" && name)? lgWordSVG(name,font,color) : null;
