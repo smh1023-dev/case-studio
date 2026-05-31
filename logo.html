@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<!-- logo.html · AI 아이덴티티 로고 신청 (공개 페이지 · API 키 없음) -->
+<!-- 실제 AI 생성은 관리자(admin.html)/Apps Script 백엔드에서. 여기선 입력 수집 + 컨셉 미리보기만. -->
+<!-- 바꿀 곳: KAKAO_URL, SHOP_URL, FORM_BASE + ENTRY_* (구글폼 사전입력 entry ID) -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 아이덴티티 로고 만들기 · SI Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--navy:#1B2A4A;--gold:#C8A04A;--card:#FBF9F2;--hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);--disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;}
+  .wrap{max-width:680px;margin:0 auto;padding:20px 20px 80px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:-.02em;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav a{font-family:var(--disp);font-weight:700;font-size:11.5px;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:6px 11px;border-radius:999px;}
+  nav a.active{background:var(--ink);color:var(--paper);}
+  h1{font-family:var(--disp);font-weight:800;font-size:clamp(28px,6vw,42px);letter-spacing:-.02em;margin:28px 0 6px;line-height:1.05;}
+  h1 em{font-style:normal;color:var(--accent);}
+  .lede{color:var(--soft);font-size:15px;line-height:1.5;margin:0 0 8px;}
+  .card{background:var(--card);border:1.5px solid var(--ink);border-radius:12px;padding:20px;box-shadow:var(--shadow);margin:18px 0;}
+  label{font-family:var(--disp);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;display:block;margin:14px 0 6px;}
+  label .opt{color:var(--soft);font-weight:400;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:12px;font-style:italic;}
+  input,textarea,select{font-family:var(--mono);font-size:14px;border:1.5px solid var(--hair);border-radius:8px;padding:11px;background:#fff;width:100%;}
+  textarea{min-height:64px;resize:vertical;}
+  .triple{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  @media(max-width:520px){.triple{grid-template-columns:1fr;}}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px;}
+  .chip{font-family:var(--mono);font-size:12px;border:1.5px solid var(--hair);border-radius:999px;padding:6px 12px;cursor:pointer;background:#fff;}
+  .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .consent{display:flex;gap:9px;align-items:flex-start;margin:12px 0;font-size:13px;line-height:1.5;}
+  .consent input{width:18px;height:18px;flex:none;margin-top:2px;}
+  .btn{font-family:var(--disp);font-weight:800;font-size:16px;cursor:pointer;text-decoration:none;text-align:center;border:2px solid var(--ink);border-radius:14px;padding:15px;transition:transform .12s;display:block;width:100%;}
+  .btn:hover{transform:translate(-1px,-1px);}.btn:active{transform:translate(1px,1px);}.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none;}
+  .btn.primary{background:var(--ink);color:var(--paper);}
+  .btn.kakao{background:#FEE500;color:#1A1A1A;border-color:#1A1A1A;margin-bottom:10px;}
+  .btn.ghost{background:transparent;color:var(--ink);}
+  /* preview */
+  .preview{background:var(--navy);color:#F4F1E8;border-radius:16px;padding:24px;box-shadow:var(--shadow);display:none;}
+  .preview.on{display:block;}
+  .preview .lab{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;}
+  .preview .slogan{font-family:var(--disp);font-weight:800;font-size:30px;margin:6px 0;color:#fff;}
+  .preview p{font-size:14px;line-height:1.55;color:rgba(244,241,232,.85);margin:8px 0;}
+  .preview .kw{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0;}
+  .preview .kw span{font-family:var(--mono);font-size:12px;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:4px 10px;}
+  .privacy{font-family:var(--mono);font-size:11.5px;color:var(--soft);line-height:1.7;}
+  .privacy b{color:var(--ink);}
+  .note{font-family:var(--mono);font-size:11px;color:var(--soft);line-height:1.6;margin-top:8px;}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">SI&nbsp;Story<span class="dot">.</span></div>
+    <nav>
+      <a href="event.html">이벤트</a>
+      <a href="logo.html" class="active">로고 만들기</a>
+      <a href="index.html">스튜디오</a>
+    </nav>
+  </div>
+
+  <h1>당신을 상징하는<br><em>아이덴티티 로고</em></h1>
+  <p class="lede">이름이 아니라, 당신의 이야기를 상징으로. 아래를 채우면 컨셉을 미리 보고, 카카오채널 가입 후 신청하면 AI가 정식 로고를 무료로 제작해드립니다.</p>
+
+  <a class="btn kakao" id="cta-kakao" href="#" target="_blank" rel="noopener">① 카카오채널 먼저 가입하기</a>
+
+  <div class="card">
+    <label>이메일</label>
+    <input id="email" type="email" placeholder="you@example.com">
+
+    <label>불리고 싶은 애칭</label>
+    <input id="nickname" placeholder="예: 고목나무에 핀 꽃">
+
+    <label>좋아하는 색</label>
+    <input id="color" placeholder="예: 네이비">
+
+    <label>가치관 3개</label>
+    <div class="triple">
+      <input id="v1" placeholder="예: 성장"><input id="v2" placeholder="예: 끈기"><input id="v3" placeholder="예: 가족">
+    </div>
+
+    <label>좋아하는 동물 / 상징</label>
+    <input id="symbol" placeholder="예: 늑대">
+
+    <label>가장 자랑스러운 순간 <span class="opt">(선택)</span></label>
+    <textarea id="proud" placeholder="예: 끝까지 포기하지 않고 해낸 일"></textarea>
+
+    <label>극복한 어려움 <span class="opt">(선택)</span></label>
+    <textarea id="challenge" placeholder="예: 오래 버텨온 시간"></textarea>
+
+    <label>사은품 선택</label>
+    <div class="chips" id="gift">
+      <span class="chip on" data-v="그립톡">그립톡</span>
+      <span class="chip" data-v="카드지갑">카드지갑</span>
+    </div>
+
+    <div style="margin-top:18px">
+      <button class="btn ghost" id="preview-btn">컨셉 미리보기</button>
+    </div>
+  </div>
+
+  <!-- preview -->
+  <div class="preview" id="preview">
+    <p class="lab">AI 컨셉 미리보기 (정식 로고는 신청 후 제작)</p>
+    <div class="kw" id="pv-kw"></div>
+    <p class="slogan" id="pv-slogan">—</p>
+    <p id="pv-interp"></p>
+    <p id="pv-concept"></p>
+  </div>
+
+  <!-- consent + submit -->
+  <div class="card">
+    <label class="consent" style="text-transform:none">
+      <input type="checkbox" id="c-privacy">
+      <span><b>[필수]</b> 개인정보 수집 및 이용에 동의합니다. 수집 정보는 AI 로고 제작·사은품 발송·이벤트 안내 및 맞춤 상품 제안 목적으로 사용됩니다.</span>
+    </label>
+    <label class="consent" style="text-transform:none">
+      <input type="checkbox" id="c-mkt">
+      <span><b>[선택]</b> 마케팅 정보 수신에 동의합니다. (동의하지 않아도 무료 로고 신청 가능)</span>
+    </label>
+    <a class="btn primary" id="submit" href="#" target="_blank" rel="noopener" aria-disabled="true">② 구글폼으로 무료 신청하기</a>
+    <p class="note">버튼을 누르면 입력값이 채워진 구글폼이 새 창으로 열립니다. 거기서 이름·연락처·주소를 입력하고 제출하면 접수됩니다.</p>
+  </div>
+
+  <div class="card">
+    <a class="btn ghost" id="cta-shop" href="#" target="_blank" rel="noopener">이 로고로 케이스 만들기 · 39,900원</a>
+    <p class="privacy" style="margin-top:12px">수집된 정보는 <b>AI 로고 제작·사은품 발송·이벤트 안내 및 맞춤 상품 제안</b> 목적으로 사용됩니다. 마케팅 수신은 선택이며, 주소·연락처는 사은품 발송 목적 외 사용하지 않습니다.</p>
+  </div>
+</div>
+
+<script>
+  /* ===== CONFIG — 실제 주소로 바꾸세요 ===== */
+  var KAKAO_URL = "http://pf.kakao.com/_YOUR_CHANNEL";
+  var SHOP_URL  = "https://smartstore.naver.com/YOUR_SHOP";
+  // 구글폼 사전입력(prefill) — 폼 만들고 "사전 입력된 링크 가져오기"에서 entry.xxx 번호를 복사해 채우세요.
+  var FORM_BASE = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?usp=pp_url";
+  var ENTRY = {
+    email:"entry.1111111111", nickname:"entry.2222222222", color:"entry.3333333333",
+    values:"entry.4444444444", symbol:"entry.5555555555", proud:"entry.6666666666",
+    challenge:"entry.7777777777", gift:"entry.8888888888"
+  };
+  /* ======================================== */
+  var $=function(id){return document.getElementById(id);};
+  $("cta-kakao").href=KAKAO_URL; $("cta-shop").href=SHOP_URL;
+
+  // gift chips
+  var gift="그립톡";
+  document.querySelectorAll("#gift .chip").forEach(function(c){
+    c.onclick=function(){document.querySelectorAll("#gift .chip").forEach(function(x){x.classList.remove("on");});c.classList.add("on");gift=c.dataset.v;};
+  });
+
+  function vals(){return [$("v1").value,$("v2").value,$("v3").value].filter(Boolean);}
+
+  // local concept preview (no AI / no key) — deterministic, emotional
+  $("preview-btn").onclick=function(){
+    var nick=$("nickname").value.trim()||"당신", color=$("color").value.trim()||"네이비",
+        vv=vals(), sym=$("symbol").value.trim()||"상징";
+    var kw=vv.length?vv:["정체성","성장","고유함"];
+    var slogan = nick.length>0 ? "Still, You." : "This is You.";
+    // simple slogan logic
+    if(vv.indexOf("성장")>-1||vv.indexOf("끈기")>-1) slogan="Still Blooming.";
+    else if(vv.indexOf("가족")>-1||vv.indexOf("사랑")>-1) slogan="Held, Always.";
+    else if(vv.indexOf("자유")>-1) slogan="Unbound.";
+    $("pv-kw").innerHTML=kw.slice(0,3).map(function(k){return "<span>"+k+"</span>";}).join("");
+    $("pv-slogan").textContent=slogan;
+    $("pv-interp").textContent="“"+nick+"” — "+kw.join(" · ")+"을(를) 품은 사람. 당신의 서사를 하나의 상징으로 정리합니다.";
+    $("pv-concept").textContent=sym+"의 이미지 + "+color+" 톤 + 절제된 기하학적 형태. 흑백으로도 살아있는 미니멀 프리미엄 로고.";
+    $("preview").classList.add("on");
+    $("preview").scrollIntoView({behavior:"smooth"});
+  };
+
+  // build prefilled google form URL on submit
+  function buildFormURL(){
+    var p=[]; function add(k,v){if(v)p.push(encodeURIComponent(k)+"="+encodeURIComponent(v));}
+    add(ENTRY.email,$("email").value); add(ENTRY.nickname,$("nickname").value);
+    add(ENTRY.color,$("color").value); add(ENTRY.values,vals().join(", "));
+    add(ENTRY.symbol,$("symbol").value); add(ENTRY.proud,$("proud").value);
+    add(ENTRY.challenge,$("challenge").value); add(ENTRY.gift,gift);
+    return FORM_BASE+(p.length?("&"+p.join("&")):"");
+  }
+  $("submit").onclick=function(e){
+    if(!$("c-privacy").checked){e.preventDefault();alert("개인정보 수집 및 이용 동의(필수)를 체크해주세요.");return false;}
+    this.href=buildFormURL(); // opens prefilled form in new tab
+  };
+</script>
+</body></html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<!-- detail-template.html · 아임웹 상품 상세페이지 (세로 HTML) · SI Story 케이스
+     붙이는 법: 아임웹 상품 상세 → 'HTML 삽입/소스보기' 모드에서 <body> 안쪽(아래 ===상세시작===~===상세끝===)만 복사해 붙여넣기.
+     수정할 값은 상단 [편집] 표시 부분(가격·문구). 링크는 :상담/신청 버튼. -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SI Story · 나만의 로고 케이스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ===상세시작=== (이 style 블록부터 ===상세끝=== 까지 통째로 복사) */
+.si-detail{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--ok:#2f7d4f;--card:#FBF9F2;--hair:rgba(20,18,13,.16);
+  --disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;
+  max-width:760px;margin:0 auto;background:var(--paper);color:var(--ink);font-family:var(--serif);
+  background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;overflow:hidden;}
+.si-detail *{box-sizing:border-box;}
+.si-detail .sec{padding:54px 26px;}
+.si-detail .center{text-align:center;}
+.si-detail .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--accent);margin:0 0 16px;}
+.si-detail h1{font-family:var(--disp);font-weight:800;font-size:clamp(34px,8vw,60px);line-height:1.02;letter-spacing:-.03em;margin:0 0 18px;}
+.si-detail h1 em{font-style:normal;color:var(--accent);}
+.si-detail h2{font-family:var(--disp);font-weight:800;font-size:clamp(24px,5.5vw,38px);letter-spacing:-.02em;margin:0 0 18px;line-height:1.08;}
+.si-detail h2 em{font-style:normal;color:var(--accent);}
+.si-detail .lead{font-style:italic;color:var(--soft);font-size:17px;line-height:1.6;max-width:48ch;margin:0 auto;}
+.si-detail .lead.l{margin:0;}
+.si-detail p{font-size:15.5px;line-height:1.62;}
+.si-detail .free{display:inline-flex;align-items:center;gap:8px;font-family:var(--disp);font-weight:800;font-size:14px;
+  background:var(--ink);color:var(--paper);border-radius:999px;padding:10px 18px;margin-top:24px;}
+.si-detail .free b{color:#FFD84D;}
+.si-detail .divider{height:2.5px;background:var(--ink);margin:0 26px;}
+.si-detail .dark{background:var(--ink);color:var(--paper);}
+.si-detail .dark .lead{color:rgba(244,241,232,.7);}
+.si-detail .dark h2 em{color:#FFD84D;}
+/* 케이스 목업 */
+.si-detail .cases{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px;}
+.si-detail .case{position:relative;aspect-ratio:1/2.05;border-radius:30px;overflow:hidden;border:1px solid rgba(0,0,0,.1);box-shadow:0 18px 34px -16px rgba(0,0,0,.5);}
+.si-detail .case .cam{position:absolute;top:13px;left:13px;width:40px;height:40px;border-radius:12px;background:rgba(0,0,0,.18);}
+.si-detail .case .gloss{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.32),rgba(255,255,255,0) 42%);pointer-events:none;}
+.si-detail .case .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 12px;}
+.si-detail .case .sym{font-family:var(--disp);font-weight:800;font-size:34px;line-height:1;margin-bottom:7px;}
+.si-detail .case .word{font-family:var(--disp);font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:10px;}
+.si-detail .case .slogan{position:absolute;left:0;right:0;bottom:11%;text-align:center;font-family:var(--mono);font-size:7px;letter-spacing:.24em;text-transform:uppercase;}
+.si-detail .caselabel{font-family:var(--mono);font-size:10px;color:var(--soft);text-align:center;margin-top:8px;letter-spacing:.05em;}
+/* 단계 */
+.si-detail .steps{margin-top:24px;}
+.si-detail .step{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--hair);}
+.si-detail .step:last-child{border-bottom:none;}
+.si-detail .step .si{font-family:var(--disp);font-weight:800;font-size:18px;width:38px;height:38px;flex:none;border-radius:50%;
+  border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;}
+.si-detail .step .st{font-family:var(--disp);font-weight:800;font-size:16px;margin:2px 0 4px;}
+.si-detail .step .st .tag{font-size:11px;color:var(--accent);margin-left:6px;}
+.si-detail .step .sd{font-size:14px;color:var(--soft);line-height:1.5;margin:0;}
+/* 예시 카드 */
+.si-detail .ex{background:var(--card);border:1.5px solid var(--ink);border-radius:10px;padding:22px;margin-top:24px;text-align:left;}
+.si-detail .ex .row{display:flex;gap:10px;font-size:14px;padding:5px 0;}
+.si-detail .ex .k{font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;width:58px;flex:none;color:var(--accent);padding-top:3px;}
+.si-detail .ex .ai{margin-top:14px;padding-top:14px;border-top:1px dashed var(--hair);}
+.si-detail .ex .slogan{font-family:var(--disp);font-weight:800;font-size:22px;margin:6px 0;}
+.si-detail .ex .interp{font-style:italic;color:var(--soft);font-size:14px;}
+/* 재질·기종 */
+.si-detail .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px;}
+.si-detail .chip{font-family:var(--mono);font-size:12px;border:1.5px solid var(--ink);border-radius:999px;padding:7px 14px;}
+.si-detail .chip.on{background:var(--ink);color:var(--paper);}
+/* 가격 */
+.si-detail .price{font-family:var(--disp);font-weight:800;font-size:46px;letter-spacing:-.02em;}
+.si-detail .price small{font-size:16px;color:var(--soft);font-weight:600;}
+.si-detail .pnote{font-family:var(--mono);font-size:11px;color:var(--soft);margin-top:8px;letter-spacing:.04em;}
+/* FAQ */
+.si-detail details{border-bottom:1px solid var(--hair);padding:14px 0;text-align:left;}
+.si-detail summary{font-family:var(--disp);font-weight:700;font-size:15px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px;}
+.si-detail summary::-webkit-details-marker{display:none;}
+.si-detail summary::after{content:"+";color:var(--accent);font-size:20px;line-height:1;}
+.si-detail details[open] summary::after{content:"–";}
+.si-detail details p{margin:10px 0 0;color:var(--soft);font-size:14px;}
+/* 버튼 */
+.si-detail .cta{display:flex;flex-direction:column;gap:10px;max-width:340px;margin:26px auto 0;}
+.si-detail .btn{font-family:var(--disp);font-weight:800;font-size:15px;text-decoration:none;text-align:center;
+  border:2px solid var(--ink);border-radius:999px;padding:15px 20px;transition:transform .12s;display:block;}
+.si-detail .btn:hover{transform:translate(-1px,-1px);}
+.si-detail .btn.solid{background:var(--ink);color:var(--paper);}
+.si-detail .btn.kakao{background:#FEE500;color:#3A1D1D;border-color:#3A1D1D;}
+.si-detail .btn.ghost{background:transparent;color:var(--ink);}
+.si-detail .btn small{display:block;font-weight:600;font-size:11px;opacity:.7;margin-top:3px;}
+.si-detail .dark .btn.ghost{color:var(--paper);border-color:var(--paper);}
+.si-detail .foot{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);text-align:center;padding:30px 26px 50px;line-height:1.8;}
+@media(max-width:480px){.si-detail .cases{gap:9px;}.si-detail .case{border-radius:22px;}}
+</style>
+
+<div class="si-detail">
+
+  <!-- HERO -->
+  <section class="sec center">
+    <p class="eyebrow">SI STORY · IDENTITY CASE</p>
+    <h1>이름이 아니라,<br><em>당신의 이야기</em>를<br>케이스에 담습니다.</h1>
+    <p class="lead">애칭·좋아하는 색·가치관 3가지만 알려주세요.<br>AI가 당신만의 로고를 만들고, 그 로고로 케이스를 제작합니다.</p>
+    <span class="free">로고 제작 <b>100% 무료</b> · 사은품까지 증정</span>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- 예시 목업 3종 -->
+  <section class="sec center">
+    <p class="eyebrow">EXAMPLES</p>
+    <h2>이렇게 <em>당신처럼</em> 나옵니다</h2>
+    <p class="lead">같은 케이스는 없습니다. 당신의 서사에 맞춰 색·심볼·문구가 전부 달라집니다.</p>
+    <div class="cases">
+      <div>
+        <div class="case" style="background:#1B2A4A">
+          <div class="cam"></div>
+          <div class="face"><div class="sym" style="color:#E8C766">✦</div><div class="word" style="color:#F4F1E8">STILL</div></div>
+          <div class="slogan" style="color:#E8C766">STILL BLOOMING</div><div class="gloss"></div>
+        </div>
+        <p class="caselabel">잔잔한 위로 · 네이비+골드</p>
+      </div>
+      <div>
+        <div class="case" style="background:#0E0E0E">
+          <div class="cam"></div>
+          <div class="face"><div class="sym" style="color:#D8412F">▲</div><div class="word" style="color:#F4F1E8">RISE</div></div>
+          <div class="slogan" style="color:#D8412F">RISE AGAIN</div><div class="gloss"></div>
+        </div>
+        <p class="caselabel">강인한 당당 · 블랙+레드</p>
+      </div>
+      <div>
+        <div class="case" style="background:#F0E2D8">
+          <div class="cam"></div>
+          <div class="face"><div class="sym" style="color:#C57B8E">❀</div><div class="word" style="color:#5A4047">BLOOM</div></div>
+          <div class="slogan" style="color:#C57B8E">SOFTLY YOURS</div><div class="gloss"></div>
+        </div>
+        <p class="caselabel">사랑스러운 감성 · 로즈+크림</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 어떻게 만들어지나 (예시 카드) -->
+  <section class="sec dark">
+    <p class="eyebrow">HOW IT WORKS</p>
+    <h2>당신의 답이<br><em>로고가 되는</em> 과정</h2>
+    <div class="ex" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.2);color:#F4F1E8">
+      <div class="row"><span class="k">애칭</span><span>고목나무에 핀 꽃</span></div>
+      <div class="row"><span class="k">색상</span><span>네이비</span></div>
+      <div class="row"><span class="k">가치관</span><span>성장 · 끈기 · 가족</span></div>
+      <div class="row"><span class="k">상징</span><span>늑대</span></div>
+      <div class="ai" style="border-color:rgba(255,255,255,.2)">
+        <span class="eyebrow" style="margin:0">AI 해석</span>
+        <p class="interp" style="color:rgba(244,241,232,.75)">"오래 버틴 사람, 무너지지 않고 다시 피어나는 사람."</p>
+        <p class="slogan" style="color:#FFD84D">Still Blooming.</p>
+        <p style="font-size:13.5px;color:rgba(244,241,232,.7);margin:4px 0 0">고목나무 실루엣 + 작은 꽃 + 늑대의 보호 본능, 네이비와 골드의 조합.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 진행 단계 -->
+  <section class="sec">
+    <p class="eyebrow center">PROCESS</p>
+    <h2 class="center">신청부터 <em>제작까지</em></h2>
+    <div class="steps">
+      <div class="step"><span class="si">1</span><div><p class="st">카카오채널 가입<span class="tag">· 무료</span></p><p class="sd">친구 추가하면 로고·사은품을 여기로 보내드려요.</p></div></div>
+      <div class="step"><span class="si">2</span><div><p class="st">신청서 작성<span class="tag">· 무료</span></p><p class="sd">애칭·색·가치관 등 1분이면 끝. 비용 0원.</p></div></div>
+      <div class="step"><span class="si">3</span><div><p class="st">AI 로고 무료 제작</p><p class="sd">당신의 서사를 담은 아이덴티티 로고를 받아보세요.</p></div></div>
+      <div class="step"><span class="si">4</span><div><p class="st">나만의 케이스 제작 <span class="tag">· 선택</span></p><p class="sd">마음에 들면 그 로고로 케이스를 만듭니다. (이 상품)</p></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- 재질·기종 -->
+  <section class="sec center">
+    <p class="eyebrow">MATERIAL &amp; FIT</p>
+    <h2>재질 4종 · <em>아이폰·갤럭시</em> 56기종</h2>
+    <p class="lead">레드프린팅 글라스 범퍼 MagSafe 정품 케이스. 정밀 칼선으로 카메라·버튼 완벽 호환.</p>
+    <div class="chips">
+      <span class="chip on">유광 블랙</span><span class="chip">유광 실버</span><span class="chip">무광 블랙</span><span class="chip">무광 실버</span>
+    </div>
+    <div class="chips">
+      <span class="chip">iPhone 17~11</span><span class="chip">Galaxy S26~S21</span><span class="chip">Z Fold / Flip</span><span class="chip">MagSafe</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- 가격 + 결제 -->
+  <section class="sec center">
+    <p class="eyebrow">ORDER</p>
+    <!-- [편집] 가격 -->
+    <div class="price">39,900<small> 원</small></div>
+    <p class="pnote">로고 제작 무료 · 케이스 제작 시에만 결제 · 전국 배송</p>
+    <div class="cta">
+      <a class="btn solid" id="buy" href="#">이 케이스 주문하기<small>장바구니 · 바로 결제</small></a>
+      <a class="btn kakao" id="kakao" href="https://pf.kakao.com/_xnrAxln/chat" target="_blank" rel="noopener">먼저 무료 로고 받기<small>카카오채널 1:1 상담</small></a>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="sec">
+    <p class="eyebrow center">FAQ</p>
+    <h2 class="center">자주 묻는 <em>질문</em></h2>
+    <div style="margin-top:18px">
+      <details><summary>정말 로고가 무료인가요?</summary><p>네. 카카오채널 가입 + 신청서 작성만 하면 AI 로고와 사은품을 무료로 받습니다. 케이스 제작은 원할 때만 결제합니다.</p></details>
+      <details><summary>로고 저작권은 누구에게 있나요?</summary><p>완성된 로고·디자인의 권리는 <b>고객님께</b> 있습니다. 원하시면 저희 쇼핑몰·홈페이지에 상품으로 올려 함께 판매할 기회도 드립니다.</p></details>
+      <details><summary>내 폰 기종도 되나요?</summary><p>아이폰 17~11, 갤럭시 S26~S21, Z Fold/Flip 등 56기종을 지원합니다. 없는 기종은 카카오로 문의해 주세요.</p></details>
+      <details><summary>제작·배송은 얼마나 걸리나요?</summary><p>로고 시안 확정 후 제작에 들어가며, 영업일 기준 배송까지 약 1주일 내외입니다. (상담 시 안내)</p></details>
+    </div>
+  </section>
+
+  <!-- 최종 CTA -->
+  <section class="sec dark center">
+    <h2>당신의 이야기,<br><em>이제 손에 담을</em> 차례.</h2>
+    <div class="cta">
+      <a class="btn kakao" href="https://pf.kakao.com/_xnrAxln/chat" target="_blank" rel="noopener">무료 로고 신청하기<small>카카오채널 · 100% 무료</small></a>
+      <a class="btn ghost" id="buy2" href="#">바로 케이스 주문하기<small>39,900원 · 선택</small></a>
+    </div>
+  </section>
+
+  <p class="foot">SI Story · 당신의 정체성을 디자인합니다<br>YOUR LOGO. YOUR STORY. YOUR IDENTITY. DESIGNED.</p>
+</div>
+
+<script>
+/* 아임웹 상품 페이지에선 '주문하기'가 아임웹 기본 버튼이므로, 이 버튼들은 같은 페이지 상단의 구매영역으로 스크롤시킵니다.
+   별도 결제 링크로 보내려면 BUY_URL 값을 채우세요. (비우면 페이지 맨 위로 스크롤) */
+(function(){
+  var BUY_URL=""; /* 예: "https://ceo71754.imweb.me/shop_view?idx=1" — 다른 페이지로 보낼 때만 */
+  function go(e){ if(BUY_URL){return;} e.preventDefault(); window.scrollTo({top:0,behavior:"smooth"}); }
+  ["buy","buy2"].forEach(function(id){var el=document.getElementById(id); if(!el)return;
+    if(BUY_URL){el.href=BUY_URL;el.target="_blank";el.rel="noopener";} else {el.addEventListener("click",go);} });
+})();
+</script>
+<!-- ===상세끝=== -->
+</body></html>

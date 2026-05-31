@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<!-- learning.html · 디자인 러닝: CASETiFY 분석 + 색상/구도/타이포/배치/판매포인트 + 거장 5인 관점 (OpenAI) -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Learning · Case Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--ok:#2f7d4f;--card:#FBF9F2;--hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);--disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;min-height:100vh;}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 22px 90px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:24px;letter-spacing:-.02em;text-transform:uppercase;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav a{font-family:var(--disp);font-weight:700;font-size:12px;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:7px 12px;border-radius:999px;}
+  nav a.active{background:var(--ink);color:var(--paper);}
+  h2.sec{font-family:var(--disp);font-weight:800;font-size:clamp(26px,5vw,44px);letter-spacing:-.02em;margin:22px 0 4px;text-transform:uppercase;}
+  h2.sec em{font-style:normal;color:var(--accent);}
+  .lede{font-style:italic;color:var(--soft);max-width:72ch;margin:0 0 8px;font-size:15px;}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0;}
+  .btn{font-family:var(--disp);font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:9px 15px;border-radius:999px;transition:transform .12s;}
+  .btn:hover{transform:translate(-1px,-1px);}.btn:active{transform:translate(1px,1px);}.btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .btn.ghost{background:transparent;color:var(--ink);}.btn.sm{padding:6px 11px;font-size:11px;border-width:1.5px;}
+  select.sel{font-family:var(--disp);font-size:12px;font-weight:600;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);padding:8px 12px;border-radius:999px;cursor:pointer;}
+  label{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+  input{font-family:var(--mono);font-size:13px;border:1.5px solid var(--hair);border-radius:7px;padding:9px;background:#fff;}
+  .loading{display:none;align-items:center;gap:12px;padding:18px 0;color:var(--soft);font-family:var(--disp);font-weight:600;}
+  .loading.on{display:flex;}
+  .spin{width:20px;height:20px;border:3px solid var(--hair);border-top-color:var(--accent);border-radius:50%;animation:sp .9s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .err{border:1.5px solid var(--accent);border-radius:8px;padding:14px;background:#fff;color:var(--accent);font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin-top:12px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:16px;}
+  .card{background:var(--card);border:1.5px solid var(--ink);border-radius:8px;padding:18px;box-shadow:var(--shadow);}
+  .card .vh{font-family:var(--disp);font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px;}
+  .card p{font-size:14px;line-height:1.55;margin:6px 0;}
+  .tag{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--ink);color:#fff;border-radius:3px;padding:3px 7px;display:inline-block;margin-bottom:6px;}
+  .ar{display:flex;gap:9px;font-size:13.5px;line-height:1.45;margin:5px 0;}
+  .ar .k{font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;width:62px;flex:none;padding-top:2px;color:var(--accent);}
+  .note{font-family:var(--mono);font-size:11px;color:var(--soft);line-height:1.6;}
+  .master{border-left:3px solid var(--accent);padding-left:12px;margin:10px 0;}
+  .master h4{font-family:var(--disp);font-size:14px;margin:0 0 3px;}
+  .master .who{font-family:var(--mono);font-size:10px;color:var(--soft);}
+  .chatlog{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;margin:4px 0 10px;}
+  .chatlog:empty{display:none;}
+  .msg{font-size:13.5px;line-height:1.5;padding:9px 12px;border-radius:10px;max-width:88%;white-space:pre-wrap;word-break:break-word;}
+  .msg.u{align-self:flex-end;background:var(--ink);color:var(--paper);}
+  .msg.a{align-self:flex-start;background:#fff;border:1.5px solid var(--hair);}
+  .chatbar{display:flex;gap:8px;align-items:center;}
+  .chatbar input{flex:1;}
+  .drop{border:2px dashed var(--hair);border-radius:9px;padding:14px 18px;text-align:center;background:#fff;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--soft);min-width:220px;}
+  .drop.has{border-style:solid;border-color:var(--ink);color:var(--ink);}
+  .scorebox{background:var(--card);border:1.5px solid var(--ink);border-radius:10px;padding:18px;box-shadow:var(--shadow);margin-top:4px;}
+  .scorebig{font-family:var(--disp);font-weight:800;font-size:48px;line-height:1;}
+  .scorebig small{font-size:18px;color:var(--soft);}
+  .sgrade{display:inline-block;font-family:var(--disp);font-weight:800;font-size:12px;padding:4px 10px;border-radius:999px;background:var(--ink);color:var(--paper);margin-left:8px;vertical-align:6px;}
+  .smetric{display:flex;align-items:center;gap:10px;margin:8px 0;}
+  .smetric .nm{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;width:96px;flex:none;}
+  .smetric .barbg{flex:1;height:9px;background:rgba(20,18,13,.1);border-radius:999px;overflow:hidden;}
+  .smetric .barfl{height:100%;background:var(--accent);border-radius:999px;}
+  .smetric .vv{font-family:var(--mono);font-size:12px;width:38px;flex:none;text-align:right;}
+  /* ===== 트렌드 갤러리 ===== */
+  .gal-wrap{width:100%;max-width:100%;margin:34px 0;padding:0;}
+  .gal-head{max-width:1600px;margin:0 auto;padding:0 22px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
+  .gal-ctrls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden;}
+  .seg button{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.04em;text-transform:uppercase;background:transparent;color:var(--ink);border:none;padding:8px 13px;cursor:pointer;}
+  .seg button.on{background:var(--ink);color:var(--paper);}
+  .masonry{max-width:1600px;margin:18px auto 0;padding:0 14px;column-gap:14px;}
+  .masonry.lg{columns:4 320px;}
+  .masonry.md{columns:5 230px;}
+  .masonry.sm{columns:6 170px;}
+  @media(max-width:900px){.masonry.lg{columns:3 240px;}.masonry.md{columns:3 200px;}.masonry.sm{columns:4 130px;}}
+  @media(max-width:560px){.masonry.lg{columns:2 150px;}.masonry.md{columns:2 150px;}.masonry.sm{columns:3 100px;}}
+  .gcard{break-inside:avoid;margin-bottom:14px;position:relative;border-radius:14px;overflow:hidden;cursor:zoom-in;background:var(--card);border:1px solid var(--hair);box-shadow:0 6px 20px -10px rgba(0,0,0,.4);transition:transform .18s, box-shadow .18s;}
+  .gcard:hover{transform:scale(1.03);box-shadow:0 22px 44px -16px rgba(0,0,0,.55);z-index:2;}
+  .gcard img{width:100%;display:block;background:#e9e5da;}
+  .gcard .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 11px;color:#fff;font-family:var(--disp);font-weight:800;font-size:13px;letter-spacing:.01em;
+    background:linear-gradient(to top,rgba(0,0,0,.72),transparent);opacity:0;transition:opacity .18s;}
+  .gcard:hover .cap{opacity:1;}
+  .gcard.skel{aspect-ratio:1/1.6;display:flex;align-items:center;justify-content:center;cursor:default;}
+  .gcard.skel .ph{font-family:var(--mono);font-size:10px;color:var(--soft);text-align:center;padding:10px;}
+  .gcard.skel.gen{animation:pulse 1.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.5;}50%{opacity:.9;}}
+  /* ===== Lightbox ===== */
+  .lb{position:fixed;inset:0;background:rgba(14,12,9,.94);display:none;z-index:9999;align-items:center;justify-content:center;}
+  .lb.on{display:flex;}
+  .lb img{max-width:94vw;max-height:90vh;border-radius:8px;box-shadow:0 30px 80px rgba(0,0,0,.6);transition:transform .15s;touch-action:none;user-select:none;}
+  .lb .lbcap{position:absolute;bottom:20px;left:0;right:0;text-align:center;color:#fff;font-family:var(--disp);font-weight:700;font-size:15px;}
+  .lb .x{position:absolute;top:18px;right:22px;width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);background:transparent;color:#fff;font-size:22px;cursor:pointer;}
+  .lb .nav{position:absolute;top:50%;transform:translateY(-50%);width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);background:rgba(0,0,0,.3);color:#fff;font-size:26px;cursor:pointer;}
+  .lb .nav.prev{left:18px;}.lb .nav.next{right:18px;}
+  .lb .hint{position:absolute;top:20px;left:22px;color:rgba(255,255,255,.6);font-family:var(--mono);font-size:11px;}
+  @media(max-width:560px){.lb .nav{width:42px;height:42px;font-size:20px;}.lb .x{width:38px;height:38px;}}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Case&nbsp;Studio<span class="dot">.</span></div>
+    <nav>
+      <a href="index.html">메인</a>
+      <a href="product.html">Product</a>
+      <a href="learning.html" class="active">러닝</a>
+      <a href="mydesign.html">내 디자인</a>
+      <a href="evaluation.html">평가</a>
+      <a href="reels.html">릴스</a>
+    </nav>
+  </div>
+
+  <h2 class="sec">Design <em>Learning</em></h2>
+  <p class="lede">디자인을 <b>업로드</b>하면 그 케이스를 AI가 직접 보고 <b>디자이너 관점·행동경제학 관점·거장 5인 관점</b>으로 분석하고 <b>점수</b>까지 매깁니다. 이미지가 없으면 주제별 원리 학습으로도 쓸 수 있어요. (OpenAI Vision)</p>
+
+  <div class="bar">
+    <label>주제</label>
+    <select class="sel" id="topic">
+      <option value="color">색상 분석 (색채심리)</option>
+      <option value="composition">구도 분석 (레이아웃)</option>
+      <option value="typography">타이포 분석</option>
+      <option value="layout">배치 분석</option>
+      <option value="sales">판매 포인트 분석</option>
+    </select>
+    <input id="focus" placeholder="(선택) 특정 케이스/스타일 — 예: 미러 케이스" style="min-width:220px">
+    <button class="btn" id="run">디자이너 분석</button>
+    <button class="btn ghost sm" id="runBE">행동경제학 관점</button>
+    <button class="btn ghost sm" id="run5">거장 5인 관점</button>
+  </div>
+
+  <!-- 디자인 업로드 → 점수 평가 -->
+  <div class="card" style="margin-top:6px">
+    <div class="vh">디자인 업로드 → 점수 평가 <span style="font-family:var(--mono);font-weight:400;font-size:11px;color:var(--soft);text-transform:none;letter-spacing:0">— 케이스/디자인 이미지를 올리면 AI가 보고 채점 (Vision)</span></div>
+    <div class="bar" style="margin:4px 0 0">
+      <div class="drop" id="udrop">디자인 이미지를 클릭/드롭<input type="file" id="ufile" accept="image/*" hidden></div>
+      <button class="btn" id="uscore" disabled>점수 평가</button>
+    </div>
+    <div id="upreviewwrap" style="display:none;margin-top:10px"><img id="upreview" alt="" style="max-height:160px;border-radius:8px;border:1px solid var(--hair)"></div>
+  </div>
+  <div class="loading" id="load"><div class="spin"></div><span>분석 중…</span></div>
+  <div id="out"></div>
+</div><!-- /.wrap (갤러리는 풀폭으로 빠져나옴) -->
+
+<!-- ===== 내 디자인 갤러리 (풀폭) ===== -->
+<section class="gal-wrap">
+  <div class="gal-head">
+    <div>
+      <h2 class="sec" style="margin:0">My <em>Gallery</em></h2>
+      <p class="lede" style="margin:4px 0 0">위에서 <b>점수 평가</b>한 디자인이 여기에 모입니다. 카드를 누르면 크게 봐요.</p>
+    </div>
+    <div class="gal-ctrls">
+      <div class="seg" id="viewseg">
+        <button data-v="lg" class="on">Large</button>
+        <button data-v="md">Medium</button>
+        <button data-v="sm">Compact</button>
+      </div>
+    </div>
+  </div>
+  <div class="loading" id="galload" style="padding-left:max(22px,calc((100vw - 1600px)/2 + 22px))"><div class="spin"></div><span id="galmsg">…</span></div>
+  <div class="masonry lg" id="masonry"></div>
+  <p class="note" id="galnote" style="max-width:1600px;margin:14px auto 0;padding:0 22px">아직 비어 있어요. 위에서 디자인을 업로드하고 "점수 평가"를 누르면 여기에 추가됩니다.</p>
+</section>
+
+<div class="wrap" style="padding-top:0"><!-- 다시 본문 폭으로 -->
+
+  <!-- OpenAI 채팅 -->
+  <div class="card" style="margin-top:24px">
+    <div class="vh">AI 디자인 디렉터에게 질문하기 <span style="font-family:var(--mono);font-weight:400;font-size:11px;color:var(--soft);text-transform:none;letter-spacing:0">— 위 분석에 이어서 자유롭게</span></div>
+    <div id="chatlog" class="chatlog"></div>
+    <div class="chatbar">
+      <input id="chatin" placeholder="예: 미러 케이스에 어울리는 색 조합은? / 이 분석을 내 케이스에 어떻게 적용해?" style="flex:1;min-width:0">
+      <button class="btn sm" id="chatsend">보내기</button>
+    </div>
+    <p class="note" style="margin-top:8px">위에서 분석을 한 번 돌리면 그 내용을 기억해 이어서 답합니다. 디자이너 + 행동경제학 관점으로 대화해요.</p>
+  </div>
+
+  <p class="note" style="margin-top:30px;border-top:1px solid var(--hair);padding-top:14px">키는 메인 <b>설정</b>에서 저장한 OpenAI 키를 공유합니다. 이 페이지는 키 입력칸이 없어요 — 메인에서 한 번 저장하면 전 페이지에서 작동합니다.</p>
+</div>
+<script>
+function ls_get(k){try{return localStorage.getItem(k)||"";}catch(e){return"";}}
+const OMODEL=()=>ls_get("omdl")||"gpt-4o-mini";
+const $=id=>document.getElementById(id);
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function show(e,on){e.classList.toggle("on",on);}
+async function openaiChat(messages,max_tokens){
+  const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:OMODEL(),messages,max_tokens:max_tokens||1100,temperature:0.7})});
+  const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 오류");
+  return d.choices[0].message.content.trim();
+}
+async function openaiVision(text,imageDataUrl,max_tokens){
+  const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:OMODEL(),max_tokens:max_tokens||1200,temperature:0.6,
+      messages:[{role:"user",content:[{type:"text",text},{type:"image_url",image_url:{url:imageDataUrl}}]}]})});
+  const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 오류");
+  return d.choices[0].message.content.trim();
+}
+function parseJSON(t,o,c){let s=String(t).replace(/```json/gi,"").replace(/```/g,"").trim();const a=s.indexOf(o),b=s.lastIndexOf(c);if(a!==-1&&b!==-1)s=s.slice(a,b+1);try{return JSON.parse(s);}catch(e){return null;}}
+const TOPICS={color:"폰케이스 디자인의 색상(색채심리) 관점",composition:"폰케이스 디자인의 구도/레이아웃 관점",typography:"폰케이스 디자인의 타이포그래피 관점",layout:"폰케이스 디자인의 요소 배치 관점",sales:"폰케이스의 판매 포인트(구매·저장·공유 욕구) 관점"};
+/* 이미지가 있으면 Vision으로, 없으면 텍스트로 — 분석 호출 통합 */
+function analyze(prompt,max_tokens){
+  if(typeof UPIMG!=="undefined" && UPIMG){ return openaiVision(prompt,UPIMG,max_tokens); }
+  return openaiChat([{role:"user",content:prompt}],max_tokens);
+}
+function subjectLine(topic,focus){
+  if(typeof UPIMG!=="undefined" && UPIMG){ return "첨부한 이 케이스/디자인 이미지"; }
+  return '"'+TOPICS[topic]+'"'+(focus?(" / 대상: "+focus):"");
+}
+let LAST_CTX=""; // 마지막 분석 요약 (채팅 맥락)
+var UPIMG=null;  // 업로드한 디자인 이미지 (있으면 분석 버튼이 이걸 봄)
+
+$("run").onclick=async()=>{
+  const topic=$("topic").value, focus=$("focus").value.trim();
+  $("run").disabled=true; show($("load"),true); $("out").innerHTML="";
+  const subj=subjectLine(topic,focus);
+  const prompt=`당신은 세계적인 AI 디자인 디렉터입니다. 분석 대상: ${subj}.
+${UPIMG?"이미지를 실제로 보고":"폰케이스(CASETiFY 류 프리미엄) 맥락에서"} 디자이너 관점으로 분석하세요. 복제가 아니라 "왜 그런가/어떻게 더 좋게"의 원리.
+JSON만 출력(한국어). 형식:
+{"title":"분석 제목","summary":"2~3문장 핵심","points":[{"k":"소항목(예: 색상/구도/대비/여백 등)","v":"설명 1~2문장"} … 5~7개],"takeaway":"내 디자인에 적용할 실전 팁 한 줄"}`;
+  try{
+    const d=parseJSON(await analyze(prompt,1300),"{","}");
+    if(!d) throw new Error("해석 실패");
+    let h='<div class="card"><span class="tag">'+(UPIMG?"내 디자인 · 디자이너 분석":esc(TOPICS[topic]))+'</span><div class="vh">'+esc(d.title)+'</div><p>'+esc(d.summary)+'</p>';
+    (d.points||[]).forEach(p=>h+='<div class="ar"><span class="k">'+esc(p.k)+'</span><span>'+esc(p.v)+'</span></div>');
+    if(d.takeaway)h+='<p class="note" style="margin-top:10px">💡 '+esc(d.takeaway)+'</p>';
+    h+='</div>'; $("out").innerHTML=h;
+    LAST_CTX="[디자이너 분석"+(UPIMG?" · 내 디자인":(" · "+TOPICS[topic]))+"] "+(d.summary||"")+" / 핵심: "+(d.points||[]).map(p=>p.k+"="+p.v).join("; ")+" / 적용: "+(d.takeaway||"");
+  }catch(e){$("out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("load"),false);$("run").disabled=false;}
+};
+
+$("run5").onclick=async()=>{
+  const topic=$("topic").value, focus=$("focus").value.trim();
+  $("run5").disabled=true; show($("load"),true); $("out").innerHTML="";
+  const subj=subjectLine(topic,focus);
+  const prompt=`당신은 디자인사 전문가입니다. 분석 대상: ${subj}를 아래 거장 5인이 각각 어떻게 볼지, ${UPIMG?"이미지를 실제로 보고 ":""}그들의 실제 철학에 근거해 설명하세요.
+Paul Rand(절제·강한 심볼), Paula Scher(타이포·대담함·표현성), Massimo Vignelli(그리드·절제·시대초월), Saul Bass(상징·움직임·단순한 마크), Josef Albers(색의 상호작용·지각).
+JSON 배열만(한국어), 5개. 각: {"name":"이름","who":"한 줄 소개","view":"이 디자인/주제를 보는 관점 2~3문장","advice":"이 디자이너라면 줄 조언 한 줄"}`;
+  try{
+    const arr=parseJSON(await analyze(prompt,1500),"[","]");
+    if(!arr||!arr.length) throw new Error("해석 실패");
+    let h='<div class="card"><div class="vh">거장 5인의 관점 · '+(UPIMG?"내 디자인":esc(TOPICS[topic]))+'</div>';
+    arr.forEach(m=>h+='<div class="master"><h4>'+esc(m.name)+'</h4><div class="who">'+esc(m.who)+'</div><p>'+esc(m.view)+'</p><p class="note">→ '+esc(m.advice)+'</p></div>');
+    h+='</div>'; $("out").innerHTML=h;
+    LAST_CTX="[거장 5인"+(UPIMG?" · 내 디자인":"")+"] "+arr.map(m=>m.name+": "+(m.advice||"")).join(" / ");
+  }catch(e){$("out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("load"),false);$("run5").disabled=false;}
+};
+
+/* 행동경제학 관점 */
+$("runBE").onclick=async()=>{
+  const topic=$("topic").value, focus=$("focus").value.trim();
+  $("runBE").disabled=true; show($("load"),true); $("out").innerHTML="";
+  const subj=subjectLine(topic,focus);
+  const prompt=`당신은 행동경제학·소비자심리 전문가입니다. 분석 대상: ${subj}를 폰케이스 구매 맥락에서 ${UPIMG?"이미지를 실제로 보고 ":""}분석하세요.
+다음 원리를 실제로 어떻게 활용하는지/활용할 수 있는지 구체적으로: 사회적 증거, 희소성, 손실회피, 앵커링, 밴드왜건, 보유효과, 디드로 효과, 정체성 표현, 도파민/즉각보상(Fast Thinking). "왜 지갑을 열게 되는가"의 원리.
+JSON만 출력(한국어). 형식:
+{"title":"제목","summary":"2~3문장 핵심","principles":[{"k":"원리명(한글)","v":"이 디자인/케이스 판매에 어떻게 작동하는지 1~2문장","use":"내가 바로 쓸 적용 한 줄"} … 5~7개],"fast":"Fast Thinking(직관·충동구매)을 자극하는 한 줄 전술","takeaway":"종합 실전 팁 한 줄"}`;
+  try{
+    const d=parseJSON(await analyze(prompt,1600),"{","}");
+    if(!d) throw new Error("해석 실패");
+    let h='<div class="card"><span class="tag">행동경제학 · '+(UPIMG?"내 디자인":esc(TOPICS[topic]))+'</span><div class="vh">'+esc(d.title||"")+'</div><p>'+esc(d.summary||"")+'</p>';
+    (d.principles||[]).forEach(p=>h+='<div class="master"><h4>'+esc(p.k)+'</h4><p>'+esc(p.v)+'</p><p class="note">→ 적용: '+esc(p.use||"")+'</p></div>');
+    if(d.fast)h+='<p style="margin-top:10px"><span class="tag" style="background:var(--accent)">FAST THINKING</span><br>'+esc(d.fast)+'</p>';
+    if(d.takeaway)h+='<p class="note" style="margin-top:8px">💡 '+esc(d.takeaway)+'</p>';
+    h+='</div>'; $("out").innerHTML=h;
+    LAST_CTX="[행동경제학 분석 · "+TOPICS[topic]+"] "+(d.summary||"")+" / 원리: "+(d.principles||[]).map(p=>p.k+"="+p.v).join("; ")+" / Fast: "+(d.fast||"")+" / 적용: "+(d.takeaway||"");
+  }catch(e){$("out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("load"),false);$("runBE").disabled=false;}
+};
+
+/* OpenAI 채팅 */
+const CHAT=[];
+function pushMsg(role,text){const d=document.createElement("div");d.className="msg "+(role==="user"?"u":"a");d.textContent=text;$("chatlog").appendChild(d);$("chatlog").scrollTop=$("chatlog").scrollHeight;}
+async function sendChat(){
+  const t=$("chatin").value.trim(); if(!t) return;
+  $("chatin").value=""; pushMsg("user",t);
+  CHAT.push({role:"user",content:t});
+  $("chatsend").disabled=true;
+  const thinking=document.createElement("div");thinking.className="msg a";thinking.textContent="…";$("chatlog").appendChild(thinking);$("chatlog").scrollTop=$("chatlog").scrollHeight;
+  const sys={role:"system",content:"당신은 폰케이스 브랜드(SI Story)의 AI 디자인 디렉터입니다. 디자이너 관점과 행동경제학(소비자심리) 관점을 함께 활용해 실용적이고 구체적으로 한국어로 답하세요. 답은 간결하게."+(LAST_CTX?(" 참고 분석 맥락: "+LAST_CTX):"")};
+  try{
+    const reply=await openaiChat([sys, ...CHAT.slice(-8)],900);
+    thinking.remove(); pushMsg("assistant",reply); CHAT.push({role:"assistant",content:reply});
+  }catch(e){ thinking.remove(); pushMsg("assistant","오류: "+e.message); }
+  finally{ $("chatsend").disabled=false; $("chatin").focus(); }
+}
+$("chatsend").onclick=sendChat;
+$("chatin").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendChat(); } });
+
+/* ===== 디자인 업로드 → 점수 평가 (Vision) ===== */
+(function(){
+  const d=$("udrop"),f=$("ufile");
+  d.onclick=()=>f.click();
+  d.ondragover=e=>e.preventDefault();
+  d.ondrop=e=>{e.preventDefault(); if(e.dataTransfer.files[0]) upick(e.dataTransfer.files[0]);};
+  f.onchange=()=>{ if(f.files[0]) upick(f.files[0]); };
+})();
+function upick(file){
+  const rd=new FileReader();
+  rd.onload=()=>{ UPIMG=rd.result; $("upreview").src=UPIMG; $("upreviewwrap").style.display="block";
+    $("udrop").classList.add("has"); $("udrop").firstChild.nodeValue="✓ "+file.name+" "; $("uscore").disabled=false; };
+  rd.readAsDataURL(file);
+}
+$("uscore").onclick=async()=>{
+  if(!UPIMG) return;
+  if(!ls_get("ok")){ $("out").innerHTML='<div class="err">메인 설정에서 OpenAI 키를 저장하세요.</div>'; return; }
+  $("uscore").disabled=true; show($("load"),true); $("out").innerHTML="";
+  const prompt=`당신은 폰케이스 디자인 심사위원입니다(디자이너 관점 + 행동경제학 관점). 첨부한 케이스/디자인 이미지를 실제로 보고 평가하세요.
+JSON만 출력(한국어). 형식:
+{"name":"이 디자인에 붙일 이름(한글 8자 내외)",
+ "total":0~100 정수,"grade":"S/A/B/C/D 중 하나",
+ "summary":"두세 문장 총평",
+ "metrics":[{"k":"구도","v":0~100},{"k":"색감","v":0~100},{"k":"타이포","v":0~100},{"k":"심볼·컨셉","v":0~100},{"k":"판매력(행동경제학)","v":0~100}],
+ "good":["잘된 점 2~3개"],"improve":["개선점 2~3개"],
+ "be":"행동경제학 관점 한 줄(이 디자인이 지갑을 열게 하는가)"}`;
+  try{
+    const d=parseJSON(await openaiVision(prompt,UPIMG,1400),"{","}");
+    if(!d) throw new Error("평가 해석 실패");
+    let h='<div class="scorebox"><span class="tag">디자인 점수 평가</span>';
+    h+='<div style="margin:8px 0"><span class="scorebig">'+esc(String(d.total))+'<small>/100</small></span><span class="sgrade">'+esc(d.grade||"")+'</span></div>';
+    if(d.name)h+='<p style="font-family:var(--disp);font-weight:800;font-size:16px;margin:2px 0 8px">'+esc(d.name)+'</p>';
+    h+='<p>'+esc(d.summary||"")+'</p><div style="margin:12px 0">';
+    (d.metrics||[]).forEach(m=>{const v=Math.max(0,Math.min(100,+m.v||0));h+='<div class="smetric"><span class="nm">'+esc(m.k)+'</span><span class="barbg"><span class="barfl" style="width:'+v+'%"></span></span><span class="vv">'+v+'</span></div>';});
+    h+='</div>';
+    if(d.good&&d.good.length)h+='<p class="note" style="margin-top:6px"><b style="color:var(--ok)">잘된 점</b><br>'+d.good.map(x=>'· '+esc(x)).join('<br>')+'</p>';
+    if(d.improve&&d.improve.length)h+='<p class="note" style="margin-top:6px"><b style="color:var(--accent)">개선점</b><br>'+d.improve.map(x=>'· '+esc(x)).join('<br>')+'</p>';
+    if(d.be)h+='<p class="note" style="margin-top:8px">💰 '+esc(d.be)+'</p>';
+    h+='</div>'; $("out").innerHTML=h;
+    LAST_CTX="[디자인 점수 평가] "+(d.name||"")+" "+(d.total)+"/100 ("+(d.grade||"")+") · "+(d.summary||"")+" · 개선: "+((d.improve||[]).join("; "));
+    // 갤러리 맨 앞에 추가
+    addToGalleryFront({title:(d.name||"내 디자인")+" · "+(d.total)+"점", why:(d.be||""), url:UPIMG});
+    $("galnote").innerHTML="내 디자인이 갤러리 맨 앞에 추가됐어요. 카드를 누르면 크게 봅니다.";
+  }catch(e){ $("out").innerHTML='<div class="err">'+esc(e.message)+'</div>'; }
+  finally{ show($("load"),false); $("uscore").disabled=false; }
+};
+function addToGalleryFront(item){
+  GAL.unshift(item);
+  const c=document.createElement("div"); c.className="gcard";
+  c.innerHTML='<img loading="lazy" src="'+item.url+'" alt="'+esc(item.title)+'"><div class="cap">'+esc(item.title)+'</div>';
+  const m=$("masonry"); m.insertBefore(c,m.firstChild);
+  // 인덱스가 앞으로 밀리므로 전체 클릭 핸들러 재바인딩
+  [...m.children].forEach((el,i)=>{ el.onclick=()=>openLB(i); });
+}
+
+/* ===== 트렌드 갤러리 ===== */
+/* 보기 모드 */
+$("viewseg").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  [...$("viewseg").children].forEach(x=>x.classList.toggle("on",x===b));
+  $("masonry").className="masonry "+b.dataset.v; });
+
+let GAL=[]; // {title, why, url} — 점수 평가한 내 디자인이 쌓임
+
+/* ===== Lightbox (ESC·좌우·휠줌·더블클릭리셋·핀치줌) ===== */
+let LBI=0, lbScale=1, lbX=0, lbY=0;
+function lbApply(){ $("lbimg").style.transform="translate("+lbX+"px,"+lbY+"px) scale("+lbScale+")"; }
+function openLB(i){ LBI=i; const g=GAL[i]; if(!g)return; lbScale=1;lbX=0;lbY=0;
+  $("lbimg").src=g.url; $("lbcap").textContent=g.title+(g.why?(" — "+g.why):""); lbApply(); $("lb").classList.add("on"); document.body.style.overflow="hidden"; }
+function closeLB(){ $("lb").classList.remove("on"); document.body.style.overflow=""; }
+function lbStep(d){ if(!GAL.length)return; LBI=(LBI+d+GAL.length)%GAL.length; openLB(LBI); }
+$("lbx").onclick=closeLB;
+$("lbprev").onclick=e=>{e.stopPropagation();lbStep(-1);};
+$("lbnext").onclick=e=>{e.stopPropagation();lbStep(1);};
+$("lb").addEventListener("click",e=>{ if(e.target===$("lb")) closeLB(); });
+document.addEventListener("keydown",e=>{ if(!$("lb").classList.contains("on"))return;
+  if(e.key==="Escape")closeLB(); else if(e.key==="ArrowLeft")lbStep(-1); else if(e.key==="ArrowRight")lbStep(1); });
+$("lbimg").addEventListener("wheel",e=>{ e.preventDefault(); lbScale=Math.min(5,Math.max(1,lbScale+(e.deltaY<0?0.2:-0.2))); if(lbScale===1){lbX=0;lbY=0;} lbApply(); },{passive:false});
+$("lbimg").addEventListener("dblclick",()=>{ lbScale=1;lbX=0;lbY=0; lbApply(); });
+/* 모바일 핀치줌 + 드래그 */
+let pts=new Map(), pinchStart=0, startScale=1, dragX=0,dragY=0,sx=0,sy=0;
+$("lbimg").addEventListener("pointerdown",e=>{ $("lbimg").setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pts.size===2){ const a=[...pts.values()]; pinchStart=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y); startScale=lbScale; }
+  else { sx=e.clientX-lbX; sy=e.clientY-lbY; } });
+$("lbimg").addEventListener("pointermove",e=>{ if(!pts.has(e.pointerId))return; pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pts.size===2){ const a=[...pts.values()]; const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y); if(pinchStart) lbScale=Math.min(5,Math.max(1,startScale*d/pinchStart)); lbApply(); }
+  else if(lbScale>1){ lbX=e.clientX-sx; lbY=e.clientY-sy; lbApply(); } });
+function lbUp(e){ pts.delete(e.pointerId); if(pts.size<2)pinchStart=0; if(lbScale===1){lbX=0;lbY=0;lbApply();} }
+$("lbimg").addEventListener("pointerup",lbUp); $("lbimg").addEventListener("pointercancel",lbUp);
+</script>
+<!-- Lightbox -->
+<div class="lb" id="lb">
+  <div class="hint">휠: 확대/축소 · 더블클릭: 리셋 · ESC: 닫기</div>
+  <button class="x" id="lbx" aria-label="닫기">✕</button>
+  <button class="nav prev" id="lbprev" aria-label="이전">‹</button>
+  <img id="lbimg" alt="">
+  <button class="nav next" id="lbnext" aria-label="다음">›</button>
+  <div class="lbcap" id="lbcap"></div>
+</div>
+</body></html>

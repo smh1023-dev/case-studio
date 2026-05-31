@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!-- evaluation.html · 디자인 평가: 업로드/갤러리 이미지 → OpenAI 비전 채점 + 수정 가이드 -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation · Case Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--ok:#2f7d4f;--card:#FBF9F2;--hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);--disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;min-height:100vh;}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 22px 90px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:24px;letter-spacing:-.02em;text-transform:uppercase;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav a{font-family:var(--disp);font-weight:700;font-size:12px;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:7px 12px;border-radius:999px;}
+  nav a.active{background:var(--ink);color:var(--paper);}
+  h2.sec{font-family:var(--disp);font-weight:800;font-size:clamp(26px,5vw,44px);letter-spacing:-.02em;margin:22px 0 4px;text-transform:uppercase;}
+  h2.sec em{font-style:normal;color:var(--accent);}
+  .lede{font-style:italic;color:var(--soft);max-width:72ch;margin:0 0 8px;font-size:15px;}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0;}
+  .btn{font-family:var(--disp);font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;transition:transform .12s;}
+  .btn:hover{transform:translate(-1px,-1px);}.btn:active{transform:translate(1px,1px);}.btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .btn.ghost{background:transparent;color:var(--ink);}
+  .drop{border:2px dashed var(--hair);border-radius:10px;padding:26px;text-align:center;background:#fff;cursor:pointer;font-family:var(--mono);font-size:13px;color:var(--soft);}
+  .drop.has{border-style:solid;border-color:var(--ink);padding:10px;}
+  .drop img{max-height:300px;max-width:100%;border-radius:6px;}
+  .loading{display:none;align-items:center;gap:12px;padding:18px 0;color:var(--soft);font-family:var(--disp);font-weight:600;}
+  .loading.on{display:flex;}
+  .spin{width:20px;height:20px;border:3px solid var(--hair);border-top-color:var(--accent);border-radius:50%;animation:sp .9s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .err{border:1.5px solid var(--accent);border-radius:8px;padding:14px;background:#fff;color:var(--accent);font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin-top:12px;}
+  .card{background:var(--card);border:1.5px solid var(--ink);border-radius:8px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px;}
+  .vh{font-family:var(--disp);font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;}
+  .score{margin:7px 0;}
+  .score .lbl{display:flex;justify-content:space-between;font-family:var(--disp);font-size:12px;font-weight:700;}
+  .meter{height:8px;border:1px solid var(--ink);border-radius:4px;overflow:hidden;margin-top:3px;}
+  .meter i{display:block;height:100%;background:var(--accent);}
+  .listblock{margin:10px 0;}.listblock h4{font-family:var(--disp);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px;}
+  .listblock.del h4{color:var(--accent);}.listblock.emp h4{color:var(--ok);}
+  .listblock ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.5;}
+  ol.steps{font-size:14px;line-height:1.6;padding-left:20px;}ol.steps li{margin:3px 0;}
+  .note{font-family:var(--mono);font-size:11px;color:var(--soft);line-height:1.6;}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Case&nbsp;Studio<span class="dot">.</span></div>
+    <nav>
+      <a href="index.html">메인</a>
+      <a href="product.html">Product</a>
+      <a href="learning.html">러닝</a>
+      <a href="mydesign.html">내 디자인</a>
+      <a href="evaluation.html" class="active">평가</a>
+      <a href="reels.html">릴스</a>
+    </nav>
+  </div>
+
+  <h2 class="sec">Design <em>Evaluation</em></h2>
+  <p class="lede">완성한 목업 이미지를 올리면 9기준(브랜드성·저장욕구·구매욕구·색상·구도·타이포·여백·고급감·AI느낌)으로 채점하고 삭제·줄임·비움·강조 + Photoshop 수정 클릭순서를 줍니다. <b>내 디자인</b> 갤러리에서 보내면 자동으로 불러옵니다.</p>
+
+  <div class="drop" id="drop">이미지를 클릭/드롭해서 업로드<input type="file" id="file" accept="image/*" hidden></div>
+  <div class="bar"><button class="btn" id="run" disabled>평가 실행</button></div>
+  <div class="loading" id="load"><div class="spin"></div><span>디자인을 뜯어보는 중…</span></div>
+  <div id="out"></div>
+  <p class="note" style="margin-top:30px;border-top:1px solid var(--hair);padding-top:14px">키는 메인 <b>설정</b>의 OpenAI 키를 공유합니다. 비전 분석이 안 되면 설정에서 OpenAI 챗 모델을 <b>gpt-4o</b>로 바꿔보세요.</p>
+</div>
+<script>
+function ls_get(k){try{return localStorage.getItem(k)||"";}catch(e){return"";}}
+const OMODEL=()=>ls_get("omdl")||"gpt-4o-mini";
+const $=id=>document.getElementById(id);
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function show(e,on){e.classList.toggle("on",on);}
+function parseJSON(t,o,c){let s=String(t).replace(/```json/gi,"").replace(/```/g,"").trim();const a=s.indexOf(o),b=s.lastIndexOf(c);if(a!==-1&&b!==-1)s=s.slice(a,b+1);try{return JSON.parse(s);}catch(e){return null;}}
+async function openaiVision(text,image){
+  const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:OMODEL(),max_tokens:2000,temperature:0.6,
+      messages:[{role:"user",content:[{type:"text",text},{type:"image_url",image_url:{url:image}}]}]})});
+  const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 오류");
+  return d.choices[0].message.content.trim();
+}
+
+let IMG=null;
+const drop=$("drop"),file=$("file");
+drop.onclick=()=>file.click();
+drop.ondragover=e=>e.preventDefault();
+drop.ondrop=e=>{e.preventDefault();if(e.dataTransfer.files[0])pick(e.dataTransfer.files[0]);};
+file.onchange=()=>{if(file.files[0])pick(file.files[0]);};
+function pick(f){const r=new FileReader();r.onload=()=>setImg(r.result);r.readAsDataURL(f);}
+function setImg(url){IMG=url;drop.classList.add("has");drop.innerHTML='<img src="'+url+'">';$("run").disabled=false;}
+
+/* receive from mydesign ?from=id */
+(function(){
+  const id=new URLSearchParams(location.search).get("from"); if(!id)return;
+  try{const arr=JSON.parse(localStorage.getItem("mydesign:list")||"[]");const it=arr.find(x=>x.id===id);if(it)setImg(it.url);}catch(e){}
+})();
+
+const PROMPT=`업로드된 폰케이스 목업 디자인을 평가하세요. 10점 만점 9기준. JSON만(한국어):
+{"scores":{"브랜드성":n,"저장욕구":n,"구매욕구":n,"색상":n,"구도":n,"타이포":n,"여백":n,"고급감":n,"AI느낌제거":n},
+"total":n.n,
+"delete":["삭제할 것 …"],"reduce":["줄일 것 …"],"empty":["비울 것 …"],"emphasize":["강조할 것 …"],
+"photoshop":["수정 클릭 순서 1.…","2.…", …]}`;
+$("run").onclick=async()=>{
+  if(!IMG)return; $("run").disabled=true; show($("load"),true); $("out").innerHTML="";
+  try{const d=parseJSON(await openaiVision(PROMPT,IMG),"{","}"); if(!d)throw new Error("평가 JSON 해석 실패"); render(d);}
+  catch(e){$("out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("load"),false);$("run").disabled=false;}
+};
+function render(d){
+  let h='<div class="card"><div class="vh">종합 '+esc(d.total)+' / 10</div>';
+  Object.entries(d.scores||{}).forEach(([k,v])=>{const n=Math.max(0,Math.min(10,+v||0));
+    h+='<div class="score"><div class="lbl"><span>'+esc(k)+'</span><span>'+n+'</span></div><div class="meter"><i style="width:'+(n*10)+'%"></i></div></div>';});
+  h+='</div>';
+  const block=(cls,t,arr)=>arr&&arr.length?'<div class="listblock '+cls+'"><h4>'+t+'</h4><ul>'+arr.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>':"";
+  h+='<div class="card">'+block("del","삭제할 것",d.delete)+block("","줄일 것",d.reduce)+block("emp","비울 것",d.empty)+block("emp","강조할 것",d.emphasize)+'</div>';
+  if(d.photoshop)h+='<div class="card"><div class="vh">Photoshop 수정 클릭 순서</div><ol class="steps">'+d.photoshop.map(s=>'<li>'+esc(String(s).replace(/^\d+\.\s*/,""))+'</li>').join("")+'</ol></div>';
+  $("out").innerHTML=h;
+}
+</script>
+</body></html>

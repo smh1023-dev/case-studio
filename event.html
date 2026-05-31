@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!-- event.html · 릴스 유입 이벤트 랜딩 (공개 페이지 · API 키 없음) -->
+<!-- 바꿔 끼울 곳: KAKAO_URL, FORM_URL (아래 상단 CONFIG) -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>당신을 상징하는 로고, 무료로 · SI Story</title>
+<meta property="og:title" content="이름이 아니라, 당신의 이야기를 로고로">
+<meta property="og:description" content="애칭·색·가치관만 알려주세요. AI가 당신만의 상징을 만들어드립니다. 무료 + 사은품 증정.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--navy:#1B2A4A;--gold:#C8A04A;--card:#FBF9F2;--hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);--disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 20px 80px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:22px;letter-spacing:-.02em;text-transform:uppercase;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav a{font-family:var(--disp);font-weight:700;font-size:11.5px;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:6px 11px;border-radius:999px;}
+  nav a.active{background:var(--ink);color:var(--paper);}
+  /* hero */
+  .hero{text-align:center;padding:46px 0 26px;}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin:0 0 16px;}
+  h1{font-family:var(--disp);font-weight:800;font-size:clamp(34px,8vw,60px);line-height:1.02;letter-spacing:-.03em;margin:0;}
+  h1 em{font-style:normal;color:var(--accent);}
+  .hero p{font-size:clamp(16px,2.6vw,20px);color:var(--soft);max-width:30ch;margin:18px auto 0;line-height:1.5;}
+  .free{display:inline-block;font-family:var(--disp);font-weight:800;font-size:13px;letter-spacing:.08em;background:var(--navy);color:#fff;border-radius:999px;padding:8px 16px;margin:22px 0 0;}
+  .free b{color:var(--gold);}
+  /* cta */
+  .ctas{display:flex;flex-direction:column;gap:10px;margin:26px 0;}
+  .btn{font-family:var(--disp);font-weight:800;font-size:16px;cursor:pointer;text-decoration:none;text-align:center;border:2px solid var(--ink);border-radius:14px;padding:16px;transition:transform .12s;display:block;}
+  .btn:hover{transform:translate(-1px,-1px);}.btn:active{transform:translate(1px,1px);}
+  .btn.primary{background:var(--ink);color:var(--paper);}
+  .btn.kakao{background:#FEE500;color:#1A1A1A;border-color:#1A1A1A;}
+  .btn.ghost{background:transparent;color:var(--ink);}
+  .btn small{display:block;font-family:var(--mono);font-weight:400;font-size:11px;opacity:.7;margin-top:3px;letter-spacing:0;}
+  /* sections */
+  section{margin:40px 0;}
+  .h2{font-family:var(--disp);font-weight:800;font-size:24px;letter-spacing:-.01em;text-transform:uppercase;margin:0 0 16px;display:flex;align-items:center;gap:10px;}
+  .h2 .n{background:var(--accent);color:#fff;border-radius:50%;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:none;}
+  /* steps */
+  .step{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px dashed var(--hair);}
+  .step:last-child{border-bottom:0;}
+  .step .si{font-family:var(--disp);font-weight:800;font-size:13px;color:#fff;background:var(--ink);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .step .st{font-family:var(--disp);font-weight:700;font-size:16px;margin:0 0 2px;}
+  .step .sd{font-size:14px;color:var(--soft);margin:0;line-height:1.4;}
+  /* example card */
+  .ex{background:var(--navy);color:#F4F1E8;border-radius:16px;padding:24px;box-shadow:var(--shadow);}
+  .ex .row{display:flex;gap:10px;font-size:14px;margin:7px 0;font-family:var(--mono);}
+  .ex .row .k{color:var(--gold);width:64px;flex:none;font-weight:700;}
+  .ex .ai{border-top:1px solid rgba(255,255,255,.2);margin-top:16px;padding-top:16px;}
+  .ex .ai .lab{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;}
+  .ex .ai .interp{font-style:italic;font-size:16px;line-height:1.5;margin:0 0 14px;}
+  .ex .slogan{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:-.01em;margin:0;color:#fff;}
+  .ex .concept{font-size:13px;color:rgba(244,241,232,.75);margin:10px 0 0;line-height:1.5;}
+  /* privacy */
+  .privacy{background:var(--card);border:1.5px solid var(--hair);border-radius:12px;padding:16px 18px;font-family:var(--mono);font-size:12px;color:var(--soft);line-height:1.7;}
+  .privacy b{color:var(--ink);}
+  .foot{text-align:center;font-family:var(--mono);font-size:11px;color:var(--soft);margin-top:40px;line-height:1.7;}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">SI&nbsp;Story<span class="dot">.</span></div>
+    <nav>
+      <a href="event.html" class="active">이벤트</a>
+      <a href="logo.html">로고 만들기</a>
+      <a href="index.html">스튜디오</a>
+    </nav>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="eyebrow">FREE · AI IDENTITY LOGO</p>
+    <h1>이름이 아니라,<br><em>당신의 이야기</em>를<br>로고로 만듭니다.</h1>
+    <p>애칭·좋아하는 색·가치관 3개만 알려주세요. AI가 당신만의 상징을 만들어드립니다.</p>
+    <span class="free">100% 무료 <b>+</b> 그립톡/카드지갑 사은품 증정</span>
+  </div>
+
+  <!-- CTA (상단) -->
+  <div class="ctas">
+    <a class="btn kakao" id="cta-kakao-1" href="#" target="_blank" rel="noopener">카카오채널 가입하기<small>여기서 로고·사은품 무료로 받아요</small></a>
+    <a class="btn primary" id="cta-form-1" href="#" target="_blank" rel="noopener">무료 로고 신청하기<small>구글폼 1분 · 100% 무료</small></a>
+  </div>
+
+  <!-- STEP -->
+  <section>
+    <div class="h2"><span class="n">1</span>참여 방법</div>
+    <div class="step"><span class="si">1</span><div><p class="st">카카오채널 가입 <span style="color:var(--accent)">· 무료</span></p><p class="sd">SI Story 채널 친구 추가 → 로고·사은품은 여기로 보내드려요</p></div></div>
+    <div class="step"><span class="si">2</span><div><p class="st">구글폼 작성 <span style="color:var(--accent)">· 무료</span></p><p class="sd">애칭·색·가치관 등 입력 (1분) · 비용 0원</p></div></div>
+    <div class="step"><span class="si">3</span><div><p class="st">AI 로고 무료 제작</p><p class="sd">당신의 서사를 담은 아이덴티티 로고</p></div></div>
+    <div class="step"><span class="si">4</span><div><p class="st">사은품 수령 <span style="color:var(--accent)">· 무료</span></p><p class="sd">그립톡 / 카드지갑 / 맥세이프 충전기 중 증정</p></div></div>
+    <div class="step"><span class="si">5</span><div><p class="st">나만의 로고 케이스 (선택)</p><p class="sd">마음에 들면 맞춤 케이스로 제작 · 39,900원</p></div></div>
+  </section>
+
+  <!-- EXAMPLE -->
+  <section>
+    <div class="h2"><span class="n">2</span>이렇게 만들어져요</div>
+    <div class="ex">
+      <div class="row"><span class="k">애칭</span><span>고목나무에 핀 꽃</span></div>
+      <div class="row"><span class="k">색상</span><span>네이비</span></div>
+      <div class="row"><span class="k">가치관</span><span>성장 · 끈기 · 가족</span></div>
+      <div class="row"><span class="k">상징</span><span>늑대</span></div>
+      <div class="ai">
+        <p class="lab">AI 해석</p>
+        <p class="interp">“오래 버틴 사람, 무너지지 않고 다시 피어나는 사람.”</p>
+        <p class="slogan">Still Blooming.</p>
+        <p class="concept">고목나무 실루엣 + 작은 꽃 + 늑대의 보호 본능, 네이비와 골드의 조합.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA (중간) -->
+  <div class="ctas">
+    <a class="btn primary" id="cta-form-2" href="#" target="_blank" rel="noopener">내 이야기로 로고 신청하기<small>지금 무료로</small></a>
+    <a class="btn ghost" href="logo.html">미리 체험해보기<small>입력하면 컨셉을 바로 보여드려요</small></a>
+  </div>
+
+  <!-- PRIVACY -->
+  <section>
+    <div class="h2"><span class="n">3</span>개인정보 안내</div>
+    <div class="privacy">
+      입력하신 정보는 <b>AI 로고 제작 · 사은품 발송 · 이벤트 안내 및 맞춤 상품 제안</b> 목적으로만 사용됩니다.
+      마케팅 수신은 <b>선택</b>이며, 동의하지 않아도 무료 로고 신청이 가능합니다. 주소·연락처는 사은품 발송 목적 외에는 사용하지 않습니다.
+    </div>
+  </section>
+
+  <!-- CTA (하단) -->
+  <div class="ctas">
+    <a class="btn kakao" id="cta-kakao-2" href="#" target="_blank" rel="noopener">카카오채널 가입하기<small>STEP 1 · 무료</small></a>
+    <a class="btn primary" id="cta-form-3" href="#" target="_blank" rel="noopener">무료 로고 신청하기<small>STEP 2 · 100% 무료</small></a>
+    <a class="btn ghost" id="cta-shop-1" href="#" target="_blank" rel="noopener">내 로고 케이스 만들기<small>마음에 들면 · 39,900원 (선택)</small></a>
+  </div>
+
+  <p class="foot">SI Story · 당신의 정체성을 디자인합니다<br>YOUR LOGO. YOUR STORY. YOUR IDENTITY. DESIGNED.</p>
+</div>
+
+<script>
+  /* ===== CONFIG — 실제 주소 ===== */
+  var KAKAO_URL = "https://pf.kakao.com/_xnrAxln/chat";   // 카카오채널(채팅 바로 열기)
+  var FORM_URL  = "https://docs.google.com/forms/d/e/1FAIpQLSeKl-0HL1BvskOSeRYYzsVM3HFHcBoFqaBcEsKy6BoRJc52iA/viewform"; // 구글폼 신청
+  var SHOP_URL  = "https://ceo71754.imweb.me/shop_view?idx=1"; // 아임웹 케이스 상품
+  /* ======================================== */
+  function setHref(id,url){var el=document.getElementById(id);if(el)el.href=url;}
+  ["cta-kakao-1","cta-kakao-2"].forEach(function(id){setHref(id,KAKAO_URL);});
+  ["cta-form-1","cta-form-2","cta-form-3"].forEach(function(id){setHref(id,FORM_URL);});
+  ["cta-shop-1","cta-shop-2"].forEach(function(id){setHref(id,SHOP_URL);});
+</script>
+</body></html>

@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<!-- product.html · 상품 제작: 기종 선택(칼선 자동) + (비표준은 업로드+Vision) → 문구·목업·소재·PS 지시서 -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product · Case Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!-- 타이포 엔진용 영문 폰트 (유료 폰트의 무료 대체) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Manrope:wght@400;600;800&family=Montserrat:wght@400;600;800;900&family=Space+Grotesk:wght@400;600;700&family=DM+Sans:wght@400;700;900&family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Anton&family=Jost:wght@400;600;800&family=Questrial&display=swap" rel="stylesheet">
+<!-- 레드프린팅 입고용 PDF 출력: 브라우저에서 작업사이즈·300dpi PDF 직접 생성 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--ok:#2f7d4f;--card:#FBF9F2;--hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);--disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;min-height:100vh;}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 22px 90px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:24px;letter-spacing:-.02em;text-transform:uppercase;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav a{font-family:var(--disp);font-weight:700;font-size:12px;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:7px 12px;border-radius:999px;}
+  nav a.active{background:var(--ink);color:var(--paper);}
+  h2.sec{font-family:var(--disp);font-weight:800;font-size:clamp(26px,5vw,44px);letter-spacing:-.02em;margin:22px 0 4px;text-transform:uppercase;}
+  h2.sec em{font-style:normal;color:var(--accent);}
+  .lede{font-style:italic;color:var(--soft);max-width:74ch;margin:0 0 8px;font-size:15px;}
+  .card{background:var(--card);border:1.5px solid var(--ink);border-radius:8px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px;}
+  .vh{font-family:var(--disp);font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;}
+  .vh small{font-family:var(--mono);font-weight:400;font-size:11px;color:var(--soft);text-transform:none;letter-spacing:0;}
+  label{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;display:block;margin:0 0 6px;}
+  input,select,textarea{font-family:var(--mono);font-size:13px;border:1.5px solid var(--hair);border-radius:7px;padding:9px;background:#fff;width:100%;}
+  textarea{min-height:60px;resize:vertical;}
+  .formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0;}
+  .btn{font-family:var(--disp);font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;transition:transform .12s;}
+  .btn:hover{transform:translate(-1px,-1px);}.btn:active{transform:translate(1px,1px);}.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;}
+  .btn.ghost{background:transparent;color:var(--ink);}.btn.sm{padding:6px 11px;font-size:11px;border-width:1.5px;}
+  .drop{border:2px dashed var(--hair);border-radius:10px;padding:22px;text-align:center;background:#fff;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--soft);}
+  .drop.has{border-style:solid;border-color:var(--ink);padding:10px;color:var(--ink);}
+  .drop img{max-height:220px;max-width:100%;border-radius:6px;}
+  .loading{display:none;align-items:center;gap:12px;padding:18px 0;color:var(--soft);font-family:var(--disp);font-weight:600;}
+  .loading.on{display:flex;}
+  .spin{width:20px;height:20px;border:3px solid var(--hair);border-top-color:var(--accent);border-radius:50%;animation:sp .9s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .err{border:1.5px solid var(--accent);border-radius:8px;padding:14px;background:#fff;color:var(--accent);font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin-top:12px;}
+  .ar{display:flex;gap:9px;font-size:13.5px;line-height:1.45;margin:5px 0;}
+  .ar .k{font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;width:84px;flex:none;padding-top:2px;color:var(--accent);}
+  ol.steps{font-size:14px;line-height:1.6;padding-left:20px;}ol.steps li{margin:3px 0;}
+  .cases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:14px;}
+  @media(max-width:760px){.cases{grid-template-columns:1fr;max-width:320px;margin-inline:auto;}.formgrid{grid-template-columns:1fr;}}
+  .case{position:relative;aspect-ratio:1/2.05;border-radius:36px;overflow:hidden;box-shadow:0 20px 36px -18px rgba(0,0,0,.5);border:1px solid rgba(0,0,0,.08);}
+  .case .cam{position:absolute;top:16px;left:16px;width:48px;height:48px;border-radius:14px;background:rgba(0,0,0,.18);}
+  .case .gloss{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.34),rgba(255,255,255,0) 40%);mix-blend-mode:screen;pointer-events:none;}
+  .case .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 16px;}
+  .case .sym{font-family:var(--disp);font-weight:800;line-height:1;margin-bottom:8px;}
+  .case .word{font-family:var(--disp);font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:12px;}
+  .case .slogan{position:absolute;left:0;right:0;bottom:13%;text-align:center;font-family:var(--mono);font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;}
+  .vlabel{font-family:var(--disp);font-weight:800;font-size:14px;text-transform:uppercase;margin:8px 0 2px;}
+  .pill{font-family:var(--mono);font-size:11px;border:1.5px solid var(--ink);border-radius:999px;padding:5px 10px;}
+  .imgwrap img{max-width:100%;border-radius:8px;border:1px solid var(--hair);}
+  .mat{border:1px solid var(--hair);border-radius:7px;padding:10px;background:#fff;}
+  .mats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .mat .mid{font-family:var(--disp);font-weight:800;font-size:11px;color:#fff;background:var(--ink);border-radius:3px;padding:2px 6px;display:inline-block;}
+  .mat .mnm{font-family:var(--disp);font-weight:700;font-size:12.5px;margin:6px 0 2px;}
+  .mat .mrole{font-size:11.5px;color:var(--soft);line-height:1.4;}
+  .mat .mimg{width:100%;aspect-ratio:1;border:1px dashed var(--hair);border-radius:5px;margin-top:7px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:var(--mono);font-size:9px;color:var(--soft);}
+  .mat .mimg img{width:100%;height:100%;object-fit:cover;}
+  .phrase{font-family:var(--disp);font-weight:700;font-size:15px;padding:8px 12px;border:1px solid var(--hair);border-radius:7px;background:#fff;margin:6px 0;}
+  .note{font-family:var(--mono);font-size:11px;color:var(--soft);line-height:1.6;}
+  .note b{color:var(--accent);}
+  /* die-line picker */
+  .dlgrid{display:grid;grid-template-columns:210px 1fr;gap:18px;align-items:start;margin-top:14px;}
+  @media(max-width:620px){.dlgrid{grid-template-columns:1fr;max-width:300px;}}
+  .dlimg{border:1.5px solid var(--ink);border-radius:8px;background:#fff;padding:8px;}
+  .dlimg img{width:100%;display:block;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:2px 0 12px;}
+  .lg{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--soft);}
+  .lg i{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--hair);flex:none;}
+  .lg i.ring{border-radius:50%;border:2px solid #9aa0a6;background:transparent;}
+  .spec{font-family:var(--mono);font-size:12.5px;line-height:1.85;}
+  .spec .row{display:flex;gap:8px;}
+  .spec .lab{font-family:var(--disp);font-weight:800;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);width:74px;flex:none;padding-top:3px;}
+  .spec .big{font-size:14.5px;color:var(--ink);}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Case&nbsp;Studio<span class="dot">.</span></div>
+    <nav>
+      <a href="index.html">메인</a>
+      <a href="product.html" class="active">Product</a>
+      <a href="learning.html">러닝</a>
+      <a href="mydesign.html">내 디자인</a>
+      <a href="evaluation.html">평가</a>
+      <a href="reels.html">릴스</a>
+    </nav>
+  </div>
+
+  <h2 class="sec"><em>Product</em> Maker</h2>
+  <p class="lede">기종을 고르면 해당 칼선·재단/작업 사이즈가 자동으로 적용됩니다. 재질·감정·가치를 입력하면 OpenAI 디자이너가 → 문구·HTML 초안 목업·Photoshop 소재·레이어/작업 지시서를 만들어줍니다. (갤럭시 등 비표준 칼선은 아래 "직접 업로드"로)</p>
+
+  <!-- ★ 거장 디자인 추천 엔진 (입력 → 5인 철학으로 통일 추천 → 폼 자동 채움) -->
+  <div class="card" id="masterCard" style="border-color:var(--accent);box-shadow:14px 14px 0 rgba(216,65,47,.10)">
+    <div class="vh" style="color:var(--accent)">✨ 거장 디자인 추천 엔진 <small>8거장 관점 · 240 브랜드 카피 DB → TOP10(S·A·B) · 색감/타이포/구도/시선 통일</small></div>
+    <p class="note" style="margin-bottom:10px">"예쁜 디자인"이 아니라 <b>거장의 디자인 철학을 적용한 '판매 가능한' 케이스</b>가 목표입니다. 추천을 받으면 아래 재질·5옵션·로고타입·문구가 <b>한 방향</b>으로 자동 채워집니다(항목별 랜덤 아님).</p>
+    <div class="formgrid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+      <div><label>브랜드명</label><input id="meBrand" placeholder="예: SISTORY"></div>
+      <div><label>가치관</label><input id="meValues" placeholder="예: 성장, 끈기"></div>
+      <div><label>좋아하는 색</label><input id="meColor" placeholder="예: 블랙 / 네이비"></div>
+      <div><label>분위기</label><input id="meMood" placeholder="예: 강인함"></div>
+      <div><label>상징</label><input id="meSymbol" placeholder="예: 고목나무에 핀 꽃"></div>
+      <div><label>원하는 문구 (선택)</label><input id="mePhrase" placeholder="비우면 추천"></div>
+    </div>
+    <div class="bar" style="margin-top:12px">
+      <button class="btn" id="meRun">✨ 거장 추천 받기</button>
+      <span class="pill" id="meStat">대기</span>
+    </div>
+    <div class="loading" id="meLoad"><div class="spin"></div><span id="meMsg">거장 관점 분석 중…</span></div>
+    <div id="meOut"></div>
+  </div>
+
+  <!-- 1. 기종 선택 → 칼선 자동 -->
+  <div class="card">
+    <div class="vh">1 · 기종 선택 → 칼선 자동 적용 <small>아이폰 28종 내장 · 레드프린팅 GS 글라스 범퍼 Magsafe 기준</small></div>
+    <div class="formgrid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+      <div><label>아이폰 기종</label>
+        <select id="model">
+          <option value="">— 기종을 선택하세요 —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 자동 칼선 미리보기 -->
+    <div id="dlview" style="display:none">
+      <div class="dlgrid">
+        <div class="dlimg" id="dlimgwrap"><img id="dlimg" alt="die line" src=""></div>
+        <div>
+          <div class="legend">
+            <span class="lg"><i style="background:#c026a3"></i> 재단선 (바깥=잘림)</span>
+            <span class="lg"><i style="background:#2f9e44"></i> 안전영역 (안쪽 5mm)</span>
+            <span class="lg"><i class="ring"></i> MagSafe 링</span>
+            <span class="lg"><i style="background:#cfcfcf"></i> 카메라 홀 (상단)</span>
+          </div>
+          <div class="spec" id="dlspec"></div>
+          <p class="note" style="margin-top:8px">디자인 요소는 <b>초록 안전영역 안쪽</b>에, 중요한 글자/심볼은 <b>맥세이프 링을 피해</b> 배치하세요. 배경/패턴은 재단선 끝까지 채워 흰 테두리를 방지합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 비표준 직접 업로드 (갤럭시 등) -->
+    <div id="dropwrap" style="display:none;margin-top:14px">
+      <label>칼선 직접 업로드 <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--soft)">(SVG · PNG는 Vision 분석 / PSD는 가이드 방식)</span></label>
+      <div class="drop" id="drop">칼선 파일을 클릭/드롭 (SVG · PNG · PSD)<input type="file" id="file" accept=".svg,.png,image/*,.psd" hidden></div>
+      <p class="note" id="filenote" style="margin-top:8px"></p>
+    </div>
+  </div>
+
+  <!-- 2. 입력 -->
+  <div class="card">
+    <div class="vh">2 · 케이스 재질 & 디자인 옵션 <small>각 항목 = 거장 관점 · 효과값 · 기타. 한 곳에서 거장을 고르면 전 항목이 그 거장으로 통일</small> <span class="pill" id="designerTag" style="margin-left:6px">거장 자동</span></div>
+    <div class="formgrid">
+      <div><label>케이스 재질</label>
+        <select id="material"></select></div>
+      <div id="optslot"></div><!-- 5개 옵션이 여기에 자동 생성 -->
+    </div>
+    <div class="formgrid" style="margin-top:12px">
+      <div><label>브랜드명 / 로고명</label><input id="brandname" placeholder="예: SI STORY (비우면 YOUR NAME)"></div>
+      <div><label>원하는 문구 (없으면 AI가 생성)</label><input id="phrase" placeholder="예: made, not found"></div>
+    </div>
+    <div style="margin-top:12px"><label>의미 (이 사람·이 케이스가 담을 것 · 직접 입력)</label>
+      <textarea id="meaning" placeholder="예: 힘든 하루를 보내는 사람에게 조용한 위로를 주고 싶다."></textarea></div>
+    <div class="bar" style="margin-top:14px">
+      <button class="btn" id="run">디자인 생성</button>
+      <span class="pill" id="stat">대기</span>
+    </div>
+    <div class="loading" id="load"><div class="spin"></div><span id="loadmsg">분석 중…</span></div>
+  </div>
+
+  <!-- ===== LOGO GENERATOR (Product 앞 단계) ===== -->
+  <div class="card" id="logoCard">
+    <div class="vh">0 · 로고 생성 <small>FLUX=심볼 · SVG=글자 · Claude=방향 (Product 전 단계)</small></div>
+    <p class="note" style="margin-bottom:10px">먼저 로고를 만들고, 그 로고를 아래 Product 디자인에 얹습니다. 글자는 실제 폰트(SVG)로 렌더되어 절대 깨지지 않습니다. <b>색·상징·가치관·분위기·타입은 ✨거장 자동</b>으로 두면 잠금 거장과 케이스 디자인에 맞춰 일관되게 결정됩니다.</p>
+    <div class="formgrid" style="grid-template-columns:repeat(2,1fr)">
+      <div><label>브랜드명 / 애칭 (영문)</label><input id="lgName" placeholder="예: SI STORY"></div>
+      <div><label>로고 타입</label>
+        <select class="sel" id="lgType" style="width:100%">
+          <option value="auto">✨ 거장 관점 자동</option>
+          <option value="combination">Combination (심볼+글자)</option>
+          <option value="symbol">Symbol (심볼만)</option>
+          <option value="wordmark">Wordmark (글자만)</option>
+        </select></div>
+      <div><label style="display:flex;justify-content:space-between;align-items:center">좋아하는 색 <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--accent)"><input type="checkbox" id="auto_lgColor" style="width:auto;margin:0 3px 0 0;vertical-align:middle">✨거장 자동</span></label><input id="lgColor" placeholder="예: 네이비 / #1B2A4A"></div>
+      <div><label style="display:flex;justify-content:space-between;align-items:center">좋아하는 동물·상징 <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--accent)"><input type="checkbox" id="auto_lgSymbol" style="width:auto;margin:0 3px 0 0;vertical-align:middle">✨거장 자동</span></label><input id="lgSymbol" placeholder="예: 늑대 / 고목나무 꽃"></div>
+      <div><label style="display:flex;justify-content:space-between;align-items:center">가치관 3개 <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--accent)"><input type="checkbox" id="auto_lgValues" style="width:auto;margin:0 3px 0 0;vertical-align:middle">✨거장 자동</span></label><input id="lgValues" placeholder="예: 성장, 끈기, 가족"></div>
+      <div><label style="display:flex;justify-content:space-between;align-items:center">분위기 <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--accent)"><input type="checkbox" id="auto_lgMood" style="width:auto;margin:0 3px 0 0;vertical-align:middle">✨거장 자동</span></label><input id="lgMood" placeholder="예: 잔잔한 위로 / 강인한"></div>
+    </div>
+    <div class="bar" style="margin-top:12px">
+      <button class="btn" id="lgRun">로고 생성</button>
+      <span class="pill" id="lgStat">대기</span>
+    </div>
+    <div class="loading" id="lgLoad"><div class="spin"></div><span id="lgMsg">로고 방향 분석 중…</span></div>
+    <div id="lgOut"></div>
+  </div>
+
+  <div id="out"></div>
+
+  <div class="card" style="margin-top:24px">
+    <div class="vh">이미지 엔진 설정 <small>소재 이미지는 FLUX 1.1 pro ultra (fal.ai) · 2K 고품질 · 장당 ~85원</small></div>
+    <div class="formgrid" style="grid-template-columns:1fr auto;align-items:end">
+      <div><label>fal.ai 키 (FAL_KEY)</label>
+        <input id="falk" type="password" placeholder="fal.ai 대시보드 → Keys 에서 발급 후 붙여넣기" autocomplete="off"></div>
+      <div><button class="btn" id="falsave" type="button">키 저장</button></div>
+    </div>
+    <p class="note" id="falstat" style="margin-top:8px"></p>
+    <p class="note">발급: <b>https://fal.ai/dashboard/keys</b> · 이 키는 이 브라우저(localStorage)에만 저장되며 다른 페이지와 공유됩니다. <b>공개 PC에선 저장 금지.</b></p>
+  </div>
+
+  <p class="note" style="margin-top:24px;border-top:1px solid var(--hair);padding-top:14px">
+    텍스트·칼선 분석은 메인 <b>설정</b>의 OpenAI 키를 공유합니다. 기종을 고르면 칼선·사이즈는 내장 데이터로 자동 적용(<b>Vision 불필요</b>). 갤럭시 등 비표준 칼선만 업로드해 Vision으로 분석합니다. 소재 이미지는 <b>FLUX 1.1 pro ultra</b>(2K 고품질)로 생성됩니다 — 단, FLUX는 진짜 투명배경을 못 만들어서 잘라낼 소재는 <b>흰 배경으로 생성 → 포토샵에서 배경 제거</b>합니다. 정확한 워드마크 글자는 Photoshop Type Tool로 입력하세요(AI 이미지 글자는 깨질 수 있음).
+  </p>
+</div>
+
+<script>
+function ls_get(k){try{return localStorage.getItem(k)||"";}catch(e){return"";}}
+function ls_set(k,v){try{localStorage.setItem(k,v);return true;}catch(e){return false;}}
+const OMODEL=()=>ls_get("omdl")||"gpt-4o-mini";
+const $=id=>document.getElementById(id);
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function show(e,on){e.classList.toggle("on",on);}
+function parseJSON(t,o,c){let s=String(t).replace(/```json/gi,"").replace(/```/g,"").trim();const a=s.indexOf(o),b=s.lastIndexOf(c);if(a!==-1&&b!==-1)s=s.slice(a,b+1);try{return JSON.parse(s);}catch(e){const last=s.lastIndexOf("}");if(o==="["&&last!==-1){try{return JSON.parse(s.slice(0,last+1)+"]");}catch(_){}}return null;}}
+
+/* ── 아이폰 28종 칼선 데이터 (레드프린팅 GS 글라스 범퍼 Magsafe) ──
+   cut=재단(mm,[W,H]) · work=작업(mm,[W,H]) · img=dielines/<key>.png
+   작업 = 재단 + 상하좌우 5mm(각 변 +10mm). 안전영역 = 재단선 안쪽 5mm. */
+const DIELINES=[
+ {key:"ip17",       label:"iPhone 17",        series:"iPhone 17", cut:[72.9,151],  work:[82.9,161]},
+ {key:"ip17e",      label:"iPhone 17e",       series:"iPhone 17", cut:[73.7,148.9],work:[83.7,158.9]},
+ {key:"ip17air",    label:"iPhone 17 Air",    series:"iPhone 17", cut:[76,132.7],  work:[86,142.7]},
+ {key:"ip17pro",    label:"iPhone 17 Pro",    series:"iPhone 17", cut:[72.7,109.4],work:[82.7,119.4]},
+ {key:"ip17promax", label:"iPhone 17 Pro Max",series:"iPhone 17", cut:[78.8,123.2],work:[88.8,133.2]},
+ {key:"ip16",       label:"iPhone 16",        series:"iPhone 16", cut:[73,149],    work:[83,159]},
+ {key:"ip16e",      label:"iPhone 16e",       series:"iPhone 16", cut:[73.7,148.9],work:[83.7,158.9]},
+ {key:"ip16plus",   label:"iPhone 16+",       series:"iPhone 16", cut:[79.2,162.3],work:[89.2,172.3]},
+ {key:"ip16pro",    label:"iPhone 16 Pro",    series:"iPhone 16", cut:[72.9,151],  work:[82.9,161]},
+ {key:"ip16promax", label:"iPhone 16 Pro Max",series:"iPhone 16", cut:[79,164.4],  work:[89,174.4]},
+ {key:"ip15",       label:"iPhone 15",        series:"iPhone 15", cut:[73,149],    work:[83,159]},
+ {key:"ip15plus",   label:"iPhone 15+",       series:"iPhone 15", cut:[79.2,162.3],work:[89.2,172.3]},
+ {key:"ip15pro",    label:"iPhone 15 Pro",    series:"iPhone 15", cut:[72,148],    work:[82,158]},
+ {key:"ip15promax", label:"iPhone 15 Pro Max",series:"iPhone 15", cut:[78.2,161.3],work:[88.2,171.3]},
+ {key:"ip14",       label:"iPhone 14",        series:"iPhone 14", cut:[73.7,148.9],work:[83.7,158.9]},
+ {key:"ip14plus",   label:"iPhone 14+",       series:"iPhone 14", cut:[80.3,163],  work:[90.3,173]},
+ {key:"ip14pro",    label:"iPhone 14 Pro",    series:"iPhone 14", cut:[73.7,149.7],work:[83.7,159.7]},
+ {key:"ip14promax", label:"iPhone 14 Pro Max",series:"iPhone 14", cut:[79.8,162.9],work:[89.8,172.9]},
+ {key:"ip13",       label:"iPhone 13",        series:"iPhone 13", cut:[73.7,148.9],work:[83.7,158.9]},
+ {key:"ip13mini",   label:"iPhone 13 Mini",   series:"iPhone 13", cut:[66.4,133.7],work:[76.4,143.7]},
+ {key:"ip13pro",    label:"iPhone 13 Pro",    series:"iPhone 13", cut:[73.7,148.9],work:[83.7,158.9]},
+ {key:"ip13promax", label:"iPhone 13 Pro Max",series:"iPhone 13", cut:[80.3,163],  work:[90.3,173]},
+ {key:"ip12",       label:"iPhone 12",        series:"iPhone 12", cut:[73.7,148.9],work:[83.7,158.9]},
+ {key:"ip12mini",   label:"iPhone 12 Mini",   series:"iPhone 12", cut:[66.6,133.9],work:[76.6,143.9]},
+ {key:"ip12promax", label:"iPhone 12 Pro Max",series:"iPhone 12", cut:[80.3,163],  work:[90.3,173]},
+ {key:"ip11",       label:"iPhone 11",        series:"iPhone 11", cut:[73.6,148.8],work:[83.6,158.8]},
+ {key:"ip11pro",    label:"iPhone 11 Pro",    series:"iPhone 11", cut:[69.6,142.3],work:[79.6,152.3]},
+ {key:"ip11promax", label:"iPhone 11 Pro Max",series:"iPhone 11", cut:[75.7,155.8],work:[85.7,165.8]},
+ /* ── 갤럭시 (레드프린팅 글라스 범퍼 Magsafe) · 칼선 그림 미보유 → 사이즈 전용 ── */
+ {key:"gxs26ultra", label:"Galaxy S26 Ultra", series:"Galaxy S26", plat:"gx", cut:[78.3,163.8],work:[88.3,173.8]},
+ {key:"gxs26plus",  label:"Galaxy S26+",      series:"Galaxy S26", plat:"gx", cut:[75.9,158.6],work:[85.9,168.6]},
+ {key:"gxs26",      label:"Galaxy S26",       series:"Galaxy S26", plat:"gx", cut:[71.8,149.7],work:[81.8,159.7]},
+ {key:"gxs25ultra", label:"Galaxy S25 Ultra", series:"Galaxy S25", plat:"gx", cut:[77.1,162.3],work:[87.1,172.3]},
+ {key:"gxs25plus",  label:"Galaxy S25+",      series:"Galaxy S25", plat:"gx", cut:[75.8,158.4],work:[85.8,168.4]},
+ {key:"gxs25",      label:"Galaxy S25",       series:"Galaxy S25", plat:"gx", cut:[70.6,147],  work:[80.6,157]},
+ {key:"gxs25edge",  label:"Galaxy S25 Edge",  series:"Galaxy S25", plat:"gx", cut:[75.5,158.2],work:[85.5,168.2]},
+ {key:"gxs24ultra", label:"Galaxy S24 Ultra", series:"Galaxy S24", plat:"gx", cut:[77.6,161.5],work:[87.6,171.5]},
+ {key:"gxs24plus",  label:"Galaxy S24+",      series:"Galaxy S24", plat:"gx", cut:[75.7,158.3],work:[85.7,168.3]},
+ {key:"gxs24",      label:"Galaxy S24",       series:"Galaxy S24", plat:"gx", cut:[70.4,146.9],work:[80.4,156.9]},
+ {key:"gxs23ultra", label:"Galaxy S23 Ultra", series:"Galaxy S23", plat:"gx", cut:[72.5,164.3],work:[82.5,174.3]},
+ {key:"gxs23plus",  label:"Galaxy S23+",      series:"Galaxy S23", plat:"gx", cut:[75.7,157.3],work:[85.7,167.3]},
+ {key:"gxs23",      label:"Galaxy S23",       series:"Galaxy S23", plat:"gx", cut:[70.4,145.9],work:[80.4,155.9]},
+ {key:"gxs22",      label:"Galaxy S22",       series:"Galaxy S22", plat:"gx", cut:[69.7,145.2],work:[79.7,155.2]},
+ {key:"gxs22ultra", label:"Galaxy S22 Ultra", series:"Galaxy S22", plat:"gx", cut:[72.4,163.7],work:[82.4,173.7]},
+ {key:"gxs22plus",  label:"Galaxy S22+",      series:"Galaxy S22", plat:"gx", cut:[75.2,156.8],work:[85.2,166.8]},
+ {key:"gxs21ultra", label:"Galaxy S21 Ultra", series:"Galaxy S21", plat:"gx", cut:[72.2,161.7],work:[82.2,171.7]},
+ {key:"gxs21plus",  label:"Galaxy S21+",      series:"Galaxy S21", plat:"gx", cut:[72.6,158.5],work:[82.6,168.5]},
+ {key:"gxs21",      label:"Galaxy S21",       series:"Galaxy S21", plat:"gx", cut:[68.1,148.6],work:[78.1,158.6]},
+ {key:"gxzfold7",   label:"Galaxy Z Fold7",   series:"Galaxy Z Fold", plat:"gx", cut:[73.1,160.8],work:[83.1,170.8]},
+ {key:"gxzfold6",   label:"Galaxy Z Fold6",   series:"Galaxy Z Fold", plat:"gx", cut:[67.8,155.7],work:[77.8,165.7]},
+ {key:"gxzfold5",   label:"Galaxy Z Fold5",   series:"Galaxy Z Fold", plat:"gx", cut:[66.4,156.9],work:[76.4,166.9]},
+ {key:"gxzfold4",   label:"Galaxy Z Fold4",   series:"Galaxy Z Fold", plat:"gx", cut:[64,156.9],  work:[74,166.9]},
+ {key:"gxzflip7",   label:"Galaxy Z Flip7",   series:"Galaxy Z Flip", plat:"gx", cut:[79.3,85.8], work:[89.3,95.8]},
+ {key:"gxzflip6",   label:"Galaxy Z Flip6",   series:"Galaxy Z Flip", plat:"gx", cut:[74.8,179.4],work:[84.8,189.4]},
+ {key:"gxzflip5",   label:"Galaxy Z Flip5",   series:"Galaxy Z Flip", plat:"gx", cut:[74.1,179.2],work:[84.1,189.2]},
+ {key:"gxzflip4",   label:"Galaxy Z Flip4",   series:"Galaxy Z Flip", plat:"gx", cut:[73.7,177.4],work:[83.7,187.4]},
+ {key:"gxzflip3",   label:"Galaxy Z Flip3",   series:"Galaxy Z Flip", plat:"gx", cut:[73.3,179.1],work:[83.3,189.1]},
+];
+const mm2px=mm=>Math.round(mm*300/25.4); // 300dpi
+
+/* 기종 드롭다운 구성 */
+(function(){
+  const sel=$("model"); const order=["iPhone 17","iPhone 16","iPhone 15","iPhone 14","iPhone 13","iPhone 12","iPhone 11",
+    "Galaxy S26","Galaxy S25","Galaxy S24","Galaxy S23","Galaxy S22","Galaxy S21","Galaxy Z Fold","Galaxy Z Flip"];
+  order.forEach(s=>{
+    const og=document.createElement("optgroup"); og.label=s;
+    DIELINES.filter(d=>d.series===s).forEach(d=>{
+      const o=document.createElement("option"); o.value=d.key; o.textContent=d.label; og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+  const oc=document.createElement("option"); oc.value="__custom"; oc.textContent="기타 (비표준 칼선 직접 업로드)"; sel.appendChild(oc);
+})();
+
+let UP=null;             // 업로드 칼선(비표준)
+window.__model=null;     // 선택된 기종
+
+/* ── 디자인 옵션 5종 (감성/색감/구도/시선/타이포) · AI자동 기본 ── */
+/* ── 거장 관점 6선택지 (AI 자동 + 5인) + 철학 ── */
+const DESIGNERS=[
+ {k:"__ai",            label:"✨ AI 자동 (거장이 자동 선택)"},
+ {k:"Paul Rand",       label:"Paul Rand 관점"},
+ {k:"Massimo Vignelli",label:"Massimo Vignelli 관점"},
+ {k:"Paula Scher",     label:"Paula Scher 관점"},
+ {k:"Saul Bass",       label:"Saul Bass 관점"},
+ {k:"Josef Albers",    label:"Josef Albers 관점"},
+ {k:"Dieter Rams",     label:"Dieter Rams 관점"},
+ {k:"Rory Sutherland", label:"Rory Sutherland 관점"},
+ {k:"Seth Godin",      label:"Seth Godin 관점"},
+];
+const DPHIL={
+ "Paul Rand":"기업 모더니즘 · 위트 있는 단순함 · 강한 단일 심볼 · 본질만 남기는 환원(IBM·UPS·NeXT)",
+ "Massimo Vignelli":"합리주의·그리드·타임리스 · 소수 서체(Helvetica류) · 유행 배제 · 절제된 우아함",
+ "Paula Scher":"표현적 타이포 · 타입을 이미지처럼 · 대담하고 에너지 넘치는 워드마크 · 화면을 꽉 채움",
+ "Saul Bass":"픽토그램 심볼·컷페이퍼 형태 · 강한 실루엣과 운동감 · 상징 하나로 이야기(AT&T·영화 타이틀)",
+ "Josef Albers":"색의 상호작용 · 기하 추상 · 절제된 팔레트의 광학적 긴장 · 색 조합 자체가 디자인",
+ "Dieter Rams":"Less but better · 정직·무군더더기·기능 우선 · 거슬리지 않는 디자인(Braun)",
+ "Rory Sutherland":"행동경제학 · 기능이 아니라 '신호/지각가치'를 판다 · 심리적 프레이밍",
+ "Seth Godin":"부족(tribe)·정체성·소속 · '모두를 위한 게 아니다' · purple cow",
+};
+const MATERIALS=["유광 블랙 (Glossy Black)","유광 실버 (Glossy Silver)","무광 블랙 (Matte Black)","무광 실버 (Matte Silver)"];
+window.__designer="__ai"; // 현재 통일된 거장
+function designerOptgroup(){ let h='<optgroup label="거장 관점 (한 곳에서 고르면 전 항목 통일)">'; DESIGNERS.forEach(d=>h+='<option value="d:'+d.k+'">'+d.label+'</option>'); return h+'</optgroup>'; }
+/* 한 곳에서 거장을 고르면 거장 값을 쓰는 모든 항목을 같은 거장으로 통일(직접 효과값/기타 지정 항목은 존중) */
+function syncDesigner(key){
+  window.__designer=key;
+  ["material","opt_emotion","opt_color","opt_comp","opt_gaze","opt_typo"].forEach(id=>{
+    const sel=$(id); if(!sel) return;
+    if(String(sel.value).indexOf("d:")===0) sel.value="d:"+key;
+    const ci=$("optc_"+id.replace("opt_","")); if(ci) ci.style.display="none";
+  });
+  const tag=$("designerTag"); if(tag) tag.textContent = (key==="__ai") ? "거장 자동" : (key+" 관점으로 통일");
+}
+function onFieldChange(id){
+  const sel=$(id); if(!sel) return; const v=String(sel.value); const ci=$("optc_"+id.replace("opt_",""));
+  if(v.indexOf("d:")===0) syncDesigner(v.slice(2));
+  else if(v==="__custom"){ if(ci) ci.style.display="block"; }
+  else { if(ci) ci.style.display="none"; }
+}
+const OPTS=[
+ {id:"emotion", label:"감성 / 분위기", list:["고요 (Quiet Luxury)","평온 (Calm)","위로 (Healing)","당당 (Confidence)","절제 (Minimal)","품격 (Premium)","사랑스러움 (Cute)","감성 (Emotional)","강인 (Strong)","우아 (Elegant)","모던 (Modern)","발랄 (Playful)"]},
+ {id:"color",   label:"색감",        list:["안정 (블랙+크림)","고급 (네이비+골드)","깔끔 (실버+화이트)","시크 (모노크롬)","부드러움 (파스텔)","활기 (비비드 포인트 1색)","미래적 (크롬·메탈)","따뜻함 (어스 톤)"]},
+ {id:"comp",    label:"구도",        list:["안정 (중앙 집중)","균형 (3분할)","동적 (Z 패턴)","절제 (미니멀 그리드)","차분 (하단 정렬)","주목 (상단 워드마크)","대담 (풀블리드)","여유 (여백 강조)"]},
+ {id:"gaze",    label:"시선 흐름",    list:["집중 (중앙 한 점)","흐름 (위→아래)","탐색 (Z자 지그재그)","안정 (좌→우 가로)","상승 (아래→위)","대각 (좌상→우하)","순환 (원형 배치)"]},
+ {id:"typo",    label:"타이포",      list:["모던 (굵은 산세리프)","우아 (세리프)","미니멀 (얇은 산세리프)","개성 (디스플레이·라운드)","테크 (모노스페이스)","감성 (필기체·스크립트)","클래식 (대문자 와이드 자간)"]},
+];
+(function(){
+  // 재질 select: 거장 관점 + 재질(직접)
+  const mat=$("material");
+  if(mat){ mat.innerHTML=designerOptgroup()+'<optgroup label="재질 (직접 선택)">'+MATERIALS.map(m=>'<option value="'+m+'">'+m.split(" (")[0]+'</option>').join("")+'</optgroup>'; mat.value="d:__ai"; mat.onchange=()=>onFieldChange("material"); }
+  // 5개 디자인 옵션 select 생성
+  const slot=$("optslot"); if(!slot) return;
+  const frag=document.createDocumentFragment();
+  OPTS.forEach(o=>{
+    const wrap=document.createElement("div");
+    let html='<label>'+o.label+'</label><select id="opt_'+o.id+'">'+designerOptgroup()+
+             '<optgroup label="효과값 (직접 선택)">'+o.list.map(v=>'<option value="'+v+'">'+v+'</option>').join("")+'</optgroup>'+
+             '<option value="__custom">기타 (직접 입력)</option></select>'+
+             '<input id="optc_'+o.id+'" placeholder="직접 입력" style="display:none;margin-top:6px">';
+    wrap.innerHTML=html; frag.appendChild(wrap);
+  });
+  slot.replaceWith(...[].slice.call(frag.childNodes)); // optslot 자리에 옵션들 펼치기
+  OPTS.forEach(o=>{ const sel=$("opt_"+o.id); if(sel){ sel.value="d:__ai"; sel.onchange=()=>onFieldChange("opt_"+o.id); } });
+})();
+function readOpt(o){ const sel=$("opt_"+o.id); if(!sel) return "AI 자동"; const v=String(sel.value);
+  if(v.indexOf("d:")===0){ const k=v.slice(2); return k==="__ai" ? "AI 자동 (거장이 의미·재질에 맞게 선택)" : (k+" 관점"); }
+  if(v==="__custom") return ($("optc_"+o.id).value.trim()||"AI 자동"); return v; }
+function readMaterial(){ const sel=$("material"); if(!sel) return "유광 블랙 (Glossy Black)"; const v=String(sel.value);
+  if(v.indexOf("d:")===0){ const k=v.slice(2); return k==="__ai" ? "거장 관점에서 자동 선택" : (k+" 관점에서 선택"); } return v; }
+/* 최종 잠금 거장: 명시 선택 거장 > 추천엔진 1순위 > 없음 */
+function lockedDesigner(){ if(window.__designer&&window.__designer!=="__ai") return window.__designer;
+  if(window.__master&&window.__master.designers&&window.__master.designers[0]){ const n=window.__master.designers[0].name||""; for(const d of DESIGNERS){ if(d.k!=="__ai"&&n.indexOf(d.k)>-1) return d.k; } }
+  return null; }
+
+/* fal.ai 키 로드/저장 */
+(function(){
+  const f=$("falk"); if(f){ const cur=ls_get("falk"); if(cur){ f.value=cur; $("falstat").innerHTML='<b style="color:var(--ok)">저장됨</b> · 소재 이미지 생성 준비 완료'; } }
+  const b=$("falsave"); if(b) b.onclick=()=>{
+    const v=$("falk").value.trim();
+    if(!v){ $("falstat").textContent="키를 입력하세요."; return; }
+    if(ls_set("falk",v)) $("falstat").innerHTML='<b style="color:var(--ok)">저장 완료</b> · 이제 소재 "이미지 생성"이 FLUX로 동작합니다.';
+    else $("falstat").textContent="저장 실패(브라우저 저장소 차단).";
+  };
+})();
+
+function renderDieline(m){
+  const cw=mm2px(m.work[0]), ch=mm2px(m.work[1]);
+  if(m.noimg){
+    $("dlimgwrap").innerHTML='<div style="aspect-ratio:'+(m.cut[0]/m.cut[1]).toFixed(3)+';border:1.5px dashed var(--hair);border-radius:7px;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--mono);font-size:10px;color:var(--soft);padding:10px;line-height:1.5">칼선 그림<br>미보유<br>(사이즈 적용됨)</div>';
+  } else {
+    $("dlimgwrap").innerHTML='<img id="dlimg" alt="'+esc(m.label)+' die line" src="dielines/'+m.key+'.png">';
+  }
+  $("dlspec").innerHTML=
+    '<div class="row"><span class="lab">기종</span><span class="big"><b>'+esc(m.label)+'</b></span></div>'+
+    '<div class="row"><span class="lab">재단</span><span>'+m.cut[0]+' × '+m.cut[1]+' mm <span style="color:var(--soft)">(잘리는 실제 케이스 크기)</span></span></div>'+
+    '<div class="row"><span class="lab">작업</span><span class="big"><b>'+m.work[0]+' × '+m.work[1]+' mm</b></span></div>'+
+    '<div class="row"><span class="lab">300dpi</span><span>'+cw+' × '+ch+' px <span style="color:var(--soft)">← 포토샵 새 문서 크기</span></span></div>'+
+    '<div class="row"><span class="lab">여백</span><span>재단선 기준 상하좌우 +5mm (각 변 +5mm 도련)</span></div>'+
+    (m.noimg?'<div class="row"><span class="lab">참고</span><span style="color:var(--accent)">갤럭시는 칼선 그림이 아직 없어 사이즈만 적용됩니다. 카메라 위치는 레드프린팅 .ai로 확인하세요.</span></div>':'');
+  $("dlview").style.display="block";
+}
+
+$("model").onchange=()=>{
+  const v=$("model").value;
+  UP=null; resetDrop();
+  if(v==="__custom"){ $("dropwrap").style.display="block"; $("dlview").style.display="none"; window.__model=null; return; }
+  $("dropwrap").style.display="none";
+  if(!v){ $("dlview").style.display="none"; window.__model=null; return; }
+  window.__model=DIELINES.find(d=>d.key===v)||null;
+  if(window.__model) renderDieline(window.__model);
+};
+
+/* OpenAI chat (+optional vision image) */
+async function openaiChat(text,image,max_tokens){
+  const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
+  const content=[{type:"text",text}];
+  if(image) content.push({type:"image_url",image_url:{url:image}});
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:OMODEL(),messages:[{role:"user",content}],max_tokens:max_tokens||1600,temperature:0.7})});
+  const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 오류");
+  return d.choices[0].message.content.trim();
+}
+/* FLUX 1.1 pro ultra 이미지 생성 (fal.ai · 2K 고품질 · 장당 ~85원) */
+async function fluxImage(prompt,portrait){
+  const key=ls_get("falk"); if(!key) throw new Error("아래 '이미지 엔진' 칸에 fal.ai 키를 저장하세요. (https://fal.ai/dashboard/keys)");
+  const aspect_ratio = portrait ? "9:16" : "1:1";
+  let r;
+  try{
+    r=await fetch("https://fal.run/fal-ai/flux-pro/v1.1-ultra",{method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Key "+key},
+      body:JSON.stringify({prompt,aspect_ratio,num_images:1,output_format:"png",enable_safety_checker:true})});
+  }catch(e){ throw new Error("fal.ai 연결 실패(네트워크/CORS). 키를 확인하거나 잠시 후 다시 시도하세요."); }
+  let d; try{ d=await r.json(); }catch(e){ throw new Error("fal.ai 응답 해석 실패 (HTTP "+r.status+")"); }
+  if(!r.ok){ const msg=(d&&(d.detail||d.message))||("HTTP "+r.status); throw new Error("fal.ai 오류: "+(typeof msg==="string"?msg:JSON.stringify(msg))); }
+  const img=d.images&&d.images[0]; if(!img||!img.url) throw new Error("이미지 없음(fal.ai 응답에 images 없음)");
+  return img.url;
+}
+/* FLUX.1 Kontext [pro] 이미지→이미지 (fal.ai) — 레퍼런스 이미지(실제 케이스 디자인)를 유지하면서 장면만 바꿈.
+   연출컷의 '디자인 일관성 + 사진 품질'을 위해 사용. image_url엔 Front 합성본(data URL) 전달. */
+async function fluxKontext(prompt, imageUrl){
+  const key=ls_get("falk"); if(!key) throw new Error("fal.ai 키가 필요합니다(설정).");
+  let r;
+  try{
+    r=await fetch("https://fal.run/fal-ai/flux-pro/kontext",{method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Key "+key},
+      body:JSON.stringify({prompt,image_url:imageUrl,num_images:1,output_format:"png"})});
+  }catch(e){ throw new Error("fal.ai(Kontext) 연결 실패(네트워크/CORS)."); }
+  let d; try{ d=await r.json(); }catch(e){ throw new Error("fal.ai(Kontext) 응답 해석 실패 (HTTP "+r.status+")"); }
+  if(!r.ok){ const msg=(d&&(d.detail||d.message))||("HTTP "+r.status); throw new Error("Kontext 오류: "+(typeof msg==="string"?msg:JSON.stringify(msg))); }
+  const img=d.images&&d.images[0]; if(!img||!img.url) throw new Error("Kontext 이미지 없음");
+  return img.url;
+}
+
+/* upload (비표준 칼선 전용) */
+const drop=$("drop"),file=$("file");
+function resetDrop(){ if(!drop)return; drop.classList.remove("has"); drop.innerHTML='칼선 파일을 클릭/드롭 (SVG · PNG · PSD)<input type="file" id="file" accept=".svg,.png,image/*,.psd" hidden>'; bindDrop(); $("filenote").textContent=""; }
+function bindDrop(){
+  const d=$("drop"),f=$("file");
+  d.onclick=()=>f.click();
+  d.ondragover=e=>e.preventDefault();
+  d.ondrop=e=>{e.preventDefault();if(e.dataTransfer.files[0])pick(e.dataTransfer.files[0]);};
+  f.onchange=()=>{if(f.files[0])pick(f.files[0]);};
+}
+bindDrop();
+function pick(f){
+  const name=f.name, isPSD=/\.psd$/i.test(name), isVector=/\.svg$/i.test(name)||/svg/i.test(f.type);
+  if(isPSD){
+    UP={kind:"psd",name};
+    $("drop").classList.add("has"); $("drop").innerHTML='📄 '+esc(name)+' (PSD)';
+    $("filenote").innerHTML='PSD는 브라우저에서 직접 분석하지 않습니다. <b>Photoshop에서 열어</b> 칼선을 가이드 레이어로 두고, 아래 생성될 작업 지시서를 그대로 따라가세요.';
+    return;
+  }
+  const r=new FileReader();
+  r.onload=()=>{ UP={kind:isVector?"svg":"img",name,url:r.result};
+    $("drop").classList.add("has"); $("drop").innerHTML='<img src="'+r.result+'" alt="die line">';
+    $("filenote").textContent=name+' — Vision 분석 사용';
+  };
+  r.readAsDataURL(f);
+}
+
+/* ===== 거장 문구 추천 엔진 (240 DB + 8거장 → TOP10 S/A/B + 디자인 통일) ===== */
+/* 240개 브랜드 카피 DB (카테고리별 30개, [문구, 판매력점수]) — 자기계발 클리셰 배제 */
+const PHRASE_DB={
+COURAGE:[["HOLD THE LINE",9],["NO RETREAT",8],["FORWARD ONLY",8],["RISK IT",8],["FIRST IN",7],["STAND",9],["AGAINST THE GRAIN",9],["WALK IN",7],["OWN THE EDGE",8],["NO FLINCH",8],["MOVE FIRST",7],["THE HARD ROAD",7],["UNAFRAID",8],["STEP UP",6],["TAKE THE SHOT",8],["NERVE",9],["INTO THE FIRE",7],["NO PERMISSION",8],["SAY IT LOUDER",8],["BURN THE MAP",8],["ALL IN",7],["EYES UP",6],["PUSH",7],["LEAD OR LEAVE",8],["NOTHING TO PROVE",9],["THE BOLD GET BUILT",9],["CLAIM IT",7],["RAISE THE STAKES",7],["STEEL",8],["DARE FORWARD",7]],
+DISCIPLINE:[["EVERY DAY",8],["NO SHORTCUTS",8],["SHOW UP",7],["REPS",8],["THE WORK",9],["SLOW IS SMOOTH",8],["EARN IT",8],["ONE MORE",7],["SHARPEN",8],["THE GRIND IS QUIET",9],["CONSISTENCY OVER INTENSITY",7],["KEEP THE STANDARD",8],["NOTHING WASTED",8],["ON TIME",6],["THE BASICS, PERFECTED",9],["DO IT AGAIN",7],["HOLD FORM",9],["RIGOR",8],["PRACTICE IN PRIVATE",8],["COUNT THE HOURS",7],["MASTER THE BORING",8],["SMALL, DAILY",7],["BUILT BY REPETITION",8],["TRAIN COLD",7],["THE LONG GAME",9],["PRECISION OVER SPEED",8],["STAY SHARP",7],["EARNED, NOT GIVEN",9],["THE STANDARD IS THE STANDARD",8],["QUIET REPS",7]],
+FOCUS:[["ONE THING",9],["CUT THE NOISE",9],["EYES ON ONE",7],["SAY NO",8],["FEWER, BETTER",9],["THE MAIN THING",7],["NOTHING ELSE",8],["SINGLE TASK",7],["CLOSE THE TABS",8],["POINT BLANK",8],["AIM SMALL",7],["DEEP, NOT WIDE",8],["ONE SHOT",8],["SILENCE THE REST",8],["SUBTRACT",9],["THE NEEDLE",7],["ON TARGET",7],["NARROW",8],["ONE PAGE",7],["LOCK IN",8],["KILL THE EXTRA",8],["SEE ONE CLEARLY",8],["NO DISTRACTION",7],["SHARP ATTENTION",7],["ESSENTIAL ONLY",9],["ALL EYES, ONE LINE",8],["CONCENTRATE",7],["DROP THE REST",7],["THIS, NOT THAT",8],["FULL BEAM",7]],
+CREATOR:[["MAKE THINGS",8],["SHIP IT",9],["MADE, NOT FOUND",9],["BUILD IN PUBLIC",8],["PROOF OF WORK",8],["FROM ZERO",8],["THE MAKER'S MARK",8],["DRAW FIRST",7],["PROTOTYPE EVERYTHING",8],["BUILT BY HAND",8],["CREATE OR COPY",8],["ORIGINAL ONLY",8],["THE BLANK PAGE",8],["SHIP UGLY, FIX LATER",8],["AUTHOR YOUR OWN",9],["NOTHING BORROWED",7],["MAKER OVER TAKER",8],["PUT IT OUT",7],["DRAFT ONE",7],["THE WORK SPEAKS",9],["HANDMADE FUTURE",8],["SHIP OFTEN",7],["INVENT THE TOOL",8],["NO TEMPLATE",8],["BUILD THE THING",8],["CREATORS ONLY",9],["WRITE YOUR OWN BRIEF",8],["MADE HERE",7],["THE FIRST VERSION",7],["KEEP MAKING",8]],
+MINIMAL:[["LESS",9],["ENOUGH",9],["NOTHING EXTRA",8],["REMOVE",8],["QUIET",8],["PLAIN, PERFECT",8],["ONE COLOR",8],["EMPTY SPACE",8],["SUBTRACTED",8],["BARE",7],["LESS, BUT BETTER",10],["THE SPACE BETWEEN",8],["NO ORNAMENT",8],["CLEAN",7],["STRIP IT BACK",7],["SAY LESS",9],["WHITE SPACE WINS",8],["SIMPLE ON PURPOSE",8],["FORM, NO NOISE",9],["FEWEST PARTS",7],["UNADORNED",7],["ESSENTIAL",9],["NOTHING TO ADD",8],["NOTHING TO REMOVE",9],["CALM",7],["BLANK",7],["REDUCED",7],["PURE FORM",9],["MUTE",7],["LEAVE IT OUT",7]],
+FUTURE:[["NEXT",9],["AHEAD OF NOW",8],["TOMORROW, EARLY",7],["THE NEW DEFAULT",8],["BUILT FORWARD",8],["POST-EVERYTHING",8],["BEYOND",7],["SOON IS HERE",7],["NEW RULES",8],["UN-LEARN",8],["THE EDGE OF NOW",8],["FORWARD STATE",7],["NO NOSTALGIA",8],["ARRIVE EARLY",7],["WHAT'S NEXT",7],["BUILT FOR LATER",7],["THE COMING THING",7],["UPGRADE EVERYTHING",7],["AFTER TODAY",7],["SET THE PACE",8],["FUTURE IS LOUD",8],["SKIP THE PRESENT",7],["NEW SIGNAL",8],["ONWARD",7],["TOMORROW'S STANDARD",8],["PRE-ORDER THE FUTURE",8],["THE NEXT FORM",8],["FUTURE-FACING",7],["NO LOOKING BACK",8],["FAST FORWARD",7]],
+ARCHITECTURE:[["STRUCTURE",9],["FORM FOLLOWS",10],["LOAD-BEARING",8],["BLUEPRINT",8],["BUILT TO STAND",8],["THE GRID",9],["FOUNDATION FIRST",8],["HARD EDGES",9],["STEEL AND LINE",8],["PLUMB AND TRUE",7],["BY DESIGN",9],["CONCRETE",8],["ELEVATION",7],["THE FRAME",8],["RIGHT ANGLES",8],["BUILD STRAIGHT",7],["CANTILEVER",7],["NEGATIVE SPACE",9],["MASS AND VOID",8],["DRAW THE PLAN",7],["LOAD AND SPAN",7],["BARE STRUCTURE",8],["GEOMETRY",9],["SECTION CUT",7],["STAND BY DESIGN",8],["FORM HELD",8],["THE SCAFFOLD",7],["STRAIGHT LINES ONLY",8],["BUILT, NOT GROWN",8],["ORDER FROM CHAOS",9]],
+LUXURY:[["QUIET LUXURY",9],["FEW MADE",8],["NOT FOR SALE",8],["EARNED ACCESS",9],["THE FINER LINE",8],["RARE BY DESIGN",9],["NO LOGO NEEDED",9],["UNDERSTATED",8],["LIMITED, ALWAYS",8],["THE PRIVATE STANDARD",8],["WEIGHT YOU FEEL",7],["MADE TO LAST",8],["FEWER OWNERS",8],["THE SLOW MADE",8],["HEIRLOOM",8],["NOT LOUD, EXPENSIVE",9],["THE INNER CIRCLE",8],["PRECIOUS RESTRAINT",8],["BY INVITATION",8],["ONLY THE BEST PARTS",7],["CRAFTED, NOT MASS",8],["SILENT WEALTH",9],["THE LONG VERSION",7],["KEPT, NOT WORN OUT",7],["DISCREET",8],["THE REAL THING",8],["NO COMPROMISE",8],["FOR THE FEW",9],["TIMELESS, NOT TRENDY",9],["WORTH THE WAIT",8]]
+};
+const MASTERS=`[디자인 거장 8인 — 입력에 가장 맞는 1~2인을 골라 합 100% 비율로. 괄호=잘 맞는 문구 카테고리]
+- Paul Rand: 기업 모더니즘·위트 있는 단순함·강한 단일 심볼·환원(IBM·UPS·NeXT). (FOCUS/ARCHITECTURE/CREATOR)
+- Massimo Vignelli: 합리주의·그리드·타임리스·소수 서체·절제된 우아함. (MINIMAL/ARCHITECTURE)
+- Paula Scher: 표현적 타이포·대담·에너지·화면을 꽉 채움. (COURAGE/FUTURE)
+- Saul Bass: 픽토그램 심볼·강한 실루엣·운동감·상징 하나로 이야기. (COURAGE/CREATOR)
+- Josef Albers: 색의 상호작용·기하 추상·절제된 팔레트의 광학적 긴장. (MINIMAL/ARCHITECTURE)
+- Dieter Rams: Less but better·정직·무군더더기·기능 우선(Braun). (MINIMAL)
+- Rory Sutherland: 행동경제학·기능이 아니라 '신호/지각가치'를 판다·심리 프레이밍. (LUXURY/FOCUS)
+- Seth Godin: 부족·정체성·소속·'모두를 위한 게 아니다'·purple cow. (LUXURY/CREATOR/COURAGE)`;
+async function masterEngine(){
+  if(!ls_get("ok")){ $("meOut").innerHTML='<div class="err">메인 설정에서 OpenAI 키를 먼저 저장하세요.</div>'; return; }
+  const brand=($("meBrand").value||"").trim(), values=($("meValues").value||"").trim(),
+        color=($("meColor").value||"").trim(), mood=($("meMood").value||"").trim(),
+        symbol=($("meSymbol").value||"").trim(), phrase=($("mePhrase").value||"").trim();
+  if(!brand&&!values&&!mood&&!symbol){ $("meOut").innerHTML='<div class="err">브랜드명·가치관·분위기·상징 중 최소 하나는 입력하세요.</div>'; return; }
+  const btn=$("meRun"); btn.disabled=true; show($("meLoad"),true); $("meOut").innerHTML=""; $("meStat").textContent="분석 중";
+  const dbStr=Object.keys(PHRASE_DB).map(c=>c+": "+PHRASE_DB[c].map(x=>x[0]).join(", ")).join("\n");
+  const prompt=`너는 세계 최고 수준의 Art Director · Brand Strategist · Copywriter다. "예쁜 문구"가 아니라, 사람이 "이건 내 이야기다"라고 느껴 사게 만드는 정체성 기반 브랜드 카피를 설계한다. 순서는 디자인 철학 → 의미 → 카피.
+${MASTERS}
+
+[고객 입력]
+- 브랜드명: ${brand||"(미입력)"} / 가치관: ${values||"(미입력)"} / 분위기: ${mood||"(미입력)"} / 상징: ${symbol||"(미입력)"} / 좋아하는 색: ${color||"(미입력)"} / 원하는 문구: ${phrase||"(없음)"}
+
+[문구 DB — 카테고리별 후보(여기서 우선 선택)]
+${dbStr}
+
+[절대 금지] KEEP GOING, DON'T GIVE UP, NEVER GIVE UP, BELIEVE IN YOURSELF, FOLLOW YOUR DREAMS, YOU CAN DO IT 류의 감성·명언·자기계발 문구. 브랜드 카피 느낌(Apple·Braun·Nike·Nothing·A24·CASETiFY) 우선. 예: LESS BUT BETTER / FOR THE FEW / AGAINST THE GRAIN / ORDER FROM CHAOS / FORM FOLLOWS / STILL BLOOMING.
+
+[필수]
+1. 위 8인 중 입력과 가장 맞는 1~2인 + 합 100% 비율 + 근거.
+2. 추천 문구 정확히 10개를 골라 순위. DB에서 우선 고르되, 브랜드 상징·가치관에 더 맞으면 같은 톤의 브랜드 카피를 최대 2개까지 새로 만들어 포함(자기계발 클리셰 금지). 영문 ALL CAPS, 1~4단어.
+3. 10개를 S(상위 3)·A(다음 3)·B(다음 4) 등급으로. 각 문구에 카테고리와 "왜 이 브랜드/디자인에 맞나" 한 줄.
+4. 색감·타이포·구도·시선흐름을 그 거장 철학 하나로 통일 추천(따로 놀면 안 됨).
+
+JSON만(설명 한국어, 문구 영문):
+{"designers":[{"name":"거장명","pct":60,"why":"근거"}],
+ "philosophy":"관통 철학 한 문장",
+ "ranked":[{"phrase":"문구","category":"COURAGE 등","tier":"S|A|B","why":"한 줄"} ...정확히 10개, S3·A3·B4 순서],
+ "material":"유광 블랙/유광 실버/무광 블랙/무광 실버 중 1개",
+ "palette":{"label":"예: 블랙+아이보리+오렌지 포인트","hex":["#hex","#hex","#hex"]},
+ "typo":{"style":"예: Bold Sans Serif","ideal":"프리미엄 폰트명","webFont":"Inter/Manrope/Montserrat/Space Grotesk/DM Sans/Bebas Neue/Oswald/Anton/Jost/Questrial 중 1개","weight":"400~900","letterSpacing":"px 숫자"},
+ "composition":"한 줄","gaze":"한 줄","logoType":"combination|symbol|wordmark + 설명","emotion":"감성 한 단어",
+ "applyColor":"안정/고급/깔끔/시크/부드러움/활기/미래적/따뜻함 중 1",
+ "applyComp":"안정/균형/동적/절제/차분/주목/대담/여유 중 1",
+ "applyGaze":"집중/흐름/탐색/안정/상승/대각/순환 중 1",
+ "applyTypo":"모던/우아/미니멀/개성/테크/감성/클래식 중 1"}`;
+  try{
+    const d=parseJSON(await openaiChat(prompt,null,2200),"{","}");
+    if(!d) throw new Error("추천 해석 실패");
+    window.__master=d;
+    renderMaster(d);
+    applyMaster(d,{brand,values,color,mood,symbol,phrase});
+    $("meStat").textContent="완료"; $("meStat").className="pill";
+  }catch(e){ $("meOut").innerHTML='<div class="err">'+esc(e.message)+'</div>'; $("meStat").textContent="실패"; }
+  finally{ show($("meLoad"),false); btn.disabled=false; }
+}
+function renderMaster(d){
+  const dz=(d.designers||[]).map(x=>'<b>'+esc(x.name)+' '+esc(String(x.pct||""))+'%</b>').join("  ·  ");
+  const why=(d.designers||[]).map(x=>x.why?esc(x.name)+': '+esc(x.why):"").filter(Boolean).join(" / ");
+  const pal=(d.palette&&d.palette.hex)?d.palette.hex.map(c=>'<span style="display:inline-block;width:13px;height:13px;border-radius:2px;border:1px solid var(--hair);background:'+esc(c)+';vertical-align:-2px;margin-right:3px"></span>').join(""):"";
+  const ranked=Array.isArray(d.ranked)?d.ranked:[];
+  const tierColor={S:"var(--accent)",A:"#C8A04A",B:"var(--soft)"};
+  function phraseRow(p,i){ const t=String(p.tier||"").toUpperCase();
+    return '<div style="display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--hair)">'+
+      '<span style="font-family:var(--disp);font-weight:800;font-size:11px;width:42px;flex:none;color:'+(tierColor[t]||"var(--soft)")+'">'+(t?t+"급":("#"+(i+1)))+'</span>'+
+      '<span style="flex:1"><span style="font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.02em">'+esc(p.phrase||"")+'</span>'+
+      (p.category?' <span class="pill" style="font-size:9px;padding:2px 6px">'+esc(p.category)+'</span>':"")+
+      (p.why?'<br><span style="color:var(--soft);font-family:var(--mono);font-size:11px">'+esc(p.why)+'</span>':"")+'</span></div>'; }
+  let h='<div class="card" style="margin-top:12px;border-style:dashed"><div class="vh" style="font-size:14px">거장 문구 추천 결과 <small>브랜드 카피 · 자기계발 문구 배제</small></div>';
+  h+='<div class="ar"><span class="k">추천 디자이너</span><span>'+dz+(why?'<br><span style="color:var(--soft);font-family:var(--mono);font-size:11px">'+why+'</span>':"")+'</span></div>';
+  if(d.philosophy) h+='<div class="ar"><span class="k">철학</span><span><i>'+esc(d.philosophy)+'</i></span></div>';
+  if(ranked.length){
+    h+='<div class="vlabel" style="font-size:12px;margin-top:12px">추천 문구 TOP 10 · S 3 / A 3 / B 4</div>';
+    ranked.forEach((p,i)=>h+=phraseRow(p,i));
+  }
+  const rows=[
+    ["케이스 재질", esc(d.material||"")],
+    ["색감", esc((d.palette&&d.palette.label)||"")+' '+pal],
+    ["타이포", esc((d.typo&&d.typo.style)||"")+((d.typo&&d.typo.ideal)?' · '+esc(d.typo.ideal):"")+((d.typo&&d.typo.webFont)?' <span style="color:var(--soft)">(웹: '+esc(d.typo.webFont)+')</span>':"")],
+    ["구도", esc(d.composition||"")],
+    ["시선 흐름", esc(d.gaze||"")],
+    ["로고 타입", esc(d.logoType||"")]
+  ];
+  h+='<div class="vlabel" style="font-size:12px;margin-top:14px">통일 디자인 (이 거장 철학으로 자동 적용)</div>';
+  rows.forEach(r=>{ if(r[1]&&String(r[1]).trim()) h+='<div class="ar"><span class="k">'+r[0]+'</span><span>'+r[1]+'</span></div>'; });
+  h+='<p class="note" style="margin-top:10px;color:var(--ok)"><b>✓ 적용 완료.</b> 색감·타이포·구도·시선이 이 거장 철학으로 통일됐습니다. 기종 선택 후 "디자인 생성"을 누르세요.</p></div>';
+  $("meOut").innerHTML=h;
+}
+function selectOptByKeyword(id,keyword,fallbackText){
+  const sel=$("opt_"+id), ci=$("optc_"+id); if(!sel) return;
+  if(keyword){ for(const o of sel.options){ if(o.value!=="__ai"&&o.value!=="__custom"&&(o.value.indexOf(keyword)===0||o.textContent.indexOf(keyword)===0)){ sel.value=o.value; if(ci)ci.style.display="none"; return; } } }
+  if(fallbackText){ sel.value="__custom"; if(ci){ ci.style.display="block"; ci.value=fallbackText; } }
+}
+function applyMaster(d,inp){
+  const set=(id,v)=>{ const e=$(id); if(e&&v!=null&&String(v).trim()!=="") e.value=v; };
+  set("brandname",inp.brand); set("lgName",inp.brand);
+  set("lgValues",inp.values); set("lgColor",inp.color); set("lgMood",inp.mood); set("lgSymbol",inp.symbol);
+  set("phrase", inp.phrase || (d.ranked&&d.ranked[0]&&d.ranked[0].phrase) || "");
+  const mean=$("meaning"); if(mean&&!mean.value.trim()){ mean.value=(inp.values?inp.values+" — ":"")+(d.philosophy||""); }
+  // 추천 1순위 거장으로 전 항목 통일(거장 관점)
+  const n=(d.designers&&d.designers[0]&&d.designers[0].name)||""; let top="__ai";
+  for(const dd of DESIGNERS){ if(dd.k!=="__ai"&&n.indexOf(dd.k)>-1){ top=dd.k; break; } }
+  if(typeof syncDesigner==="function") syncDesigner(top);
+  // 추천 재질이 구체적이면 재질만 명시 적용(나머지는 거장 관점 유지)
+  const mat=$("material"); if(mat&&d.material){ for(const o of mat.options){ if(o.value.indexOf(d.material)>-1||o.textContent.indexOf(d.material)>-1){ mat.value=o.value; break; } } }
+  const lt=$("lgType"); if(lt&&d.logoType){ const t=(/symbol/i.test(d.logoType)&&!/word|combi/i.test(d.logoType))?"symbol":(/wordmark/i.test(d.logoType)?"wordmark":"combination"); lt.value=t; }
+}
+$("meRun") && ($("meRun").onclick=masterEngine);
+
+/* main run */
+$("run").onclick=async()=>{
+  if(!ls_get("ok")){ $("out").innerHTML='<div class="err">메인 설정에서 OpenAI 키를 먼저 저장하세요.</div>'; return; }
+  const M=window.__model;
+  if(!M && !UP){ $("out").innerHTML='<div class="err">기종을 선택하거나(권장) 비표준 칼선을 업로드하세요.</div>'; return; }
+  $("run").disabled=true; show($("load"),true); $("out").innerHTML="";
+  const material=readMaterial(),
+        emotion=readOpt(OPTS[0]), color=readOpt(OPTS[1]), comp=readOpt(OPTS[2]), gaze=readOpt(OPTS[3]), typo=readOpt(OPTS[4]),
+        brand=$("brandname").value.trim()||"YOUR NAME", meaning=$("meaning").value.trim(), phrase=$("phrase").value.trim();
+  try{
+    // STEP A: 칼선 정보 확보
+    let dieline="(칼선 미지정)", sizeLine="(사이즈 미지정)", caseRatio=2.05;
+    if(M){
+      caseRatio=M.cut[1]/M.cut[0];
+      sizeLine=`${M.label} · 작업사이즈 ${M.work[0]}×${M.work[1]}mm (300dpi=${mm2px(M.work[0])}×${mm2px(M.work[1])}px) · 재단 ${M.cut[0]}×${M.cut[1]}mm`;
+      if(M.plat==="gx"){
+        dieline=`레드프린팅 글라스 범퍼 MagSafe 표준 칼선(갤럭시 ${M.label}). 재단선 ${M.cut[0]}×${M.cut[1]}mm 바깥은 잘려나감. 작업영역 ${M.work[0]}×${M.work[1]}mm(재단+상하좌우 5mm 도련). 안전영역=재단선에서 안쪽 5mm, 중요한 글자/심볼은 이 안에. 중앙에 MagSafe 원형 링 — 두꺼운 불투명·금속 패턴은 링을 피해 배치. 카메라는 좌상단 영역(갤럭시는 세로 렌즈 배열·기종마다 다름 → 상단 1/4은 핵심요소 배치 자제). 배경/패턴은 재단선 끝까지 풀블리드로 채워 흰 테두리 방지. 인쇄 300dpi. (정확한 카메라 컷아웃은 레드프린팅 .ai에서 확인)`;
+      } else {
+        dieline=`레드프린팅 GS 글라스 범퍼 MagSafe 표준 칼선. 재단선(마젠타) ${M.cut[0]}×${M.cut[1]}mm 바깥은 잘려나감. 작업영역 ${M.work[0]}×${M.work[1]}mm(재단+상하좌우 5mm 도련). 안전영역(초록)=재단선에서 안쪽 5mm, 중요한 글자/심볼은 이 안에. 중앙에 MagSafe 원형 링(지름 약 56mm) — 두꺼운 불투명·금속 패턴은 링을 피해 배치. 카메라 홀은 좌상단. 배경/패턴은 재단선 끝까지 풀블리드로 채워 흰 테두리 방지. 인쇄 300dpi.`;
+      }
+    } else if(UP&&(UP.kind==="img"||UP.kind==="svg")){
+      $("loadmsg").textContent="칼선·인쇄영역 분석 중…";
+      const va=await openaiChat(
+        `이 이미지는 폰케이스 칼선(die-line)입니다. 색 의미: 마젠타=재단선(바깥은 잘림), 초록=안전영역(안쪽), 회색 이중원=MagSafe 링, 상단 홀=카메라. 다음을 한국어 JSON으로만: {"camera":"카메라홀 위치","safe":"안전영역 설명","print":"인쇄 가능 영역","avoid":"재단선/금지 영역","magsafe":"MagSafe 링 위치"}`,
+        UP.url, 700);
+      const vj=parseJSON(va,"{","}");
+      dieline=vj?JSON.stringify(vj):va.slice(0,400);
+      sizeLine="(업로드 칼선 — 사이즈는 레드프린팅 작업사이즈 기준, 재단선 안쪽 5mm 안전영역)";
+    } else if(UP&&UP.kind==="psd"){
+      dieline="(PSD 첨부 — 브라우저 분석 생략. Photoshop에서 칼선 레이어를 가이드로 사용)";
+    }
+    // STEP B: 통합 디자인 생성
+    $("loadmsg").textContent="문구·목업·소재·지시서 생성 중…";
+    const MA=window.__master;
+    const LD=lockedDesigner();
+    const designerLock = LD ? `
+[잠금 거장 — 재질·색감·구도·시선·타이포·문구·로고 전부를 이 한 사람의 철학으로 통일]
+- 거장: ${LD}
+- 철학: ${DPHIL[LD]||""}
+- 항목별로 다른 거장/스타일을 섞지 말 것. 모든 결정이 ${LD}의 손에서 나온 하나의 작품처럼 일관되게.` : "";
+    const masterCtx = (MA ? `
+[고정 거장 철학 — 반드시 이 하나의 방향으로 통일하라]
+- 추천 거장: ${(MA.designers||[]).map(x=>x.name+" "+(x.pct||"")+"%").join(", ")}
+- 관통 철학: ${MA.philosophy||""}
+- 권장 색감: ${(MA.palette&&MA.palette.label)||""} · 권장 타이포: ${(MA.typo&&MA.typo.style)||""}/웹폰트 ${(MA.typo&&MA.typo.webFont)||""}
+- 권장 구도: ${MA.composition||""} · 시선 ${MA.gaze||""} · 로고타입 ${MA.logoType||""} · 문구스타일 ${MA.phraseStyle||""}` : "") + designerLock;
+    const prompt=`당신은 CASETiFY 분석가 + Paul Rand 그래픽 디렉터 + 행동경제학 카피라이터입니다.
+고객의 아이덴티티를 표현하는 프리미엄 폰케이스를 설계하세요. 복제 금지, 원리만.
+[입력]
+- 케이스 재질: ${material} (질감을 디자인·목업·소재에 반영: 유광=광택·선명, 무광=소프트 매트·차분, 블랙=깊은 대비, 실버=메탈 광택)
+- 감성/분위기: ${emotion}
+- 색감: ${color}
+- 구도: ${comp}
+- 시선 흐름: ${gaze}
+- 타이포: ${typo}
+- 의미: ${meaning||"(미입력)"}
+- 브랜드명/로고명: ${brand}
+- 사용자 지정 문구: ${phrase||"(없음 → AI가 생성)"}
+- 기종/사이즈: ${sizeLine}
+- 칼선 분석: ${dieline}${masterCtx}
+[규칙] "AI 자동" 항목은 절대 항목별로 따로 고르지 말고, 위 '잠금 거장' 또는 '고정 거장 철학'이 있으면 그 한 사람의 방향으로 통일해 결정한다(없으면 입력의 가치관·분위기·상징으로 거장을 스스로 정해 통일). 각 결정에 "왜 그런지" 한 줄 근거를 단다. 사용자가 직접 지정한 항목은 그 값을 존중하되 전체 거장 철학과 충돌하지 않게 해석한다. 색 1~2개+무채색, 강한 심볼 1개, 짧은 문구, 넓은 여백, 재질 일관. 디자인은 안전영역 안쪽, 배경은 재단선까지 풀블리드, MagSafe 링 위 회피. 문구는 행동심리(Identity·Recognition·Self-Expression·Gratitude·Loss Aversion) 기반.
+[타이포그래피 — 매우 중요] 너는 Paul Rand·Massimo Vignelli·Paula Scher 수준의 타이포 디렉터다. 실제 브랜드가 만든 것처럼 깔끔하게. 규칙: 영문 전용, 1~4단어, ALL CAPS 우선, 과한 장식·곡선·손글씨 금지, 읽기 쉬운 그로테스크/지오메트릭 위주, 자간 최적화, 단어 깨짐·줄바꿈 최소화. 폰트는 반드시 다음 중에서만 고른다(웹 로드됨): Inter, Manrope, Montserrat, "Space Grotesk", "DM Sans", "Bebas Neue", Oswald, Anton, Jost, Questrial. (유료폰트 느낌 매칭: Helvetica/Neue Haas→Inter·Manrope, Futura→Questrial·Jost, Gotham→Montserrat, 임팩트→Bebas Neue·Anton·Oswald)
+[조화 — 매우 중요] 배경 아트(flux_main)·타이포(워드마크)·로고는 ${LD||"한 거장"}이 설계한 '하나의 구도'여야 한다. (1) 배경은 풀블리드로 채우되, 타이포·로고가 놓일 위치(typography.layoutType: 상/중/하)에 디테일 없는 거의 단색의 '고요한 여백 존'을 크게 비워 그 위 글자가 또렷이 읽히게 한다. (2) palette 2~3색만 배경·타이포·로고가 공유한다(새 색 금지). (3) 초점은 하나(타이포 또는 심볼) — 배경이 글자와 경쟁하지 않도록 절제와 여백. (4) typography.textColor는 그 여백 존 배경색과 강한 명도 대비. (5) 로고는 타이포와 같은 정렬선/그리드에 둔다. 즉 '배경 따로'가 아니라 글자가 들어갈 자리를 위해 구성된 배경을 설계하라.
+JSON만 출력(한국어). 형식:
+{"concept":"한 문단 컨셉(재질 반영)",
+ "decisions":{"emotion":{"value":"최종 감성","why":"근거 한 줄"},"color":{"value":"최종 색감","why":"…"},"comp":{"value":"최종 구도","why":"…"},"gaze":{"value":"최종 시선흐름","why":"…"},"typo":{"value":"최종 타이포","why":"…"}},
+ "palette":["#hex","#hex","#hex"],
+ "symbol":"심볼 설명","symbolChar":"표시용 기호(예 ✶)",
+ "phrases":["행동심리 문구 5개 영문 짧게"],
+ "slogan":"대표 슬로건 1개",
+ "typography":{"mainCopy":"메인 워드마크(영문 ALL CAPS, 1~3단어)","subCopy":"보조 문구(영문 짧게, 없으면 빈칸)","fontFamily":"위 목록 중 1개 정확히","fontWeight":"400~900 숫자","letterSpacing":"px 숫자(예 8)","alignment":"center/left","layoutType":"center/top/bottom 중(타이포·로고가 함께 놓일 위치)","safezone":"top/center/bottom(layoutType과 동일 — 배경이 비워야 할 고요한 여백 존)","textColor":"#hex(그 여백 존 배경색과 강한 명도 대비)","direction":"거장 방향(Minimal/Bold/Luxury/Modern/Editorial/Poster 중)","reason":"이 타이포를 고른 이유 한 줄"},
+ "flux_main":"메인 배경 FLUX 영문 프롬프트. 절대 글자/숫자/단어/타이포 없음(absolutely no text, no letters, no numbers, no typography). palette 색만 사용. 타이포가 놓일 위치(위 typography.safezone)에 디테일 없는 거의 단색의 큰 빈 영역을 남겨 그 위 워드마크가 또렷이 읽히게. 나머지는 거장 구도로 풀블리드. premium, high detail, generous negative space, single focal element",
+ "firefly":["Adobe Firefly 생성형 채우기용 프롬프트 2~3개(한국어로, 상업적 안전한 텍스처·배경 보강용)"],
+ "materials":[{"id":"B1","name":"…","role":"…","prompt":"FLUX 이미지 생성용 영문 프롬프트","transparent":false} … 6~8개],
+ "photoshop":["1. …","2. …", … 칼선·안전영역·사이즈(위 작업사이즈/300dpi)·색·구도·타이포 반영 클릭 단위 14~20단계]}`;
+    const d=parseJSON(await openaiChat(prompt,null,3500),"{","}");
+    if(!d) throw new Error("디자인 JSON 해석 실패");
+    d.__brand=brand; d.__ratio=caseRatio; render(d);
+    $("stat").textContent="완료"; $("stat").className="pill";
+  }catch(e){$("out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("load"),false);$("run").disabled=false;}
+};
+
+function render(d){
+  const sym=esc(d.symbolChar||"✶"), brand=esc(d.__brand||"YOUR NAME"), slo=esc(d.slogan||"");
+  const ratio=d.__ratio||2.05;
+  let h='';
+  // 문구
+  h+='<div class="card"><div class="vh">3 · 문구 (행동심리 기반)</div>';
+  (d.phrases||[]).forEach(p=>h+='<div class="phrase">'+esc(p)+'</div>');
+  if(slo)h+='<p class="note" style="margin-top:8px">대표 슬로건 · <b>'+slo+'</b></p>';
+  h+='</div>';
+  // 컨셉/팔레트
+  h+='<div class="card"><div class="vh">컨셉 & 팔레트</div><p style="font-size:14px;line-height:1.55">'+esc(d.concept)+'</p>'+
+     '<p class="note">팔레트 · '+(d.palette||[]).map(c=>'<span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:'+esc(c)+';vertical-align:-1px;margin:0 3px"></span>'+esc(c)).join(" ")+'</p>'+
+     '<p class="note">심볼 · '+esc(d.symbol)+'</p></div>';
+  // 디자인 결정 & 근거
+  if(d.decisions){const D=d.decisions;const rows=[["감성",D.emotion],["색감",D.color],["구도",D.comp],["시선",D.gaze],["타이포",D.typo]];
+    h+='<div class="card"><div class="vh">디자인 결정 & 근거 <small>AI 자동 항목은 왜 그렇게 정했는지 함께</small></div>';
+    rows.forEach(r=>{ if(r[1]&&r[1].value) h+='<div class="ar"><span class="k">'+r[0]+'</span><span><b>'+esc(r[1].value)+'</b><br><span style="color:var(--soft);font-family:var(--mono);font-size:11.5px">'+esc(r[1].why||"")+'</span></span></div>'; });
+    h+='</div>';}
+  // ★ 타이포그래피 (Claude 설계 · 실제 폰트 SVG · 글자 안 깨짐)
+  if(d.typography){
+    const T=d.typography; window.__typo=T;
+    h+='<div class="card"><div class="vh">4 · 타이포그래피 <small>실제 폰트 · 벡터 · '+esc(T.direction||"")+'</small></div>'+
+       '<p class="note" style="margin-bottom:8px">'+esc(T.reason||"")+' · 폰트: <b>'+esc(T.fontFamily||"")+'</b> '+esc(String(T.fontWeight||""))+' · 자간 '+esc(String(T.letterSpacing||0))+'px</p>'+
+       '<div id="typoPrev" style="background:#111;border-radius:10px;padding:18px;display:flex;align-items:center;justify-content:center;min-height:120px">'+typoSVG(T,520,160,true)+'</div>'+
+       '<div class="bar" style="margin-top:10px">'+
+         '<input id="typoMain" value="'+esc(T.mainCopy||"")+'" style="font-family:var(--mono);font-size:13px;min-width:180px" placeholder="메인 워드마크">'+
+         '<input id="typoSub" value="'+esc(T.subCopy||"")+'" style="font-family:var(--mono);font-size:13px;min-width:140px" placeholder="보조(선택)">'+
+         '<button class="btn sm" id="typoUpd">미리보기 갱신</button>'+
+         '<button class="btn sm" id="fontRec">폰트 자동 추천</button>'+
+         '<a class="btn sm ghost" id="typoSvg" download="typography.svg" style="text-decoration:none">SVG 저장</a>'+
+       '</div>'+
+       '<div id="fontRecOut"></div></div>';
+  }
+  // ★ 칼선+타이포 자동 합성 (FLUX 배경 + SVG 타이포 + 칼선)
+  if(d.flux_main && window.__model){
+    window.__fluxMain=d.flux_main;
+    h+='<div class="card"><div class="vh">5 · 칼선 맞춰 자동 합성 <small>FLUX 배경 + 로고 + 타이포 + 칼선 → preview/print</small></div>'+
+       '<p class="note" style="margin-bottom:10px">'+esc(window.__model.label)+' 작업사이즈에 맞춰: 배경(FLUX) → 로고(심볼+워드마크) → 타이포(SVG) → 칼선(미리보기) 순으로 합성합니다.</p>'+
+       '<div class="bar"><label style="align-self:center">로고 위치</label>'+
+         '<select class="sel" id="logoPos"><option value="none">로고 없음</option><option value="center">중앙</option><option value="bottom">하단</option><option value="topleft">좌측 상단</option><option value="pattern">패턴 반복</option><option value="magsafe">맥세이프 주변</option></select>'+
+         '<button class="btn" id="composeBtn">생성 & 합성</button><span class="pill" id="composeStat">대기</span></div>'+
+       '<div class="loading" id="composeLoad"><div class="spin"></div><span id="composeMsg">배경 생성 중… (10~25초)</span></div>'+
+       '<div id="composeOut" class="formgrid" style="grid-template-columns:1fr 1fr;margin-top:12px"></div>'+
+       '<div class="bar" id="exportBar" style="display:none;margin-top:10px"></div></div>';
+  }
+  // ★ 목업 5장 (연출 다양화) — print.png 생성 후 활성화
+  if(d.flux_main && window.__model){
+    h+='<div class="card"><div class="vh">6 · 목업 5장 <small>Front·Perspective=업로드 목업 정밀합성 · Hand/Desk/Lifestyle=Kontext</small></div>'+
+       '<p class="note" style="margin-bottom:10px">위 5번에서 <b>print</b>을 먼저 만든 뒤 누르세요. <b>Front·Perspective(측면)</b>는 업로드된 실제 목업(Front/Side TIFF)의 디자인 영역에 print을 정밀 합성합니다(측면은 퍼스펙티브 워프 → 옆면·각도 그대로). <b>Hand·Desk·Lifestyle</b> 3컷은 Front 합성본을 레퍼런스로 <b>FLUX Kontext</b>에 넣어 실제 디자인을 유지한 사진풍 연출로 만듭니다(레퍼런스 없으면 텍스트 생성). ※Kontext는 장당 비용 별도.</p>'+
+       '<div class="bar"><button class="btn" id="mockBtn" disabled>목업 5장 생성</button><span class="pill" id="mockStat">합성 먼저</span></div>'+
+       '<div class="loading" id="mockLoad"><div class="spin"></div><span id="mockMsg">목업 생성 중…</span></div>'+
+       '<div id="mockOut" class="mats" style="margin-top:12px"></div></div>';
+  }
+  // 소재 (보조)
+  h+='<div class="card"><div class="vh">7 · 추가 소재 (선택) <small>FLUX 1.1 pro ultra</small></div><div class="mats" id="mats">';
+  (d.materials||[]).forEach((m,i)=>h+='<div class="mat" id="mat-'+i+'"><span class="mid">'+esc(m.id)+'</span><div class="mnm">'+esc(m.name)+'</div><div class="mrole">'+esc(m.role)+'</div><div class="mimg" id="mimg-'+i+'">미생성</div><button class="btn sm" style="margin-top:7px" onclick="genMat('+i+')">이미지 생성</button></div>');
+  h+='</div></div>';
+  // 작업 지시서 → 포토샵: 공장(레드프린팅) PDF 저장 전용
+  h+='<div class="card"><div class="vh">8 · 작업 지시서 <small>Photoshop = 저작권 보관 · 공장 PDF 저장</small></div>';
+  if(window.__model){const M=window.__model;h+='<p class="note" style="margin-bottom:10px">공장 규격: <b>'+mm2px(M.work[0])+'×'+mm2px(M.work[1])+'px</b> · 300dpi · 재단 '+M.cut[0]+'×'+M.cut[1]+'mm · 작업 '+M.work[0]+'×'+M.work[1]+'mm · 안전영역 재단 안쪽 5mm</p>';}
+  if(d.flux_main){ h+='<div class="vlabel" style="font-size:12px">① 배경 FLUX 프롬프트 (글자 없음)</div>'+promptBox(d.flux_main); }
+  if(d.firefly&&d.firefly.length){ h+='<div class="vlabel" style="font-size:12px;margin-top:12px">② Firefly 보강 프롬프트</div>'; d.firefly.forEach(f=>h+=promptBox(f)); }
+  h+='<div class="vlabel" style="font-size:12px;margin-top:12px">③ 가장 쉬운 길 — 사이트가 만든 PDF → 일러스트레이터 최종 저장 (5클릭)</div>';
+  h+='<p class="note" style="margin-bottom:6px">위 <b>5번 합성 결과</b> 아래 <b>📄 레드프린팅 PDF 저장</b> 버튼을 누르면 작업사이즈·300dpi PDF가 바로 받아집니다. 그 PDF를 열어 아래 5단계만 하면 입고 완료예요. (처음 한 번만 같이 해보면 됩니다)</p>';
+  h+='<ol class="steps">'+
+     '<li>받은 <b>'+(window.__model?esc(window.__model.key):'기종')+'_..._300dpi.pdf</b>를 <b>일러스트레이터로 열기</b>.</li>'+
+     '<li>(선택) 칼선 <b>dielines/'+(window.__model?esc(window.__model.key):'')+'.png</b>를 새 레이어로 얹어 <b>가이드 레이어=비인쇄</b>로, 디자인은 맨 아래 <b>인쇄 레이어</b>로 분리.</li>'+
+     '<li>파일 → 다른 이름 저장 → <b>Adobe PDF</b>.</li>'+
+     '<li>프리셋 <b>"고품질 인쇄(Press Quality)"</b> 선택.</li>'+
+     '<li><b>"최상위 레이어에서 Acrobat 레이어 만들기"</b> 체크 → 저장(PDF 1.5+) → 레드프린팅 업로드.</li>'+
+     '</ol>';
+  h+='<div class="vlabel" style="font-size:12px;margin-top:12px">④ 또는 포토샵 경로 (저작권 보관용 PSD가 필요할 때)</div>';
+  h+='<ol class="steps">'+
+     '<li>위 5번의 <b>print.png</b>(칼선 없는 인쇄용)를 포토샵에서 연다.</li>'+
+     '<li>문서 크기 확인: '+(window.__model?(mm2px(window.__model.work[0])+'×'+mm2px(window.__model.work[1])+'px / 300dpi'):'작업사이즈 / 300dpi')+'. 다르면 Image → Image Size에서 300dpi로 맞춘다.</li>'+
+     '<li>색상 모드 Image → Mode → <b>CMYK</b>로 변환(인쇄용). 색이 틀어지면 보정.</li>'+
+     '<li>타이포(SVG) 레이어는 이미 합성돼 있다. 더 손볼 글자는 문자 도구(T)로 안전영역 안쪽에만.</li>'+
+     '<li>배경이 재단선까지 꽉 찼는지 확인(흰 테두리 금지). 부족하면 가장자리 확장.</li>'+
+     '<li>원본 보관용 <b>PSD</b>로 저장(레이어 유지 = 저작권 증빙/수정 대비).</li>'+
+     '<li>공장 입고용 <b>PDF</b> 저장: File → Save As → Photoshop PDF → 프리셋 "Press Quality" / 표준 PDF/X-1a / 재단·여백 그대로. (레드프린팅 업로드 규격에 맞춤)</li>'+
+     '<li>파일명: 기종_재질_디자인명_300dpi.pdf 형태로 저장해 보관.</li>'+
+     '</ol>';
+  h+='</div>';
+  $("out").innerHTML=h; window.__mats=d.materials||[];
+  bindCompose();
+}
+
+/* ===== 타이포 SVG 생성 (실제 폰트, 벡터) ===== */
+function typoSVG(T,W,H,preview){
+  const main=(T.mainCopy||"").toString(), sub=(T.subCopy||"").toString();
+  const ff=T.fontFamily||"Inter", fw=T.fontWeight||800, ls=parseFloat(T.letterSpacing||0)||0;
+  const col=T.textColor||"#ffffff", align=(T.alignment||"center");
+  const anchor= align==="left"?"start":(align==="right"?"end":"middle");
+  const ax= anchor==="start"?Math.round(W*0.08):(anchor==="end"?Math.round(W*0.92):W/2);
+  const lay=(T.layoutType||"center");
+  let my = lay==="top"?H*0.22 : lay==="bottom"?H*0.8 : H*0.5;
+  // 메인 폰트 크기: 폭과 글자수로 대략 최적화
+  const len=Math.max(main.length,1);
+  let fs=Math.min(H*0.18, (W*0.86)/(len*0.62));
+  fs=Math.max(fs, H*0.06);
+  const subFs=fs*0.34;
+  const esc2=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  let txt='<text x="'+ax+'" y="'+Math.round(my)+'" font-family="'+esc2(ff)+', sans-serif" font-size="'+Math.round(fs)+'" font-weight="'+fw+'" letter-spacing="'+ls+'" fill="'+col+'" text-anchor="'+anchor+'" dominant-baseline="middle" style="text-transform:uppercase">'+esc2(main)+'</text>';
+  if(sub) txt+='<text x="'+ax+'" y="'+Math.round(my+fs*0.78)+'" font-family="'+esc2(ff)+', sans-serif" font-size="'+Math.round(subFs)+'" font-weight="400" letter-spacing="'+(ls*0.6)+'" fill="'+col+'" text-anchor="'+anchor+'" dominant-baseline="middle" style="text-transform:uppercase;opacity:.85">'+esc2(sub)+'</text>';
+  const bg = preview? '<rect width="'+W+'" height="'+H+'" fill="none"/>' : '';
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+bg+txt+'</svg>';
+}
+function svgDataUrl(svg){ return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg); }
+
+/* ===== LOGO GENERATOR ===== */
+window.__logo=null; // {name, symbolUrl, wordSVG, fontFamily, color, type}
+function lgWordSVG(name,font,color){
+  const esc2=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  const txt=String(name||"").toUpperCase();
+  const n=Math.max(txt.length,1);
+  const fs=200;                                   // viewBox 단위(무차원) — 실제 표시는 컨테이너에 맞춰 스케일
+  const ls = n>12 ? fs*0.012 : (n>8 ? fs*0.035 : fs*0.07);  // 길면 자간 자동 축소
+  let adv=0; for(const ch of txt){ adv += (ch===" ")?0.34:0.64; } // 굵은 산세리프 대문자 ≈0.64em, 공백 ≈0.34em
+  const textW = adv*fs + ls*(n-1);
+  const pad = fs*0.45;
+  const VBW = Math.round(textW + pad*2), VBH = Math.round(fs*1.6); // 텍스트 길이에 맞춰 viewBox 자동 계산
+  // width/height 속성은 래스터(img/합성)용 본래 크기, 화면 표시는 style의 max-width:100%로 컨테이너에 맞춤
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+VBW+'" height="'+VBH+'" viewBox="0 0 '+VBW+' '+VBH+'" preserveAspectRatio="xMidYMid meet" style="display:block;max-width:100%;height:auto">'+
+    '<text x="'+(VBW/2)+'" y="'+(VBH/2)+'" font-family="'+esc2(font)+', sans-serif" font-size="'+fs+'" font-weight="800" letter-spacing="'+ls.toFixed(1)+'" fill="'+color+'" text-anchor="middle" dominant-baseline="central" style="text-transform:uppercase">'+esc2(txt)+'</text></svg>';
+}
+/* 로고 입력: '거장 자동' 체크 시 입력 비활성화 + 안내 */
+["lgColor","lgSymbol","lgValues","lgMood"].forEach(id=>{
+  const c=$("auto_"+id), e=$(id); if(!c||!e) return;
+  c.onchange=()=>{ e.disabled=c.checked; e.style.opacity=c.checked?0.5:1;
+    if(c.checked){ if(!e.dataset.ph) e.dataset.ph=e.placeholder; e.placeholder="✨ 거장 관점에서 자동 결정"; }
+    else if(e.dataset.ph){ e.placeholder=e.dataset.ph; } };
+});
+$("lgRun") && ($("lgRun").onclick=async()=>{
+  const name=($("lgName").value||"").trim();
+  let type=$("lgType").value;
+  if(!ls_get("ok")){ $("lgStat").textContent="OpenAI 키 필요"; return; }
+  $("lgRun").disabled=true; show($("lgLoad"),true); $("lgOut").innerHTML=""; $("lgStat").textContent="생성 중";
+  try{
+    // 1) 로고 방향 — 잠금 거장 + 케이스 디자인과 일관
+    $("lgMsg").textContent="로고 방향 설계 중…";
+    const lgVal=id=>{ const c=$("auto_"+id), e=$(id); const v=e?String(e.value).trim():""; return ((c&&c.checked)||!v) ? "" : v; };
+    const LD=lockedDesigner(), MA=window.__master;
+    const desCtx = LD ? ("잠금 거장: "+LD+" — "+(DPHIL[LD]||"")) : "거장 미지정 — 브랜드 의미에 맞는 거장 관점을 스스로 정해 일관 유지";
+    const caseCtx = MA ? ("케이스 디자인 기준(일관 유지): 거장 "+((MA.designers||[]).map(x=>x.name).join("·"))+" / 색감 "+((MA.palette&&MA.palette.label)||"")+" / 타이포 "+((MA.typo&&(MA.typo.webFont||MA.typo.style))||"")+" / 철학 "+(MA.philosophy||"")) : "";
+    const fColor=lgVal("lgColor"), fSymbol=lgVal("lgSymbol"), fValues=lgVal("lgValues"), fMood=lgVal("lgMood");
+    const prompt=`너는 ${LD||"세계적"} 수준의 로고 디자이너다. 아래 브랜드 로고 방향을 정하되, 폰케이스 디자인과 "한 거장의 손"에서 나온 듯 일관되게 하라.
+${desCtx}
+${caseCtx?caseCtx+"\n":""}브랜드명: ${name||"(미정)"}
+- 색: ${fColor||"(거장 자동 — 케이스 색감과 일관되게)"}
+- 상징: ${fSymbol||"(거장 자동 — 거장 스타일의 추상/미니멀 마크)"}
+- 가치관: ${fValues||"(거장 자동 — 브랜드 의미에서 도출)"}
+- 분위기: ${fMood||"(거장 자동 — 거장 철학에 맞게)"}
+- 로고 타입: ${type==="auto"?"(거장 자동 — combination/symbol/wordmark 중 선택)":type}
+심볼은 FLUX로 그릴 추상/미니멀 마크(글자 없음, ${LD||"거장"} 스타일). 워드마크 폰트는 다음 중 1개: Inter, Montserrat, "Bebas Neue", Oswald, "Space Grotesk", "DM Sans", Manrope, "Playfair Display"(케이스 타이포가 있으면 같은/유사 계열).
+JSON만: {"logoType":"combination|symbol|wordmark","fontFamily":"위 목록 중 1개","textColor":"#hex(밝은 배경에서 잘 보이게, 너무 옅지 않게)","palette":["#hex","#hex"],"symbolPrompt":"FLUX 영문 프롬프트 — single bold solid vector logo mark, NO text, no letters, no numbers, no words, no watermark, flat, centered, plain white background, iconic, premium, in the style of ${LD||"a master designer"}","chosenColor":"색 설명(한국어)","chosenSymbol":"상징 설명(한국어)","values":"가치관","mood":"분위기","direction":"방향 한 줄","reason":"케이스와 어떻게 일관되는지 한 줄"}`;
+    const L=parseJSON(await openaiChat(prompt,null,1000),"{","}");
+    if(!L) throw new Error("로고 방향 해석 실패");
+    if(type==="auto"){ const t=String(L.logoType||"").toLowerCase(); type=(/symbol/.test(t)&&!/word|combi/.test(t))?"symbol":(/wordmark/.test(t)?"wordmark":"combination"); }
+    // 자동 결정값을 입력칸에 채워 사용자에게 보여주기
+    const fill=(id,v)=>{ const c=$("auto_"+id), e=$(id); if(c&&c.checked&&e&&v){ e.value=v; } };
+    fill("lgColor", L.chosenColor||L.textColor); fill("lgSymbol", L.chosenSymbol); fill("lgValues", L.values); fill("lgMood", L.mood);
+    const font=L.fontFamily||"Montserrat", color=L.textColor||"#14120D";
+    // 2) 심볼 (FLUX) — wordmark 타입이면 생략
+    let symbolUrl=null;
+    if(type!=="wordmark"){
+      if(!ls_get("falk")) throw new Error("심볼 생성엔 fal.ai 키가 필요합니다(설정).");
+      $("lgMsg").textContent="심볼 생성 중… (FLUX)";
+      symbolUrl=await fluxImage((L.symbolPrompt||"minimal vector logo mark")+" Single bold solid vector logo mark, centered, iconic, premium. ABSOLUTELY NO text, no letters, no numbers, no words, no watermark, no signature, do NOT write 'FLUX'. Plain pure white background for easy isolation.", false);
+    }
+    // 3) 워드마크 SVG — symbol 타입이면 생략
+    const wordSVG = (type!=="symbol" && name)? lgWordSVG(name,font,color) : null;
+    // 4) 미리보기 + 파일
+    window.__logo={name,type,symbolUrl,wordSVG,fontFamily:font,color};
+    let h='<div class="card" style="margin-top:12px;box-shadow:none;border-style:dashed"><div class="vh" style="font-size:14px">로고 결과 <small>'+esc(L.direction||"")+'</small></div>';
+    h+='<div style="background:#F4F1E8;border-radius:10px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;min-height:160px;justify-content:center">';
+    if(symbolUrl) h+='<img src="'+symbolUrl+'" style="max-height:140px;border-radius:8px">';
+    if(wordSVG) h+='<div style="width:100%;max-width:420px;overflow:hidden;display:flex;justify-content:center;align-items:center;padding:4px 0">'+wordSVG+'</div>';
+    h+='</div>';
+    h+='<p class="note" style="margin-top:8px">'+esc(L.reason||"")+' · 폰트 <b>'+esc(font)+'</b></p>';
+    // 다운로드
+    h+='<div class="bar" style="margin-top:8px">';
+    if(wordSVG) h+='<a class="btn sm ghost" style="text-decoration:none" download="logo-wordmark.svg" href="'+svgDataUrl(wordSVG)+'">logo-wordmark.svg</a>';
+    if(symbolUrl) h+='<a class="btn sm ghost" style="text-decoration:none" download="logo-symbol.png" target="_blank" rel="noopener" href="'+symbolUrl+'">logo-symbol.png ↗</a>';
+    h+='<a class="btn sm ghost" style="text-decoration:none" download="logo-data.json" href="data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({name,type,fontFamily:font,color,direction:L.direction,symbolPrompt:L.symbolPrompt},null,2))+'">logo-data.json</a>';
+    h+='</div>';
+    h+='<p class="note" style="margin-top:10px;color:var(--ok)"><b>✓ 이 로고가 아래 Product 디자인에 전달됩니다.</b> Product 생성 후 5번 합성에서 배치 위치를 고르세요.</p>';
+    h+='</div>';
+    $("lgOut").innerHTML=h;
+    $("lgStat").textContent="완료"; $("lgStat").className="pill";
+  }catch(e){ $("lgOut").innerHTML='<div class="err">'+esc(e.message)+'</div>'; $("lgStat").textContent="실패"; }
+  finally{ show($("lgLoad"),false); $("lgRun").disabled=false; }
+});
+
+/* 새 버튼 바인딩 (render 후 호출) */
+function bindCompose(){
+  if($("composeBtn")) $("composeBtn").onclick=composeWithDieline;
+  if($("mockBtn")) $("mockBtn").onclick=genMockups;
+  if($("typoUpd")) $("typoUpd").onclick=()=>{
+    const T=window.__typo||{}; T.mainCopy=$("typoMain").value; T.subCopy=$("typoSub").value;
+    $("typoPrev").innerHTML=typoSVG(T,520,160,true);
+    if($("typoSvg")) $("typoSvg").href=svgDataUrl(typoSVG(T, mm2px(window.__model?window.__model.work[0]:82.7), mm2px(window.__model?window.__model.work[1]:119.4), false));
+  };
+  if($("typoSvg")&&window.__model){ $("typoSvg").href=svgDataUrl(typoSVG(window.__typo||{}, mm2px(window.__model.work[0]), mm2px(window.__model.work[1]), false)); }
+  if($("fontRec")) $("fontRec").onclick=recommendFonts;
+}
+
+/* ===== 폰트 자동 추천 엔진 (가치관·분위기·색 → 폰트3·자간·배치·레이아웃) ===== */
+const FONT_POOL=["Inter","Manrope","DM Sans","Space Grotesk","Montserrat","Bebas Neue","Oswald"];
+async function recommendFonts(){
+  if(!ls_get("ok")){ $("fontRecOut").innerHTML='<div class="err" style="margin-top:10px">OpenAI 키를 설정에서 저장하세요.</div>'; return; }
+  // 입력: 메인 폼의 가치관(의미)/분위기/색 끌어오기
+  const vibe = ($("emotion")&&$("emotion").value!=="auto"?$("emotion").value:"") || "";
+  const color = ($("color")&&$("color").value!=="auto"?$("color").value:"") || "";
+  const meaning = $("meaning")?$("meaning").value:"";
+  const brand = $("brandname")?$("brandname").value:"";
+  const btn=$("fontRec"); btn.disabled=true; $("fontRecOut").innerHTML='<p class="note" style="margin-top:10px">추천 분석 중…</p>';
+  const prompt=`너는 타이포 디렉터다. 아래 입력에 맞는 영문 워드마크 폰트를 추천하라.
+브랜드:${brand} / 가치관·의미:${meaning} / 분위기:${vibe} / 색:${color}
+폰트는 반드시 다음 7개 중에서만 고른다(웹 로드됨): ${FONT_POOL.join(", ")}.
+JSON만: {"fonts":[{"family":"7개중 1개","weight":"400~900","why":"한 줄"} 정확히 3개],"letterSpacing":"px 숫자","alignment":"center/left","layoutType":"center/top/bottom","reason":"종합 한 줄"}`;
+  try{
+    const R=parseJSON(await openaiChat(prompt,null,900),"{","}");
+    if(!R||!R.fonts) throw new Error("추천 해석 실패");
+    // 7개 외 폰트 들어오면 필터
+    const fonts=R.fonts.filter(f=>FONT_POOL.includes(f.family)).slice(0,3);
+    if(!fonts.length) throw new Error("유효 폰트 없음");
+    let h='<div class="card" style="margin-top:10px;box-shadow:none;border-style:dashed"><div class="vh" style="font-size:13px">추천 폰트 3종 <small>'+esc(R.reason||"")+'</small></div>';
+    fonts.forEach((f,i)=>{
+      h+='<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--hair)">'+
+         '<div style="flex:1"><div style="font-family:\''+esc(f.family)+'\',sans-serif;font-weight:'+esc(String(f.weight||700))+';font-size:26px;letter-spacing:'+esc(String(R.letterSpacing||2))+'px;text-transform:uppercase">'+esc($("typoMain")&&$("typoMain").value?$("typoMain").value:(brand||"YOUR BRAND"))+'</div>'+
+         '<div class="note">'+esc(f.family)+' '+esc(String(f.weight||""))+' · '+esc(f.why||"")+'</div></div>'+
+         '<button class="btn sm" onclick="applyFont(\''+esc(f.family).replace(/\'/g,"")+'\','+(f.weight||700)+','+(R.letterSpacing||2)+',\''+(R.alignment||"center")+'\',\''+(R.layoutType||"center")+'\')">적용</button></div>';
+    });
+    h+='<p class="note" style="margin-top:8px">추천 자간 <b>'+esc(String(R.letterSpacing||2))+'px</b> · 정렬 <b>'+esc(R.alignment||"center")+'</b> · 레이아웃 <b>'+esc(R.layoutType||"center")+'</b></p></div>';
+    $("fontRecOut").innerHTML=h;
+  }catch(e){ $("fontRecOut").innerHTML='<div class="err" style="margin-top:10px">'+esc(e.message)+'</div>'; }
+  finally{ btn.disabled=false; }
+}
+function applyFont(family,weight,ls,align,layout){
+  const T=window.__typo||(window.__typo={});
+  T.fontFamily=family; T.fontWeight=weight; T.letterSpacing=ls; T.alignment=align; T.layoutType=layout;
+  if($("typoMain")) T.mainCopy=$("typoMain").value;
+  if($("typoSub")) T.subCopy=$("typoSub").value;
+  $("typoPrev").innerHTML=typoSVG(T,520,160,true);
+  if($("typoSvg")&&window.__model) $("typoSvg").href=svgDataUrl(typoSVG(T,mm2px(window.__model.work[0]),mm2px(window.__model.work[1]),false));
+}
+
+/* 심볼 PNG: 밝은 배경(흰 박스)·연한 워터마크 제거 + 남은 마크를 hex 단색으로 → 타이포 색과 통일 */
+function hexToRGB(h){ h=String(h||"").replace("#",""); if(h.length===3)h=h.split("").map(c=>c+c).join(""); const n=parseInt(h||"14120d",16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function symbolToColor(img,hex){
+  try{
+    const S=600, cv=document.createElement("canvas"); cv.width=S; cv.height=S; const ctx=cv.getContext("2d");
+    const ir=img.width/img.height; let dw,dh; if(ir>1){dw=S;dh=S/ir;}else{dh=S;dw=S*ir;}
+    ctx.drawImage(img,(S-dw)/2,(S-dh)/2,dw,dh);
+    const id=ctx.getImageData(0,0,S,S), d=id.data, c=hexToRGB(hex);
+    for(let i=0;i<d.length;i+=4){
+      const lum=d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114;        // 명도
+      const a = lum>=232 ? 0 : Math.round(255*(1-lum/232));   // 밝을수록 투명(흰 배경·연한 워터마크 제거)
+      d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=Math.min(d[i+3],a);
+    }
+    ctx.putImageData(id,0,0); return cv;
+  }catch(e){ return img; } // CORS 등 실패 시 원본 사용
+}
+
+/* 칼선+타이포 자동 합성: FLUX 배경 → SVG 타이포 → 칼선 → preview/print + 내보내기 */
+let __printDataUrl=null;
+async function composeWithDieline(){
+  const M=window.__model;
+  if(!M){ $("composeStat").textContent="기종 미선택"; $("composeOut").innerHTML='<div class="err" style="grid-column:1/3">먼저 1번에서 기종을 선택하세요(칼선 자동 적용).</div>'; return; }
+  if(!ls_get("falk")){ $("composeStat").textContent="fal.ai 키 필요"; $("composeOut").innerHTML='<div class="err" style="grid-column:1/3">하단 이미지 엔진 설정에서 fal.ai 키를 저장하세요.</div>'; return; }
+  const btn=$("composeBtn"); btn.disabled=true; show($("composeLoad"),true); $("composeOut").innerHTML=""; $("composeStat").textContent="생성 중";
+  const _lay=(window.__typo&&window.__typo.layoutType)||"center";
+  const _zone=(_lay==="top")?"top area":(_lay==="bottom")?"bottom area":"central area";
+  const fluxPrompt=window.__fluxMain+" Full bleed background art only. ABSOLUTELY NO text, no letters, no words, no numbers, no typography. Leave a large calm, low-detail, near-solid empty zone in the "+_zone+" so a wordmark and logo sit clearly. Use only the design palette, a restrained composition with generous negative space and a single focal element. No phone, no mockup, edge to edge, premium, high detail.";
+  try{
+    $("composeMsg").textContent="배경 생성 중… (10~25초)";
+    const bgUrl=await fluxImage(fluxPrompt, true);
+    $("composeMsg").textContent="타이포·칼선 합성 중…";
+    const W=mm2px(M.work[0]), H=mm2px(M.work[1]);
+    // 현재 타이포(편집 반영)
+    const T=Object.assign({}, window.__typo||{});
+    if($("typoMain")) T.mainCopy=$("typoMain").value;
+    if($("typoSub")) T.subCopy=$("typoSub").value;
+    const typoMarkup=typoSVG(T,W,H,false);
+    const pos = $("logoPos")?$("logoPos").value:"none";
+    const lg = window.__logo;
+    // 로고 레이어 이미지 준비 (심볼 PNG + 워드마크 SVG)
+    let symImg=null, wordImg=null;
+    const matchColor = T.textColor || (lg&&lg.color) || "#14120D";  // 로고 색 = 타이포 색으로 통일
+    if(pos!=="none" && lg){
+      try{
+        if(lg.symbolUrl){ const raw=await loadImg(lg.symbolUrl,true); symImg=symbolToColor(raw, matchColor); } // 흰 박스·워터마크 제거 + 색 통일
+        if(lg.name && lg.type!=="symbol"){ wordImg=await loadImg(svgDataUrl(lgWordSVG(lg.name, lg.fontFamily||"Montserrat", matchColor)),false); } // 워드마크도 타이포 색으로
+        else if(lg.wordSVG){ wordImg=await loadImg(svgDataUrl(lg.wordSVG),false); }
+      }catch(e){ /* 로고 로드 실패시 무시하고 진행 */ }
+    }
+    const dielinePath="dielines/"+M.key+".png";
+    const [bgImg,tyImg]=await Promise.all([
+      loadImg(bgUrl,true),
+      loadImg(svgDataUrl(typoMarkup),false)
+    ]);
+    // 칼선은 미리보기 오버레이에만 필요 → 실패해도 print은 정상 생성 (file:// 안전)
+    let dlImg=null, dlWarn="";
+    try{ dlImg=await loadImg(dielinePath,false); }
+    catch(e){ dlWarn=dielinePath; }
+    function paint(ctx,withDieline){
+      drawCover(ctx,bgImg,W,H);
+      drawLogo(ctx,W,H,pos,symImg,wordImg);
+      ctx.drawImage(tyImg,0,0,W,H);
+      if(withDieline && dlImg) ctx.drawImage(dlImg,0,0,W,H);
+    }
+    const printCv=document.createElement("canvas"); printCv.width=W; printCv.height=H; paint(printCv.getContext("2d"),false);
+    const prevCv=document.createElement("canvas"); prevCv.width=W; prevCv.height=H; paint(prevCv.getContext("2d"),true);
+    let pngPrint,pngPrev;
+    try{ pngPrint=printCv.toDataURL("image/png"); pngPrev=prevCv.toDataURL("image/png"); }
+    catch(e){ throw new Error("합성 보안 오류(canvas tainted). fal 이미지 CORS 문제 — 배경을 저장해 포토샵에서 합치세요."); }
+    __printDataUrl=pngPrint; window.__printForMock=pngPrint;
+    $("composeOut").innerHTML=
+      composeCard("print.png (인쇄용)", pngPrint, M.key+"_print.png", "배경+타이포 · 칼선없음 · "+W+"×"+H)+
+      composeCard("preview.png"+(dlImg?" (칼선표시)":" (칼선 미적용)"), pngPrev, M.key+"_preview.png", dlImg?"배경+타이포+칼선":"칼선 이미지를 못 찾아 칼선 없이 생성");
+    if(dlWarn){ $("composeOut").insertAdjacentHTML("afterbegin",
+      '<div class="note" style="grid-column:1/3;color:var(--accent)">⚠ 칼선 이미지를 찾지 못했습니다: <b>'+esc(dlWarn)+'</b> · print은 정상 생성됐어요. (file://에서 안 보이면 dielines 폴더가 product.html과 같은 위치인지 확인)</div>'); }
+    // 내보내기: svg-source / prompt.txt / typography.json
+    const eb=$("exportBar"); if(eb){ eb.style.display="flex";
+      eb.innerHTML=
+        '<button class="btn sm" id="pdfBtn">📄 레드프린팅 PDF 저장 (작업사이즈·300dpi)</button>'+
+        '<a class="btn sm ghost" style="text-decoration:none" download="svg-source.svg" href="'+svgDataUrl(typoMarkup)+'">svg-source.svg</a>'+
+        '<a class="btn sm ghost" style="text-decoration:none" download="prompt.txt" href="data:text/plain;charset=utf-8,'+encodeURIComponent(fluxPrompt)+'">prompt.txt</a>'+
+        '<a class="btn sm ghost" style="text-decoration:none" download="typography.json" href="data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(T,null,2))+'">typography.json</a>';
+      if($("pdfBtn")) $("pdfBtn").onclick=()=>exportPrintPDF(M);
+    }
+    if($("mockBtn")){ $("mockBtn").disabled=false; $("mockStat").textContent="준비됨"; }
+    $("composeStat").textContent="완료"; $("composeStat").className="pill";
+  }catch(e){ $("composeOut").innerHTML='<div class="err" style="grid-column:1/3">'+esc(e.message)+'</div>'; $("composeStat").textContent="실패"; }
+  finally{ show($("composeLoad"),false); btn.disabled=false; }
+}
+
+/* ===== 레드프린팅 입고용 PDF 내보내기 (작업사이즈 · 300dpi · 풀블리드) ===== */
+function exportPrintPDF(M){
+  if(!__printDataUrl){ alert("먼저 위 5번에서 '생성 & 합성'으로 print을 만들어 주세요."); return; }
+  const JS = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if(!JS){ alert("PDF 생성기를 불러오지 못했어요. 인터넷이 연결된 상태에서 페이지를 새로고침한 뒤 다시 눌러 주세요."); return; }
+  try{
+    const wmm=M.work[0], hmm=M.work[1];
+    const orient = wmm>hmm ? "l" : "p";              // 작업사이즈 가로/세로에 맞춰 페이지 방향 고정
+    const doc = new JS({unit:"mm", format:[wmm,hmm], orientation:orient, compress:true});
+    const pw=doc.internal.pageSize.getWidth(), ph=doc.internal.pageSize.getHeight();
+    // 작업사이즈 풀블리드 배치. 이미지 픽셀=작업mm의 300dpi(mm2px) → PDF가 자동으로 300dpi가 됨.
+    doc.addImage(__printDataUrl, "PNG", 0, 0, pw, ph, M.key, "FAST");
+    doc.setProperties({title:M.label+" "+wmm+"x"+hmm+"mm 300dpi 인쇄데이터", creator:"Case Studio", subject:"레드프린팅 GS 글라스 범퍼 MagSafe"});
+    doc.save(M.key+"_"+wmm+"x"+hmm+"mm_300dpi.pdf");
+    if($("composeStat")){ $("composeStat").textContent="PDF 저장됨"; }
+  }catch(e){ alert("PDF 생성 실패: "+(e&&e.message?e.message:String(e))); }
+}
+
+/* ===== 업로드 목업 키트(TIFF→오버레이 PNG + 디자인 사각형 좌표, 1600 기준) ===== */
+const MK_SIZE=1600;
+const MK_QUADS={
+  front:{tl:[557.8,303.0],tr:[1011.2,302.7],br:[1014.7,1281.0],bl:[554.2,1280.6]},
+  side: {tl:[625.9,306.9],tr:[996.5,284.5],br:[1003.5,1295.7],bl:[623.0,1278.1]}
+};
+/* 삼각형 텍스처 매핑: source 삼각형 → dest 삼각형 (affine + clip) */
+function affineTri(ctx,img,s,d){
+  const x0=s[0][0],y0=s[0][1],x1=s[1][0],y1=s[1][1],x2=s[2][0],y2=s[2][1];
+  const u0=d[0][0],v0=d[0][1],u1=d[1][0],v1=d[1][1],u2=d[2][0],v2=d[2][1];
+  const den=(x1-x0)*(y2-y0)-(x2-x0)*(y1-y0); if(!den) return;
+  const a=((u1-u0)*(y2-y0)-(u2-u0)*(y1-y0))/den, b=((u2-u0)*(x1-x0)-(u1-u0)*(x2-x0))/den;
+  const c=((v1-v0)*(y2-y0)-(v2-v0)*(y1-y0))/den, e=((v2-v0)*(x1-x0)-(v1-v0)*(x2-x0))/den;
+  const tx=u0-a*x0-b*y0, ty=v0-c*x0-e*y0;
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(u0,v0); ctx.lineTo(u1,v1); ctx.lineTo(u2,v2); ctx.closePath(); ctx.clip();
+  ctx.setTransform(a,c,b,e,tx,ty); ctx.drawImage(img,0,0);
+  ctx.restore();
+}
+/* 사각형(이미지 전체) → quad(tl,tr,br,bl) 퍼스펙티브 워프(세로 N분할로 부드럽게) */
+function drawImageQuad(ctx,img,tl,tr,br,bl,steps){
+  steps=steps||60; const sw=img.width, sh=img.height;
+  const lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t];
+  for(let i=0;i<steps;i++){
+    const t0=i/steps, t1=(i+1)/steps;
+    const L0=lerp(tl,bl,t0),L1=lerp(tl,bl,t1),R0=lerp(tr,br,t0),R1=lerp(tr,br,t1);
+    const sy0=t0*sh, sy1=t1*sh+0.6; // 슬라이스 살짝 겹쳐 이음매 방지
+    affineTri(ctx,img,[[0,sy0],[sw,sy0],[sw,sy1]],[L0,R0,R1]);
+    affineTri(ctx,img,[[0,sy0],[sw,sy1],[0,sy1]],[L0,R1,L1]);
+  }
+  ctx.setTransform(1,0,0,1,0,0);
+}
+/* 목업 합성: 흰배경 → print을 디자인 사각형에 (퍼스펙티브) → 프레임 오버레이 위 */
+async function composeMockup(printUrl, view){
+  const q=MK_QUADS[view]; if(!q) throw new Error("알 수 없는 목업: "+view);
+  let ov;
+  try{ ov=await loadImg("mockups/mk-"+view+"-overlay.png",false); }
+  catch(e){ const isFile=(location.protocol==="file:");
+    throw new Error("'mockups/mk-"+view+"-overlay.png'를 불러오지 못했습니다."+(isFile?" file://면 로컬 서버나 배포 사이트에서 여세요.":" mockups 폴더 배포를 확인하세요.")); }
+  const pr=await loadImg(printUrl,false);
+  const S=MK_SIZE;
+  const cv=document.createElement("canvas"); cv.width=S; cv.height=S; const ctx=cv.getContext("2d");
+  ctx.fillStyle="#fff"; ctx.fillRect(0,0,S,S);
+  drawImageQuad(ctx,pr,q.tl,q.tr,q.br,q.bl,60);
+  ctx.drawImage(ov,0,0,S,S);
+  try{ return cv.toDataURL("image/png"); }
+  catch(e){ throw new Error("합성 결과 저장 실패(canvas 보안). file://면 로컬 서버나 배포 사이트에서 여세요."); }
+}
+
+/* 목업 5장: Front·Perspective=업로드 목업 정밀합성, Hand/Desk/Lifestyle=Kontext */
+async function genMockups(){
+  const T=window.__typo||{}; const desc=(window.__fluxMain||"premium phone case")+", color and style of this case design";
+  const btn=$("mockBtn"); btn.disabled=true; show($("mockLoad"),true); $("mockOut").innerHTML=""; $("mockStat").textContent="생성 중";
+  const labels=["Front 제품컷","Perspective (측면)","Hand","Desk","Lifestyle"];
+  labels.forEach((s,i)=>{ const c=document.createElement("div"); c.className="mat"; c.id="mk-"+i;
+    c.innerHTML='<div class="mnm">'+esc(s)+'</div><div class="mimg" id="mkimg-'+i+'">대기…</div>'; $("mockOut").appendChild(c); });
+  if(!window.__printForMock){ $("mkimg-0").innerHTML='<span style="color:var(--accent);font-size:11px">먼저 5번에서 print을 만들어 주세요.</span>'; $("mockStat").textContent="합성 먼저"; show($("mockLoad"),false); btn.disabled=false; return; }
+
+  // ── 1) Front (업로드 정면 목업) ──
+  $("mockMsg").textContent="Front 정밀 합성 중…";
+  try{
+    const url=await composeMockup(window.__printForMock,"front");
+    window.__frontMockupUrl=url;   // 연출컷 Kontext 레퍼런스
+    $("mkimg-0").innerHTML='<img src="'+url+'">';
+    const a=document.createElement("a"); a.className="btn sm"; a.style.cssText="margin-top:7px;display:inline-block;text-decoration:none"; a.href=url; a.download="mockup-front.png"; a.textContent="다운로드 ↓"; $("mk-0").appendChild(a);
+  }catch(e){ $("mkimg-0").innerHTML='<span style="color:var(--accent);font-size:11px">'+esc(e.message)+'</span>'; }
+
+  // ── 2) Perspective (업로드 측면 목업 · 실제 퍼스펙티브 워프) ──
+  $("mockMsg").textContent="Perspective 퍼스펙티브 합성 중…";
+  try{
+    const url=await composeMockup(window.__printForMock,"side");
+    $("mkimg-1").innerHTML='<img src="'+url+'">';
+    const a=document.createElement("a"); a.className="btn sm"; a.style.cssText="margin-top:7px;display:inline-block;text-decoration:none"; a.href=url; a.download="mockup-perspective.png"; a.textContent="다운로드 ↓"; $("mk-1").appendChild(a);
+  }catch(e){ $("mkimg-1").innerHTML='<span style="color:var(--accent);font-size:11px">'+esc(e.message)+'</span>'; }
+
+  // ── 3~5) Hand / Desk / Lifestyle (Kontext: Front 합성본 레퍼런스로 실제 디자인 유지) ──
+  if(!ls_get("falk")){ $("mockStat").textContent="Front·Perspective 완료 · 나머지는 fal.ai 키 필요"; show($("mockLoad"),false); btn.disabled=false; return; }
+  const ref=window.__frontMockupUrl||null;
+  const shots=[ // [card idx, 파일명, Kontext 지시(디자인 유지), 텍스트 폴백]
+    [2,"mockup-hand.png",
+      "Show this exact phone case held naturally in a person's hand, artwork unchanged. Soft daylight from a window, realistic skin and reflections, shallow depth of field 50mm f/1.8, candid lifestyle photo, photorealistic. Do not add any text.",
+      "A hand holding a premium phone case by a bright window, "+desc+", shallow depth of field 50mm f/1.8, natural daylight, candid lifestyle photograph, photorealistic, real photo, no 3d render, no text"],
+    [3,"mockup-desk.png",
+      "Place this exact phone case as a flat-lay on a minimal light-wood desk beside a ceramic coffee cup and a notebook, artwork unchanged. Soft morning light, realistic soft shadows, top-down editorial flat lay, photorealistic. Do not add any text.",
+      "Top-down flat-lay of a premium phone case on a minimal light-wood desk with a coffee cup and notebook, "+desc+", soft morning light, realistic shadows, editorial photograph, photorealistic, real photo, no 3d render, no text"],
+    [4,"mockup-lifestyle.png",
+      "A person in a cozy sunlit cafe using a phone that has this exact case, artwork unchanged. Cinematic warm background bokeh, natural light, candid 35mm lifestyle photograph, photorealistic. Do not add any text.",
+      "A person using a phone with a premium case in a cozy sunlit cafe, "+desc+", cinematic warm bokeh, natural light, 35mm candid lifestyle photograph, photorealistic, real photo, no 3d render, no text"]
+  ];
+  for(let i=0;i<shots.length;i++){
+    const idx=shots[i][0];
+    $("mockMsg").textContent=(ref?"Kontext 연출 ":"FLUX 연출 ")+(i+1)+"/3… (디자인 "+(ref?"유지":"근사")+")";
+    try{
+      let url;
+      if(ref){ try{ url=await fluxKontext(shots[i][2], ref); } catch(e){ url=await fluxImage(shots[i][3], true); } }
+      else { url=await fluxImage(shots[i][3], true); }
+      $("mkimg-"+idx).innerHTML='<img src="'+url+'">';
+      const a=document.createElement("a"); a.className="btn sm"; a.style.cssText="margin-top:7px;display:inline-block;text-decoration:none"; a.href=url; a.target="_blank"; a.rel="noopener"; a.textContent="열기 ↗"; $("mk-"+idx).appendChild(a);
+    }catch(e){ $("mkimg-"+idx).innerHTML='<span style="color:var(--accent);font-size:11px">실패: '+esc(e.message)+'</span>'; }
+  }
+  $("mockStat").textContent="완료"; show($("mockLoad"),false); btn.disabled=false;
+}
+
+/* Front TIFF 합성: 흰배경 → shadow → print(mask) → base → highlight(screen) */
+async function composeFrontMockup(printUrl){
+  const W=2000,H=2000;
+  // 레이어를 하나씩 로드해 '어떤 파일'이 왜 실패했는지 정확히 보고
+  const files=["mockups/front-mask.png","mockups/front-base.png","mockups/front-shadow.png","mockups/front-highlight.png"];
+  const assets=[];
+  for(const f of files){
+    try{ assets.push(await loadImg(f,false)); }
+    catch(e){
+      const isFile = (location.protocol==="file:");
+      throw new Error("'"+f+"' 을(를) 불러오지 못했습니다."+(isFile
+        ? " — file:// 로 직접 연 상태입니다. 브라우저가 로컬 이미지를 막아서 그래요. 로컬 서버(예: 폴더에서 python -m http.server)나 배포 사이트(GitHub Pages)에서 열면 정상 동작합니다."
+        : " mockups 폴더가 product.html과 같은 위치에 함께 배포됐는지, 파일명이 정확한지 확인하세요."));
+    }
+  }
+  try{ assets.push(await loadImg(printUrl,false)); }
+  catch(e){ throw new Error("합성용 print 이미지를 불러오지 못했습니다(먼저 5번에서 '생성 & 합성')."); }
+  const [mask,base,shadow,print,_]=assets;
+  const printImg=assets[4];
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const ctx=cv.getContext("2d");
+  ctx.fillStyle="#fff"; ctx.fillRect(0,0,W,H);
+  // shadow (옅게)
+  ctx.globalAlpha=0.5; ctx.drawImage(shadow,0,0,W,H); ctx.globalAlpha=1;
+  // print을 mask 영역에만: 임시 캔버스에서 print × mask(destination-in)
+  const pc=document.createElement("canvas"); pc.width=W; pc.height=H; const pctx=pc.getContext("2d");
+  drawCover(pctx, printImg, W, H);
+  pctx.globalCompositeOperation="destination-in"; pctx.drawImage(mask,0,0,W,H);
+  ctx.drawImage(pc,0,0);
+  // base(케이스, 디자인영역 투명)
+  ctx.drawImage(base,0,0,W,H);
+  // highlight: screen
+  const hc=document.createElement("canvas"); hc.width=W; hc.height=H; const hctx=hc.getContext("2d");
+  hctx.drawImage(assets[3],0,0,W,H);
+  ctx.globalCompositeOperation="screen"; ctx.globalAlpha=0.5; ctx.drawImage(hc,0,0); ctx.globalAlpha=1; ctx.globalCompositeOperation="source-over";
+  try{ return cv.toDataURL("image/png"); }
+  catch(e){ throw new Error("합성 결과를 저장하지 못했습니다(canvas 보안). file:// 로 연 경우 로컬 서버나 배포 사이트에서 열어주세요."); }
+}
+
+function loadImg(src,cross){ return new Promise((res,rej)=>{ const im=new Image(); if(cross)im.crossOrigin="anonymous"; im.onload=()=>res(im); im.onerror=()=>rej(new Error("이미지 로드 실패: "+(String(src).startsWith("data:")?"(생성 이미지)":String(src)))); im.src=src; }); }
+function drawCover(ctx,img,W,H){ const ir=img.width/img.height, cr=W/H; let dw,dh,dx,dy;
+  if(ir>cr){ dh=H; dw=H*ir; dx=(W-dw)/2; dy=0; } else { dw=W; dh=W/ir; dx=0; dy=(H-dh)/2; }
+  ctx.fillStyle="#fff"; ctx.fillRect(0,0,W,H); ctx.drawImage(img,dx,dy,dw,dh); }
+function drawLogo(ctx,W,H,pos,sym,word){
+  if(pos==="none"||(!sym&&!word)) return;
+  // 심볼 한 변 기준 크기
+  const S=Math.min(W,H)*0.26;
+  function place(cx,cy,scale){
+    let yy=cy;
+    if(sym){ const s=S*scale, r=sym.width/sym.height; const w=s*r, h=s; ctx.drawImage(sym,cx-w/2,yy-h/2,w,h); yy+=h*0.62; }
+    if(word){ const ww=Math.min(W*0.6,W*0.6)*scale, wh=ww*(word.height/word.width); ctx.drawImage(word,cx-ww/2,yy,ww,wh); }
+  }
+  if(pos==="center"){ place(W/2,H*0.46,1); }
+  else if(pos==="bottom"){ place(W/2,H*0.8,0.8); }
+  else if(pos==="topleft"){ const s=S*0.6, r=sym?sym.width/sym.height:1; if(sym)ctx.drawImage(sym,W*0.1,H*0.07,s*r,s); if(word){const ww=W*0.34,wh=ww*(word.height/word.width); ctx.drawImage(word,W*0.1,H*0.07+s+10,ww,wh);} }
+  else if(pos==="magsafe"){ place(W/2,H*0.34,0.7); }
+  else if(pos==="pattern"){ // 심볼만 타일 반복
+    const img=sym||word; if(!img)return; const t=Math.min(W,H)*0.16, r=img.width/img.height; const tw=t*r, th=t;
+    ctx.globalAlpha=0.85;
+    for(let y=H*0.08;y<H*0.92;y+=th*1.7){ for(let x=W*0.1;x<W*0.92;x+=tw*1.7){ ctx.drawImage(img,x,y,tw,th); } }
+    ctx.globalAlpha=1;
+  }
+}
+function composeCard(title,url,fname,note){
+  return '<div class="mat"><div class="mnm">'+esc(title)+'</div><div class="mrole">'+esc(note)+'</div>'+
+    '<div class="mimg" style="aspect-ratio:'+(window.__model?(window.__model.work[0]/window.__model.work[1]).toFixed(3):'0.69')+'"><img src="'+url+'"></div>'+
+    '<a class="btn sm" style="margin-top:7px;display:inline-block;text-decoration:none" href="'+url+'" download="'+fname+'">다운로드 ↓</a></div>';
+}
+/* 복사 가능한 프롬프트 박스 */
+function promptBox(txt){
+  const t=esc(txt);
+  return '<div style="position:relative;background:#fff;border:1.5px solid var(--hair);border-radius:7px;padding:10px 64px 10px 10px;margin:6px 0;font-family:var(--mono);font-size:11.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word">'+
+    t+'<button class="btn sm" style="position:absolute;top:8px;right:8px" onclick="copyTxt(this)">복사</button></div>';
+}
+function copyTxt(btn){
+  const box=btn.parentNode; const txt=box.childNodes[0].nodeValue||box.innerText.replace(/복사$/,"");
+  const done=()=>{const o=btn.textContent;btn.textContent="복사됨";setTimeout(()=>btn.textContent=o,1200);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,()=>fallbackCopy(txt,done)); }
+  else fallbackCopy(txt,done);
+}
+function fallbackCopy(txt,done){ const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done();}catch(e){}document.body.removeChild(ta); }
+async function genMat(i){
+  const m=window.__mats[i],box=$("mimg-"+i); if(!m)return;
+  box.textContent="생성 중… (FLUX, 10~25초)";
+  // FLUX는 투명배경(알파) 불가 → 잘라낼 소재는 흰 배경으로 생성해 포토샵에서 제거
+  const prompt=(m.prompt||m.name)+(m.transparent?" Isolated, centered on a plain pure white background, product shot, clean edges for easy background removal.":"");
+  try{const url=await fluxImage(prompt, !m.transparent);
+    box.innerHTML='<img src="'+url+'">';
+    const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";a.textContent="원본 열기/저장 ↗";a.style.cssText="display:block;margin-top:6px;font-family:var(--disp);font-weight:700;font-size:12px;color:var(--ink);border-bottom:2px solid var(--accent);text-decoration:none;width:fit-content";
+    $("mat-"+i).appendChild(a);
+    if(m.transparent){const n=document.createElement("p");n.className="note";n.style.marginTop="4px";n.textContent="※ 흰 배경 — 포토샵에서 배경 제거 후 사용";$("mat-"+i).appendChild(n);}
+  }catch(e){box.textContent="실패: "+e.message;}
+}
+</script>
+</body></html>

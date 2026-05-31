@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!-- mydesign.html · 내 디자인 갤러리: 이미지 업로드 → 저장(localStorage) → 평가로 보내기 -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Design · Case Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--ok:#2f7d4f;--card:#FBF9F2;--hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);--disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;min-height:100vh;}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 22px 90px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:24px;letter-spacing:-.02em;text-transform:uppercase;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav a{font-family:var(--disp);font-weight:700;font-size:12px;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:7px 12px;border-radius:999px;}
+  nav a.active{background:var(--ink);color:var(--paper);}
+  h2.sec{font-family:var(--disp);font-weight:800;font-size:clamp(26px,5vw,44px);letter-spacing:-.02em;margin:22px 0 4px;text-transform:uppercase;}
+  h2.sec em{font-style:normal;color:var(--accent);}
+  .lede{font-style:italic;color:var(--soft);max-width:72ch;margin:0 0 8px;font-size:15px;}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0;}
+  .btn{font-family:var(--disp);font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;transition:transform .12s;}
+  .btn:hover{transform:translate(-1px,-1px);}.btn:active{transform:translate(1px,1px);}
+  .btn.ghost{background:transparent;color:var(--ink);}.btn.sm{padding:6px 11px;font-size:11px;border-width:1.5px;}
+  .btn.danger{border-color:var(--accent);color:var(--accent);background:transparent;}
+  input{font-family:var(--mono);font-size:13px;border:1.5px solid var(--hair);border-radius:7px;padding:9px;background:#fff;}
+  .drop{border:2px dashed var(--hair);border-radius:10px;padding:30px;text-align:center;background:#fff;cursor:pointer;font-family:var(--mono);font-size:13px;color:var(--soft);}
+  .drop:hover{border-color:var(--ink);color:var(--ink);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:18px;}
+  .item{background:var(--card);border:1.5px solid var(--ink);border-radius:8px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;}
+  .item .thumb{width:100%;aspect-ratio:1/1.6;object-fit:cover;background:#fff;border-bottom:1px solid var(--hair);}
+  .item .meta{padding:10px;}
+  .item .nm{font-family:var(--disp);font-weight:700;font-size:13px;margin:0 0 2px;word-break:break-all;}
+  .item .dt{font-family:var(--mono);font-size:10px;color:var(--soft);}
+  .item .acts{display:flex;gap:6px;padding:0 10px 10px;flex-wrap:wrap;}
+  .pill{font-family:var(--mono);font-size:11px;border:1.5px solid var(--ink);border-radius:999px;padding:5px 10px;}
+  .empty{border:1.5px dashed var(--hair);border-radius:10px;padding:40px;text-align:center;color:var(--soft);font-family:var(--disp);margin-top:18px;}
+  .note{font-family:var(--mono);font-size:11px;color:var(--soft);line-height:1.6;}
+  .note b{color:var(--accent);}
+  a.lnk{font-family:var(--disp);font-weight:700;font-size:11px;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--accent);}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Case&nbsp;Studio<span class="dot">.</span></div>
+    <nav>
+      <a href="index.html">메인</a>
+      <a href="product.html">Product</a>
+      <a href="learning.html">러닝</a>
+      <a href="mydesign.html" class="active">내 디자인</a>
+      <a href="evaluation.html">평가</a>
+      <a href="reels.html">릴스</a>
+    </nav>
+  </div>
+
+  <h2 class="sec">My <em>Design</em></h2>
+  <p class="lede">완성한 목업·디자인 이미지를 올려 갤러리에 저장하세요. 이 브라우저에 보관되며, 각 디자인을 <b>평가</b> 페이지로 바로 보낼 수 있습니다.</p>
+
+  <div class="bar">
+    <div class="drop" id="drop" style="flex:1;min-width:260px">이미지를 클릭/드롭해서 저장 (PNG · JPG)<input type="file" id="file" accept="image/*" multiple hidden></div>
+    <span class="pill" id="count">0개</span>
+    <button class="btn ghost sm danger" id="clear">전체 삭제</button>
+  </div>
+  <div id="gallery"></div>
+
+  <p class="note" style="margin-top:30px;border-top:1px solid var(--hair);padding-top:14px">
+    저장은 이 브라우저(localStorage)에만 됩니다. 용량 한계가 있어 <b>큰 이미지는 자동으로 축소</b>해 보관해요(원본은 직접 따로 보관 권장). 다른 기기와는 공유되지 않습니다.
+  </p>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const KEY="mydesign:list";
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||"[]");}catch(e){return[];}}
+function save(a){try{localStorage.setItem(KEY,JSON.stringify(a));}catch(e){alert("저장 공간이 가득 찼습니다. 일부 삭제 후 다시 시도하세요.");}}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+/* downscale to keep localStorage small */
+function downscale(dataUrl,maxW){return new Promise(res=>{
+  const img=new Image();
+  img.onload=()=>{
+    let w=img.width,h=img.height; const m=maxW||720;
+    if(w>m){h=Math.round(h*m/w);w=m;}
+    const c=document.createElement("canvas");c.width=w;c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    res(c.toDataURL("image/jpeg",0.82));
+  };
+  img.onerror=()=>res(dataUrl);
+  img.src=dataUrl;
+});}
+
+const drop=$("drop"),file=$("file");
+drop.onclick=()=>file.click();
+drop.ondragover=e=>e.preventDefault();
+drop.ondrop=e=>{e.preventDefault(); handle(e.dataTransfer.files);};
+file.onchange=()=>handle(file.files);
+async function handle(files){
+  const arr=load();
+  for(const f of files){
+    if(!/^image\//.test(f.type)) continue;
+    const url=await new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(f);});
+    const small=await downscale(url,720);
+    arr.unshift({id:Date.now()+"_"+Math.random().toString(36).slice(2,6),name:f.name,url:small,dt:new Date().toLocaleString("ko-KR")});
+  }
+  save(arr); render();
+}
+function render(){
+  const arr=load(); $("count").textContent=arr.length+"개";
+  if(!arr.length){$("gallery").innerHTML='<div class="empty">아직 저장된 디자인이 없습니다. 위에 이미지를 올려보세요.</div>';return;}
+  let h='<div class="grid">';
+  arr.forEach(it=>{
+    h+='<div class="item"><img class="thumb" src="'+it.url+'" alt="'+esc(it.name)+'">'+
+       '<div class="meta"><div class="nm">'+esc(it.name)+'</div><div class="dt">'+esc(it.dt)+'</div></div>'+
+       '<div class="acts">'+
+         '<a class="lnk" href="evaluation.html?from='+encodeURIComponent(it.id)+'">평가하기 ↗</a>'+
+         '<a class="lnk" href="'+it.url+'" download="'+esc(it.name)+'">다운로드</a>'+
+         '<button class="btn ghost sm danger" onclick="del(\''+it.id+'\')">삭제</button>'+
+       '</div></div>';
+  });
+  h+='</div>'; $("gallery").innerHTML=h;
+}
+function del(id){const arr=load().filter(x=>x.id!==id);save(arr);render();}
+$("clear").onclick=()=>{if(confirm("저장된 디자인을 모두 삭제할까요?")){save([]);render();}};
+render();
+</script>
+</body></html>

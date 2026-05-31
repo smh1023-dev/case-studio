@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<!-- reels.html · 릴스 기획: 프레임 이미지(OpenAI) + 대본/자막/BGM/전환 가이드. Sora 자동영상 없음. -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reels · Case Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--ok:#2f7d4f;--card:#FBF9F2;--hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);--disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;min-height:100vh;}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 22px 90px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:24px;letter-spacing:-.02em;text-transform:uppercase;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav a{font-family:var(--disp);font-weight:700;font-size:12px;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:7px 12px;border-radius:999px;}
+  nav a.active{background:var(--ink);color:var(--paper);}
+  h2.sec{font-family:var(--disp);font-weight:800;font-size:clamp(26px,5vw,44px);letter-spacing:-.02em;margin:22px 0 4px;text-transform:uppercase;}
+  h2.sec em{font-style:normal;color:var(--accent);}
+  .lede{font-style:italic;color:var(--soft);max-width:74ch;margin:0 0 8px;font-size:15px;}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0;}
+  .btn{font-family:var(--disp);font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;transition:transform .12s;}
+  .btn:hover{transform:translate(-1px,-1px);}.btn:active{transform:translate(1px,1px);}.btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .btn.ghost{background:transparent;color:var(--ink);}.btn.sm{padding:6px 11px;font-size:11px;border-width:1.5px;}
+  input{font-family:var(--mono);font-size:13px;border:1.5px solid var(--hair);border-radius:7px;padding:9px;background:#fff;}
+  .drop{border:2px dashed var(--hair);border-radius:10px;padding:22px;text-align:center;background:#fff;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--soft);}
+  .drop.has{border-style:solid;border-color:var(--ink);padding:10px;}
+  .drop img{max-height:240px;max-width:100%;border-radius:6px;}
+  .loading{display:none;align-items:center;gap:12px;padding:18px 0;color:var(--soft);font-family:var(--disp);font-weight:600;}
+  .loading.on{display:flex;}
+  .spin{width:20px;height:20px;border:3px solid var(--hair);border-top-color:var(--accent);border-radius:50%;animation:sp .9s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .err{border:1.5px solid var(--accent);border-radius:8px;padding:14px;background:#fff;color:var(--accent);font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin-top:12px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:16px;}
+  .reel{background:var(--card);border:1.5px solid var(--ink);border-radius:8px;padding:18px;box-shadow:var(--shadow);}
+  .reel .idx{font-family:var(--disp);font-weight:800;font-size:11px;color:var(--accent);letter-spacing:.08em;}
+  .reel .rt{font-family:var(--disp);font-weight:800;font-size:17px;margin:2px 0;}
+  .reel .meta{font-family:var(--mono);font-size:11px;color:var(--soft);margin:3px 0;}
+  .reel .hook{background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:12px;padding:8px 10px;border-radius:6px;margin:8px 0;}
+  .blk{margin:8px 0;}.blk h5{font-family:var(--disp);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 3px;color:var(--accent);}
+  .blk p,.blk li{font-size:13.5px;line-height:1.5;margin:2px 0;}
+  .frame{border:1px solid var(--hair);border-radius:6px;padding:8px;background:#fff;margin:6px 0;}
+  .frame .fimg{width:100%;aspect-ratio:9/16;max-height:280px;border:1px dashed var(--hair);border-radius:5px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:var(--mono);font-size:9px;color:var(--soft);}
+  .frame .fimg img{width:100%;height:100%;object-fit:cover;}
+  .scripts{margin-top:18px;}
+  .scriptcard{background:var(--card);border:1.5px solid var(--ink);border-radius:8px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;}
+  .scriptcard h4{font-family:var(--disp);font-size:14px;margin:0 0 6px;}
+  .scriptcard p{font-size:13.5px;line-height:1.55;margin:3px 0;white-space:pre-wrap;}
+  .note{font-family:var(--mono);font-size:11px;color:var(--soft);line-height:1.6;}
+  .note b{color:var(--accent);}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Case&nbsp;Studio<span class="dot">.</span></div>
+    <nav>
+      <a href="index.html">메인</a>
+      <a href="product.html">Product</a>
+      <a href="learning.html">러닝</a>
+      <a href="mydesign.html">내 디자인</a>
+      <a href="evaluation.html">평가</a>
+      <a href="reels.html" class="active">릴스</a>
+    </nav>
+  </div>
+
+  <h2 class="sec">Instagram <em>Reels</em></h2>
+  <p class="lede">목업을 올리면 유행 릴스 포맷을 참조해 <b>릴스 4편</b>(후크·대본·자막·BGM·전환) + 장면별 <b>프레임 이미지</b>(OpenAI)를 만들어줍니다. 프레임을 받아 CapCut/Canva에 넣으면 영상이 됩니다. <b>자동 영상 생성은 없습니다.</b></p>
+
+  <div class="drop" id="drop">목업 이미지를 클릭/드롭<input type="file" id="file" accept="image/*" hidden></div>
+  <input id="ctx" placeholder="(선택) 브랜드 한 줄·타깃·강조점" style="margin-top:10px;width:100%">
+  <div class="bar"><button class="btn" id="run" disabled>릴스 4편 생성</button></div>
+  <div class="loading" id="load"><div class="spin"></div><span id="loadmsg">유행 릴스 참조 중…</span></div>
+  <div id="out"></div>
+  <div id="scripts"></div>
+
+  <p class="note" style="margin-top:30px;border-top:1px solid var(--hair);padding-top:14px">
+    프레임 이미지는 메인 <b>설정</b>의 fal.ai 키(FLUX 1.1 pro ultra)를 공유합니다. 각 프레임의 <b>프레임 생성</b>으로 9:16 장면 이미지를 만들고 다운로드해 편집기에 배치하세요. 정확한 화면 문구(자막)는 편집기에서 타이포로 얹는 게 선명합니다.
+  </p>
+</div>
+<script>
+function ls_get(k){try{return localStorage.getItem(k)||"";}catch(e){return"";}}
+const OMODEL=()=>ls_get("omdl")||"gpt-4o-mini";
+const $=id=>document.getElementById(id);
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function show(e,on){e.classList.toggle("on",on);}
+function parseJSON(t,o,c){let s=String(t).replace(/```json/gi,"").replace(/```/g,"").trim();const a=s.indexOf(o),b=s.lastIndexOf(c);if(a!==-1&&b!==-1)s=s.slice(a,b+1);try{return JSON.parse(s);}catch(e){const last=s.lastIndexOf("}");if(o==="["&&last!==-1){try{return JSON.parse(s.slice(0,last+1)+"]");}catch(_){}}return null;}}
+async function openaiVision(text,image,max_tokens){
+  const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
+  const content=[{type:"text",text}]; if(image) content.push({type:"image_url",image_url:{url:image}});
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:OMODEL(),max_tokens:max_tokens||3600,temperature:0.7,messages:[{role:"user",content}]})});
+  const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 오류");
+  return d.choices[0].message.content.trim();
+}
+async function fluxImage(prompt){
+  const key=ls_get("falk"); if(!key) throw new Error("메인 설정에서 fal.ai 키를 저장하세요. (https://fal.ai/dashboard/keys)");
+  let r; try{ r=await fetch("https://fal.run/fal-ai/flux-pro/v1.1-ultra",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Key "+key},
+    body:JSON.stringify({prompt,aspect_ratio:"9:16",num_images:1,output_format:"png",enable_safety_checker:true})}); }
+  catch(e){ throw new Error("fal.ai 연결 실패(네트워크/CORS). 키 확인 후 재시도."); }
+  let d; try{ d=await r.json(); }catch(e){ throw new Error("fal.ai 응답 해석 실패 (HTTP "+r.status+")"); }
+  if(!r.ok){ const m=(d&&(d.detail||d.message))||("HTTP "+r.status); throw new Error("fal.ai 오류: "+(typeof m==="string"?m:JSON.stringify(m))); }
+  const img=d.images&&d.images[0]; if(!img||!img.url) throw new Error("이미지 없음"); return img.url;
+}
+
+let IMG=null;
+const drop=$("drop"),file=$("file");
+drop.onclick=()=>file.click();
+drop.ondragover=e=>e.preventDefault();
+drop.ondrop=e=>{e.preventDefault();if(e.dataTransfer.files[0])pick(e.dataTransfer.files[0]);};
+file.onchange=()=>{if(file.files[0])pick(file.files[0]);};
+function pick(f){const r=new FileReader();r.onload=()=>{IMG=r.result;drop.classList.add("has");drop.innerHTML='<img src="'+r.result+'">';$("run").disabled=false;};r.readAsDataURL(f);}
+/* receive from mydesign */
+(function(){const id=new URLSearchParams(location.search).get("from");if(!id)return;try{const arr=JSON.parse(localStorage.getItem("mydesign:list")||"[]");const it=arr.find(x=>x.id===id);if(it){IMG=it.url;drop.classList.add("has");drop.innerHTML='<img src="'+it.url+'">';$("run").disabled=false;}}catch(e){}})();
+
+$("run").onclick=async()=>{
+  if(!IMG)return; $("run").disabled=true; show($("load"),true); $("out").innerHTML=""; $("scripts").innerHTML="";
+  const ctx=$("ctx").value.trim();
+  try{
+    $("loadmsg").textContent="릴스 4편 기획 중…";
+    const p1=`당신은 숏폼 콘텐츠 전략가입니다. 업로드된 폰케이스 목업을 홍보할 인스타그램 릴스 4편을 기획하세요. 지금 유행하는 릴스 포맷/편집/전환을 참조하고, 행동심리(후크 3초·Identity·Loss Aversion·Social Proof·CTA)를 적용. 컨텍스트:${ctx||"없음"}.
+JSON 배열만(한국어), 4개. 각: {"title":"제목","format":"참조 포맷","hook":"첫3초 후크","script":["비트별 대본 4~6"],"subtitles":["자막 3~5"],"shots":["샷/장면 3~5"],"bgm":"BGM/사운드 방향","transition":"전환 효과","caption":"캡션+해시태그","cta":"행동유도","framePrompt":"이 릴스 대표 9:16 프레임 이미지 영문 프롬프트(폰케이스 중심, 글자 최소)"}`;
+    const reels=parseJSON(await openaiVision(p1,IMG),"[","]");
+    if(!reels||!reels.length)throw new Error("릴스 JSON 해석 실패");
+    renderReels(reels);
+    $("loadmsg").textContent="15/30/60초 대본 작성 중…";
+    const p2=`위 릴스 컨셉을 바탕으로 같은 제품의 릴스 대본을 길이별로 작성. JSON만(한국어): {"s15":"15초 대본(씬/멘트/자막 포함)","s30":"30초 대본","s60":"60초 대본"}. 핵심 메시지: YOUR LOGO. YOUR STORY. / YOUR IDENTITY. DESIGNED. / NOT JUST A CASE.`;
+    const sc=parseJSON(await openaiVision(p2,IMG,2500),"{","}");
+    if(sc)renderScripts(sc);
+  }catch(e){$("out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+  finally{show($("load"),false);$("run").disabled=false;}
+};
+function renderReels(arr){
+  window.__reels=arr;
+  let h='<div class="grid">';
+  arr.slice(0,4).forEach((r,i)=>{
+    h+='<div class="reel"><div class="idx">REEL '+(i+1)+'</div><div class="rt">'+esc(r.title)+'</div>'+
+       '<div class="meta">포맷 · '+esc(r.format)+'</div>'+
+       '<div class="frame"><div class="fimg" id="fimg-'+i+'">프레임 미생성</div>'+
+       '<button class="btn sm" style="margin-top:6px" onclick="genFrame('+i+')">프레임 생성</button></div>'+
+       '<div class="hook">HOOK · '+esc(r.hook)+'</div>'+
+       '<div class="blk"><h5>대본</h5>'+(r.script||[]).map(s=>'<p>'+esc(s)+'</p>').join("")+'</div>'+
+       '<div class="blk"><h5>자막</h5><ul>'+(r.subtitles||[]).map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>'+
+       '<div class="blk"><h5>샷</h5><ul>'+(r.shots||[]).map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>'+
+       '<div class="blk"><h5>BGM</h5><p>'+esc(r.bgm)+'</p></div>'+
+       '<div class="blk"><h5>전환</h5><p>'+esc(r.transition)+'</p></div>'+
+       '<div class="blk"><h5>캡션</h5><p>'+esc(r.caption)+'</p></div>'+
+       '<div class="blk"><h5>CTA</h5><p>'+esc(r.cta)+'</p></div></div>';
+  });
+  h+='</div>'; $("out").innerHTML=h;
+}
+async function genFrame(i){
+  const r=window.__reels[i],box=$("fimg-"+i); if(!r)return;
+  box.textContent="생성 중…";
+  try{const url=await fluxImage(r.framePrompt||("premium phone case social media reel frame, vertical 9:16, "+(r.title||"")));
+    box.innerHTML='<img src="'+url+'">';
+    const card=box.closest(".frame");
+    const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";a.textContent="원본 열기/저장 ↗";a.style.cssText="display:block;margin-top:6px;font-family:var(--disp);font-weight:700;font-size:12px;color:var(--ink);border-bottom:2px solid var(--accent);text-decoration:none;width:fit-content";
+    card.appendChild(a);
+  }catch(e){box.textContent="실패: "+e.message;}
+}
+function renderScripts(sc){
+  let h='<div class="scripts"><h2 class="sec" style="font-size:22px">대본 <em>15 / 30 / 60초</em></h2>';
+  if(sc.s15)h+='<div class="scriptcard"><h4>15초</h4><p>'+esc(sc.s15)+'</p></div>';
+  if(sc.s30)h+='<div class="scriptcard"><h4>30초</h4><p>'+esc(sc.s30)+'</p></div>';
+  if(sc.s60)h+='<div class="scriptcard"><h4>60초</h4><p>'+esc(sc.s60)+'</p></div>';
+  h+='</div>'; $("scripts").innerHTML=h;
+}
+</script>
+</body></html>

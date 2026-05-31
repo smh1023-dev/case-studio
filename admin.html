@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!-- admin.html · 관리자 전용 (본인 PC에서만). 신청자 목록 + AI 로고 분석/프롬프트/이미지 생성. -->
+<!-- 키는 이 브라우저에만 저장. 공개 배포 시 이 페이지는 검색 노출 금지/비공개 경로 권장. -->
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin · SI Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F4F1E8;--ink:#14120D;--soft:#4A463B;--accent:#D8412F;--navy:#1B2A4A;--gold:#C8A04A;--ok:#2f7d4f;--card:#FBF9F2;--hair:rgba(20,18,13,.16);--shadow:14px 14px 0 rgba(20,18,13,.06);--disp:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Newsreader",Georgia,serif;--mono:"Space Mono",monospace;}
+  *{box-sizing:border-box;}html,body{margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(rgba(20,18,13,.022) 1px,transparent 1px);background-size:4px 4px;}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 22px 90px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:2.5px solid var(--ink);padding-bottom:12px;}
+  .brand{font-family:var(--disp);font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:-.02em;}
+  .brand .dot{color:var(--accent);}
+  nav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav a{font-family:var(--disp);font-weight:700;font-size:11.5px;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:6px 11px;border-radius:999px;}
+  nav a.active{background:var(--ink);color:var(--paper);}
+  h1{font-family:var(--disp);font-weight:800;font-size:clamp(26px,5vw,40px);margin:22px 0 4px;text-transform:uppercase;letter-spacing:-.02em;}
+  h1 em{font-style:normal;color:var(--accent);}
+  .lede{color:var(--soft);font-size:14px;margin:0 0 8px;font-style:italic;}
+  .card{background:var(--card);border:1.5px solid var(--ink);border-radius:10px;padding:16px;box-shadow:var(--shadow);margin:14px 0;}
+  label{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;display:block;margin:0 0 6px;}
+  input{font-family:var(--mono);font-size:13px;border:1.5px solid var(--hair);border-radius:7px;padding:9px;background:#fff;width:100%;}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0;}
+  .btn{font-family:var(--disp);font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:9px 15px;border-radius:999px;transition:transform .12s;}
+  .btn:hover{transform:translate(-1px,-1px);}.btn:active{transform:translate(1px,1px);}.btn[disabled]{opacity:.4;cursor:not-allowed;}
+  .btn.ghost{background:transparent;color:var(--ink);}.btn.sm{padding:6px 11px;font-size:11px;border-width:1.5px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--hair);vertical-align:top;}
+  th{font-family:var(--disp);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);}
+  .status{font-family:var(--mono);font-size:10px;border-radius:999px;padding:3px 8px;border:1px solid var(--hair);white-space:nowrap;}
+  .s-new{color:var(--accent);border-color:var(--accent);}
+  .s-done{color:var(--ok);border-color:var(--ok);}
+  .loading{display:none;align-items:center;gap:12px;padding:14px 0;color:var(--soft);font-family:var(--disp);font-weight:600;}
+  .loading.on{display:flex;}
+  .spin{width:18px;height:18px;border:3px solid var(--hair);border-top-color:var(--accent);border-radius:50%;animation:sp .9s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .err{border:1.5px solid var(--accent);border-radius:8px;padding:12px;background:#fff;color:var(--accent);font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin-top:10px;}
+  .result .blk{margin:8px 0;}
+  .result h4{font-family:var(--disp);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 3px;}
+  .result p{font-size:13.5px;line-height:1.5;margin:2px 0;}
+  .promptbox{font-family:var(--mono);font-size:12px;background:#fff;border:1px solid var(--hair);border-radius:6px;padding:10px;white-space:pre-wrap;line-height:1.5;}
+  .logoimg{max-width:280px;border:1px solid var(--hair);border-radius:8px;margin-top:8px;}
+  .note{font-family:var(--mono);font-size:11px;color:var(--soft);line-height:1.6;}
+  .note b{color:var(--accent);}
+  details{margin-top:8px;}summary{cursor:pointer;font-family:var(--disp);font-weight:700;font-size:12px;}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">SI&nbsp;Story<span class="dot">.</span> <span style="font-family:var(--mono);font-size:11px;color:var(--accent)">ADMIN</span></div>
+    <nav>
+      <a href="event.html">이벤트</a>
+      <a href="logo.html">로고 만들기</a>
+      <a href="index.html">스튜디오</a>
+    </nav>
+  </div>
+
+  <h1>Admin · <em>신청자 관리</em></h1>
+  <p class="lede">구글시트(웹 게시 CSV)에서 신청자를 불러와, 선택한 고객의 로고 분석·슬로건·이미지 프롬프트·로고 이미지를 생성합니다. 생성 결과는 복사해 시트에 붙여넣으세요. (이 페이지는 본인 PC에서만 사용)</p>
+
+  <div class="card">
+    <label>구글시트 CSV 게시 URL</label>
+    <input id="csv" placeholder="파일 ▸ 공유 ▸ 웹에 게시 ▸ CSV 링크 (응답 시트)">
+    <div class="bar">
+      <button class="btn" id="load">신청자 불러오기</button>
+      <button class="btn ghost sm" id="savecfg">URL 저장</button>
+      <span class="note" id="okkey"></span>
+    </div>
+    <p class="note">OpenAI 키는 메인 <b>설정</b>에서 저장한 값을 공유합니다. CSV는 "웹에 게시"로 만든 읽기 전용 링크예요(개인정보가 포함되니 링크 관리 주의).</p>
+  </div>
+
+  <div class="loading" id="load1"><div class="spin"></div><span>불러오는 중…</span></div>
+  <div id="list"></div>
+  <div id="work"></div>
+</div>
+<script>
+function ls_get(k){try{return localStorage.getItem(k)||"";}catch(e){return"";}}
+function ls_set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+const OMODEL=()=>ls_get("omdl")||"gpt-4o-mini";
+const $=id=>document.getElementById(id);
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function show(e,on){e.classList.toggle("on",on);}
+function parseJSON(t,o,c){let s=String(t).replace(/```json/gi,"").replace(/```/g,"").trim();const a=s.indexOf(o),b=s.lastIndexOf(c);if(a!==-1&&b!==-1)s=s.slice(a,b+1);try{return JSON.parse(s);}catch(e){return null;}}
+
+$("csv").value=ls_get("admin:csv");
+$("savecfg").onclick=()=>{ls_set("admin:csv",$("csv").value.trim());alert("저장됨");};
+$("okkey").textContent = ls_get("ok") ? "OpenAI 키 감지됨 ✓" : "⚠ 메인 설정에서 OpenAI 키 저장 필요";
+
+/* minimal CSV parser (handles quoted fields) */
+function parseCSV(text){
+  const rows=[];let i=0,f="",row=[],q=false;
+  while(i<text.length){const ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; } else f+=ch; }
+    else{ if(ch==='"')q=true; else if(ch===","){row.push(f);f="";} else if(ch==="\n"){row.push(f);rows.push(row);row=[];f="";} else if(ch==="\r"){} else f+=ch; }
+    i++;
+  }
+  if(f.length||row.length){row.push(f);rows.push(row);}
+  return rows;
+}
+
+let DATA=[],HEAD=[];
+$("load").onclick=async()=>{
+  const url=$("csv").value.trim(); if(!url){alert("CSV URL을 입력하세요");return;}
+  show($("load1"),true); $("list").innerHTML="";
+  try{
+    const r=await fetch(url); const t=await r.text();
+    const rows=parseCSV(t).filter(x=>x.length>1);
+    HEAD=rows[0].map(h=>h.trim()); DATA=rows.slice(1);
+    renderList();
+  }catch(e){$("list").innerHTML='<div class="err">불러오기 실패: '+esc(e.message)+'\n(시트가 "웹에 게시"로 공개돼 있어야 합니다)</div>';}
+  finally{show($("load1"),false);}
+};
+function col(row,name){const i=HEAD.findIndex(h=>h.toLowerCase()===name.toLowerCase());return i>=0?row[i]:"";}
+function renderList(){
+  if(!DATA.length){$("list").innerHTML='<div class="card">신청자가 없습니다.</div>';return;}
+  let h='<div class="card"><label>신청자 '+DATA.length+'명</label><table><thead><tr><th>#</th><th>애칭</th><th>이메일</th><th>색</th><th>상태</th><th></th></tr></thead><tbody>';
+  DATA.forEach((row,i)=>{
+    const nick=col(row,"nickname")||col(row,"애칭")||row[3]||"-";
+    const email=col(row,"email")||row[1]||"-";
+    const color=col(row,"favorite_color")||col(row,"좋아하는 색")||"-";
+    const st=col(row,"logo_status")||"접수";
+    const cls=/완료|done|발송/.test(st)?"s-done":"s-new";
+    h+='<tr><td>'+(i+1)+'</td><td>'+esc(nick)+'</td><td>'+esc(email)+'</td><td>'+esc(color)+'</td><td><span class="status '+cls+'">'+esc(st)+'</span></td><td><button class="btn sm" onclick="gen('+i+')">생성</button></td></tr>';
+  });
+  h+='</tbody></table></div>';
+  $("list").innerHTML=h;
+}
+
+async function openaiChat(text,max){
+  const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:OMODEL(),max_tokens:max||1500,temperature:0.8,messages:[{role:"user",content:text}]})});
+  const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 오류");
+  return d.choices[0].message.content.trim();
+}
+async function openaiImage(prompt){
+  const key=ls_get("ok"); if(!key) throw new Error("OpenAI 키 필요");
+  const r=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:"gpt-image-1",prompt,size:"1024x1024",n:1,background:"transparent"})});
+  const d=await r.json(); if(d.error) throw new Error(d.error.message||"이미지 오류");
+  const x=d.data&&d.data[0]; return x.b64_json?("data:image/png;base64,"+x.b64_json):x.url;
+}
+
+async function gen(i){
+  const row=DATA[i];
+  const nick=col(row,"nickname")||row[3]||"", color=col(row,"favorite_color")||"", sym=col(row,"symbol")||"";
+  const vals=[col(row,"value1"),col(row,"value2"),col(row,"value3")].filter(Boolean).join(", ")||col(row,"values")||"";
+  const proud=col(row,"proud_moment")||"", chal=col(row,"challenge")||"", email=col(row,"email")||"";
+  $("work").innerHTML='<div class="loading on"><div class="spin"></div><span>'+esc(nick||email)+' 생성 중…</span></div>';
+  const prompt=`너는 세계 최고의 브랜드 전략가이자 로고 디자이너다. 아래 고객의 "정체성과 인생 서사가 담긴 아이덴티티 로고"를 설계하라.
+고객: 애칭=${nick} / 색=${color} / 가치관=${vals} / 상징=${sym} / 자랑스러운순간=${proud} / 극복한어려움=${chal}
+JSON만(한국어). 형식:
+{"identity":"아이덴티티 분석 300자 이내, 따뜻하고 감성적으로",
+"keywords":["핵심 키워드 3개"],
+"slogan_ko":["한글 슬로건 3개"],
+"slogan_en":["영어 슬로건 3개"],
+"logo":{"symbol":"상징","color":"색상","form":"형태","emotion":"감정"},
+"image_prompt":"영어 이미지 생성 프롬프트. 반드시 포함: minimal premium vector logo, clean geometry, symbolic, emotional, suitable for phone case, works in black and white, no mockup, no text, luxury brand identity style",
+"case_apply":"로고를 스마트폰 케이스에 적용 시 배치·여백·분위기 설명"}`;
+  try{
+    const d=parseJSON(await openaiChat(prompt,1800),"{","}");
+    if(!d) throw new Error("분석 JSON 해석 실패");
+    renderResult(i,d,email);
+  }catch(e){$("work").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+}
+function renderResult(i,d,email){
+  const L=d.logo||{};
+  let h='<div class="card result"><label>생성 결과 · '+esc(email)+'</label>'+
+    '<div class="blk"><h4>아이덴티티 분석</h4><p>'+esc(d.identity)+'</p></div>'+
+    '<div class="blk"><h4>핵심 키워드</h4><p>'+(d.keywords||[]).map(esc).join(" · ")+'</p></div>'+
+    '<div class="blk"><h4>슬로건 (한글)</h4><p>'+(d.slogan_ko||[]).map(esc).join(" / ")+'</p></div>'+
+    '<div class="blk"><h4>슬로건 (영어)</h4><p>'+(d.slogan_en||[]).map(esc).join(" / ")+'</p></div>'+
+    '<div class="blk"><h4>로고 컨셉</h4><p>상징: '+esc(L.symbol)+' / 색상: '+esc(L.color)+' / 형태: '+esc(L.form)+' / 감정: '+esc(L.emotion)+'</p></div>'+
+    '<div class="blk"><h4>이미지 생성 프롬프트</h4><div class="promptbox" id="ip-'+i+'">'+esc(d.image_prompt)+'</div></div>'+
+    '<div class="blk"><h4>케이스 적용</h4><p>'+esc(d.case_apply)+'</p></div>'+
+    '<div class="bar">'+
+      '<button class="btn sm" onclick="genImg('+i+')">로고 이미지 생성</button>'+
+      '<button class="btn ghost sm" onclick="copyResult('+i+')">시트용 결과 복사</button>'+
+    '</div>'+
+    '<div id="img-'+i+'"></div>'+
+    '<details><summary>구글시트에 붙여넣을 값 보기</summary><div class="promptbox" id="sheet-'+i+'"></div></details>'+
+    '</div>';
+  $("work").innerHTML=h;
+  window.__res=window.__res||{}; window.__res[i]={d,email};
+  // pre-build sheet text
+  const sheet="generated_identity: "+(d.identity||"")+"\ngenerated_slogan: "+[].concat(d.slogan_ko||[],d.slogan_en||[]).join(" / ")+"\nimage_prompt: "+(d.image_prompt||"");
+  $("sheet-"+i).textContent=sheet;
+}
+async function genImg(i){
+  const box=$("img-"+i), d=window.__res[i].d;
+  box.innerHTML='<div class="loading on"><div class="spin"></div><span>로고 생성 중…</span></div>';
+  try{const url=await openaiImage(d.image_prompt);
+    box.innerHTML='<img class="logoimg" src="'+url+'"><br><a class="btn ghost sm" href="'+url+'" download="logo.png" style="display:inline-block;margin-top:6px;text-decoration:none">로고 다운로드 ↗</a>';
+  }catch(e){box.innerHTML='<div class="err">'+esc(e.message)+'</div>';}
+}
+function copyResult(i){
+  const t=$("sheet-"+i).textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(t);
+  alert("복사됨 — 구글시트 해당 행에 붙여넣으세요.");
+}
+</script>
+</body></html>
