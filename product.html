@@ -783,13 +783,12 @@ function render(d){
   // ★ 칼선+타이포 자동 합성 (FLUX 배경 + SVG 타이포 + 칼선)
   if(d.flux_main && window.__model){
     window.__fluxMain=d.flux_main;
-    h+='<div class="card"><div class="vh">5 · 칼선 맞춰 자동 합성 <small>FLUX 배경 + 로고 + 타이포 + 칼선 → preview/print</small></div>'+
-       '<p class="note" style="margin-bottom:10px">'+esc(window.__model.label)+' 작업사이즈에 맞춰: 배경(FLUX) → 로고(심볼+워드마크) → 타이포(SVG) → 칼선(미리보기) 순으로 합성합니다.</p>'+
+    h+='<div class="card"><div class="vh">5 · 칼선 맞춰 자동 합성 <small>한 번에 인쇄용(칼선) + Pacdora 목업용 둘 다 생성</small></div>'+
+       '<p class="note" style="margin-bottom:10px">'+esc(window.__model.label)+' 작업사이즈에 맞춰 합성하고, <b>같은 디자인으로 ① print(칼선·인쇄용) ② preview(칼선표시) ③ pacdora.png(목업 업로드용)</b>를 한 번에 만들어 모두 다운로드할 수 있어요.</p>'+
        '<div class="bar"><label style="align-self:center">로고 위치</label>'+
          '<select class="sel" id="logoPos"><option value="none">로고 없음</option><option value="center">중앙</option><option value="bottom">하단</option><option value="topleft">좌측 상단</option><option value="pattern">패턴 반복</option><option value="magsafe">맥세이프 주변</option></select>'+
          '<label class="lg" style="align-self:center"><input type="checkbox" id="mirrorMode" style="width:auto;margin:0 4px 0 0;vertical-align:middle">🪞 미러 케이스(거울·절제)</label>'+
          '<button class="btn" id="composeBtn">생성 & 합성</button>'+
-         '<button class="btn ghost" id="pacdoraBtn" title="Pacdora 업로드용 세로 평면 PNG(칼선·카메라홀·블리드 없음)">📱 Pacdora용 평면 PNG</button>'+
          '<span class="pill" id="composeStat">대기</span></div>'+
        '<div class="loading" id="composeLoad"><div class="spin"></div><span id="composeMsg">배경 생성 중… (10~25초)</span></div>'+
        '<div id="composeOut" class="formgrid" style="grid-template-columns:1fr 1fr;margin-top:12px"></div>'+
@@ -1005,7 +1004,6 @@ JSON만: {"logoType":"combination|symbol|wordmark","fontFamily":"위 목록 중 
 /* 새 버튼 바인딩 (render 후 호출) */
 function bindCompose(){
   if($("composeBtn")) $("composeBtn").onclick=composeWithDieline;
-  if($("pacdoraBtn")) $("pacdoraBtn").onclick=exportPacdoraFlat;
   if($("mockBtn")) $("mockBtn").onclick=genMockups;
   if($("typoUpd")) $("typoUpd").onclick=()=>{
     const T=window.__typo||{}; T.mainCopy=$("typoMain").value; T.subCopy=$("typoSub").value;
@@ -1147,9 +1145,19 @@ async function composeWithDieline(){
     try{ pngPrint=printCv.toDataURL("image/png"); pngPrev=prevCv.toDataURL("image/png"); }
     catch(e){ throw new Error("합성 보안 오류(canvas tainted). fal 이미지 CORS 문제 — 배경을 저장해 포토샵에서 합치세요."); }
     __printDataUrl=pngPrint; window.__printForMock=pngPrint;
+    // ── 같은 디자인으로 Pacdora용 평면도 함께 생성 (375:699 = 1125×2097, 칼선/카메라홀 없음, 글자 잘림방지) ──
+    const PW=1125, PH=2097;
+    const Tp=Object.assign({}, T); Tp.pacdora=true; if(mirror){Tp.layoutType="bottom";}else{Tp.layoutType="center";}
+    const tyImgP=await loadImg(svgDataUrl(typoSVG(Tp,PW,PH,false)),false);
+    const pcv=document.createElement("canvas"); pcv.width=PW; pcv.height=PH; const pctx=pcv.getContext("2d");
+    if(mirrorGrad){ drawMirror(pctx); } else if(bgImg){ drawCover(pctx,bgImg,PW,PH); } else { pctx.fillStyle="#111"; pctx.fillRect(0,0,PW,PH); }
+    drawLogo(pctx,PW,PH,pos,symImg,wordImg);
+    pctx.drawImage(tyImgP,0,0,PW,PH);
+    let pngPac=null; try{ pngPac=pcv.toDataURL("image/png"); }catch(e){}
     $("composeOut").innerHTML=
-      composeCard("print.png (인쇄용)", pngPrint, M.key+"_print.png", "배경+타이포 · 칼선없음 · "+W+"×"+H)+
-      composeCard("preview.png"+(dlImg?" (칼선표시)":" (칼선 미적용)"), pngPrev, M.key+"_preview.png", dlImg?"배경+타이포+칼선":"칼선 이미지를 못 찾아 칼선 없이 생성");
+      composeCard("print.png (인쇄용·칼선맞춤)", pngPrint, M.key+"_print.png", "레드프린팅 입고용 · "+W+"×"+H)+
+      composeCard("preview.png"+(dlImg?" (칼선표시)":" (칼선 미적용)"), pngPrev, M.key+"_preview.png", dlImg?"배경+타이포+칼선":"칼선 이미지를 못 찾아 칼선 없이 생성")+
+      (pngPac?composeCard("📱 pacdora.png (목업 업로드용)", pngPac, M.key+"_pacdora.png", "Pacdora Upload용 · 375:699 · "+PW+"×"+PH+" · 칼선/카메라홀 없음"):"");
     if(dlWarn){ $("composeOut").insertAdjacentHTML("afterbegin",
       '<div class="note" style="grid-column:1/3;color:var(--accent)">⚠ 칼선 이미지를 찾지 못했습니다: <b>'+esc(dlWarn)+'</b> · print은 정상 생성됐어요. (file://에서 안 보이면 dielines 폴더가 product.html과 같은 위치인지 확인)</div>'); }
     // 내보내기: svg-source / prompt.txt / typography.json
