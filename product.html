@@ -1057,6 +1057,14 @@ function applyFont(family,weight,ls,align,layout){
 
 /* 심볼 PNG: 밝은 배경(흰 박스)·연한 워터마크 제거 + 남은 마크를 hex 단색으로 → 타이포 색과 통일 */
 function hexToRGB(h){ h=String(h||"").replace("#",""); if(h.length===3)h=h.split("").map(c=>c+c).join(""); const n=parseInt(h||"14120d",16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function _isLightHex(hex){
+  let h=String(hex||"").replace("#","").trim();
+  if(h.length===3) h=h.split("").map(c=>c+c).join("");
+  if(h.length<6) return false;
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  // 상대 휘도(0~255). 128 이상이면 밝은 색으로 판단
+  return (0.299*r+0.587*g+0.114*b) >= 140;
+}
 function symbolToColor(img,hex){
   try{
     const S=600, cv=document.createElement("canvas"); cv.width=S; cv.height=S; const ctx=cv.getContext("2d");
@@ -1083,7 +1091,11 @@ async function composeWithDieline(){
   const btn=$("composeBtn"); btn.disabled=true; show($("composeLoad"),true); $("composeOut").innerHTML=""; $("composeStat").textContent="생성 중";
   const _lay=(window.__typo&&window.__typo.layoutType)||"center";
   const _zone=(_lay==="top")?"top area":(_lay==="bottom")?"bottom area":"central area";
-  const fluxPrompt=window.__fluxMain+" Full bleed background art only. ABSOLUTELY NO text, no letters, no words, no numbers, no typography. Leave a large calm, low-detail, near-solid empty zone in the "+_zone+" so a wordmark and logo sit clearly. Use only the design palette, a restrained composition with generous negative space and a single focal element. No phone, no mockup, edge to edge, premium, high detail.";
+  // 타이포/로고 색을 미리 읽어 배경이 그 색과 조화되도록 프롬프트에 주입
+  const _tc=(window.__typo&&window.__typo.textColor)||(window.__logo&&window.__logo.color)||"#14120D";
+  const _zoneTone = _isLightHex(_tc) ? "The empty zone where the text sits must be DARK and deep (so the light-colored typography reads clearly)." : "The empty zone where the text sits must be LIGHT and bright (so the dark typography reads clearly).";
+  const _harmony=" COLOR HARMONY (critical): build the whole palette around the brand accent color "+_tc+" — use it and its analogous/tonal variations as the dominant scheme so the background, logo and typography feel like ONE coherent design. "+_zoneTone+" Strong figure-ground contrast between the text zone and the type color.";
+  const fluxPrompt=window.__fluxMain+" Full bleed background art only. ABSOLUTELY NO text, no letters, no words, no numbers, no typography. Leave a large calm, low-detail, near-solid empty zone in the "+_zone+" so a wordmark and logo sit clearly."+_harmony+" Restrained composition with generous negative space and a single focal element. No phone, no mockup, edge to edge, premium, high detail.";
   try{
     let bgImg=null, mirrorGrad=false;
     if(mirror){
