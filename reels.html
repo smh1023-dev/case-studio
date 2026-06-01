@@ -97,22 +97,18 @@ async function openaiVision(text,image,max_tokens){
 }
 async function openaiImage(prompt,size){
   const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
-  size=size||"1024x1536"; let gErr="";
-  try{
+  size=size||"1024x1536"; const errs=[];
+  async function call(body){
     const r=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-      body:JSON.stringify({model:"gpt-image-1",prompt,size,quality:"high",n:1})});
-    const d=await r.json();
-    if(r.ok&&d.data&&d.data[0]&&d.data[0].b64_json) return "data:image/png;base64,"+d.data[0].b64_json;
-    gErr=(d.error&&d.error.message)||("HTTP "+r.status);
-  }catch(e){ gErr=e.message; }
-  const dsz=(size==="1024x1536")?"1024x1792":(size==="1536x1024")?"1792x1024":"1024x1024";
-  const r2=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",
-    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-    body:JSON.stringify({model:"dall-e-3",prompt,size:dsz,n:1,quality:"hd"})});
-  const d2=await r2.json();
-  if(r2.ok&&d2.data&&d2.data[0]){ if(d2.data[0].b64_json) return "data:image/png;base64,"+d2.data[0].b64_json; if(d2.data[0].url) return d2.data[0].url; }
-  throw new Error("OpenAI 이미지 생성 실패: "+((d2.error&&d2.error.message)||gErr));
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify(body)});
+    let d={}; try{ d=await r.json(); }catch(e){}
+    if(r.ok&&d.data&&d.data[0]){ if(d.data[0].b64_json) return "data:image/png;base64,"+d.data[0].b64_json; if(d.data[0].url) return d.data[0].url; }
+    throw new Error((d.error&&d.error.message)||("HTTP "+r.status));
+  }
+  try{ return await call({model:"gpt-image-1",prompt,size,quality:"high",n:1}); }catch(e){ errs.push("gpt-image-1: "+e.message); }
+  try{ const dsz=(size==="1024x1536")?"1024x1792":(size==="1536x1024")?"1792x1024":"1024x1024"; return await call({model:"dall-e-3",prompt,size:dsz,n:1,quality:"hd"}); }catch(e){ errs.push("dall-e-3: "+e.message); }
+  try{ return await call({model:"dall-e-2",prompt,size:"1024x1024",n:1}); }catch(e){ errs.push("dall-e-2: "+e.message); }
+  throw new Error("OpenAI 이미지 생성 실패 — "+errs.join(" / ")+" · 결제수단 등록 또는 조직 인증(platform.openai.com)이 필요할 수 있습니다.");
 }
 
 let IMG=null;
