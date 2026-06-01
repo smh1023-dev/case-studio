@@ -113,7 +113,7 @@
   <div class="top">
     <div class="brand">Case&nbsp;Studio<span class="dot">.</span></div>
     <nav>
-      <a class="xlink active" href="index.html">메인</a>
+      <a class="xlink active" href="index.html">Radar</a>
       <a class="xlink" href="product.html">Product</a>
       <a class="xlink" href="learning.html">러닝</a>
       <a class="xlink" href="mydesign.html">내 디자인</a>
@@ -122,15 +122,11 @@
       <a class="xlink" href="index.html#set">설정</a>
     </nav>
   </div>
-  <nav class="subnav">
-    <button class="tabbtn active" data-t="radar">Radar</button>
-    <button class="tabbtn" data-t="set">설정</button>
-  </nav>
 
   <!-- ============ RADAR ============ -->
   <section id="radar" class="on">
     <h2 class="sec">CASETiFY <em>Radar</em></h2>
-    <p class="lede">매일 1회 베스트셀러 5개를 찾아 링크 + 구도·색감·타이포·심볼·왜 트렌디를 분석하고, 오늘의 트렌드 문구도 보여줍니다.</p>
+    <p class="lede">매일 1회 베스트셀러 5개를 찾아 링크 + 구도·색감·타이포·심볼·왜 트렌디를 분석하고, 오늘의 트렌드 문구도 보여줍니다. <b>Anthropic 키가 있으면 실시간 웹검색</b>으로 분석하고(권장), 없으면 OpenAI로 대체합니다.</p>
     <div class="bar"><span class="pill" id="r-stat">—</span><button class="btn" id="r-run">오늘 분석</button><button class="btn ghost sm" id="r-force">강제 재분석</button></div>
     <div class="loading" id="r-load"><div class="spin"></div><span>웹을 훑는 중…</span></div>
     <div id="r-out"></div>
@@ -141,7 +137,7 @@
     <h2 class="sec">설정 · <em>Keys</em></h2>
     <p class="lede">키는 이 브라우저(localStorage)에만 저장됩니다. 공용 PC 금지. 운영 배포 시엔 서버리스 프록시 권장.</p>
     <div class="card" style="max-width:560px">
-      <label>Anthropic API Key (리서치·디자인·평가·릴스)</label>
+      <label>Anthropic API Key (Radar 실시간 웹검색 · 권장)</label>
       <input id="ak" type="password" placeholder="sk-ant-..." autocomplete="off">
       <label style="margin-top:14px">OpenAI API Key (소재 이미지 생성 · 왜? 챗)</label>
       <input id="ok" type="password" placeholder="sk-..." autocomplete="off">
@@ -172,11 +168,11 @@ const $=id=>document.getElementById(id);
 function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 
 /* ---------------- tabs ---------------- */
-document.querySelectorAll(".tabbtn").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll(".tabbtn").forEach(x=>x.classList.remove("active"));
+function showSection(which){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("on"));
-  b.classList.add("active"); $(b.dataset.t).classList.add("on");
-});
+  const el=$(which==="set"?"set":"radar"); if(el) el.classList.add("on");
+}
+window.addEventListener("hashchange",()=>showSection(location.hash==="#set"?"set":"radar"));
 
 /* ---------------- settings ---------------- */
 function refreshKeyStat(){const a=ls_get("ak"),o=ls_get("ok");const p=$("k-stat");
@@ -244,18 +240,34 @@ function safeUrl(u){u=String(u||"");return /^https?:\/\//i.test(u)?u:null;}
 function show(elm,on){elm.classList.toggle("on",on);}
 
 /* ================= TAB 1 · RADAR ================= */
-const R_PICK=`당신은 글로벌 폰케이스 트렌드 리서처이자 Paul Rand 관점 비평가입니다. 2026년 현재 잘 팔리는 프리미엄 폰케이스 디자인/포맷 5개를 브랜드별로 정리하세요. CASETiFY 우선(+BURGA·Velvet Caviar·Wildflower·Casely). url은 해당 브랜드 공식 사이트 형태(예: https://www.casetify.com)로. JSON 배열만, 한국어, 각 필드 14단어 이내. 키:{"brand","name","url","composition","color","typography","symbol","why"}`;
-const R_PHRASE=`2026년 현재 폰케이스/굿즈에 쓰는 유행 문구·슬로건 트렌드를 정리. 자기계발 클리셰(KEEP GOING 등) 말고 브랜드 카피 톤. JSON만, 한국어: {"trending":["3개"],"avoid":["3개"],"tip":"한 줄"}`;
+const R_PICK=`당신은 글로벌 폰케이스 트렌드 리서처이자 Paul Rand 관점 비평가입니다. 웹검색으로 지금 잘 팔리는 프리미엄 폰케이스 디자인/포맷 5개를 찾으세요. CASETiFY 우선(+BURGA·Velvet Caviar·Wildflower·Casely). 각 항목 실제 URL 포함. JSON 배열만, 한국어, 각 필드 14단어 이내. 키:{"brand","name","url","composition","color","typography","symbol","why"}`;
+const R_PHRASE=`웹검색으로 2026년 현재 폰케이스/굿즈에 쓰는 유행 문구·슬로건 트렌드를 조사. 자기계발 클리셰(KEEP GOING 등) 말고 브랜드 카피 톤. JSON만, 한국어: {"trending":["3개"],"avoid":["3개"],"tip":"한 줄"}`;
 async function radarRun(force){
   const t=today(),k="csr:"+t;
   if(!force){const c=ls_getJSON(k);if(c){radarRender(c);$("r-stat").textContent="오늘 완료 · "+t;$("r-stat").className="pill ok";return;}}
-  if(!ls_get("ok")){ $("r-out").innerHTML='<div class="err">메인 설정에서 OpenAI 키를 먼저 저장하세요.</div>'; $("r-stat").textContent="OpenAI 키 필요 · "+t; $("r-stat").className="pill bad"; return; }
+  const hasA=!!ls_get("ak"), hasO=!!ls_get("ok");
+  if(!hasA && !hasO){ $("r-out").innerHTML='<div class="err">설정에서 Anthropic 키(권장 · 실시간 웹검색) 또는 OpenAI 키를 저장하세요.</div>'; $("r-stat").textContent="키 필요 · "+t; $("r-stat").className="pill bad"; return; }
   $("r-run").disabled=$("r-force").disabled=true; show($("r-load"),true); $("r-out").innerHTML="";
   try{
-    const picks=parseJSON(await openaiChat([{role:"user",content:R_PICK}]),"[","]");
+    let picks=null, phrases=null, note="";
+    if(hasA){
+      // Anthropic 우선 — 실시간 웹검색
+      try{
+        picks=parseJSON(await claude({user:R_PICK,useSearch:true}),"[","]");
+        try{phrases=parseJSON(await claude({user:R_PHRASE,useSearch:true}),"{","}");}catch(e){}
+      }catch(e){
+        if(!hasO) throw new Error("Anthropic 분석 실패: "+e.message+" (설정에서 키 확인, 또는 OpenAI 키 추가 시 자동 대체)");
+        note="Anthropic 실패 → OpenAI 대체(실시간 웹검색 아님).";
+      }
+    }
+    if((!picks||!picks.length) && hasO){
+      // OpenAI 폴백 — 학습 지식 기반
+      picks=parseJSON(await openaiChat([{role:"user",content:R_PICK}]),"[","]");
+      try{phrases=phrases||parseJSON(await openaiChat([{role:"user",content:R_PHRASE}]),"{","}");}catch(e){}
+      if(!note) note="OpenAI 분석(실시간 웹검색 아님 · 트렌드 지식 기반). 실제 신상품은 출처 링크에서 확인하세요.";
+    }
     if(!picks||!picks.length) throw new Error("5개 분석 해석 실패");
-    let phrases=null; try{phrases=parseJSON(await openaiChat([{role:"user",content:R_PHRASE}]),"{","}");}catch(e){}
-    const payload={picks,phrases,note:"OpenAI 분석(실시간 웹검색 아님 · 트렌드 지식 기반). 실제 신상품은 출처 링크에서 확인하세요."}; ls_setJSON(k,payload); radarRender(payload);
+    const payload={picks,phrases,note}; ls_setJSON(k,payload); radarRender(payload);
     $("r-stat").textContent="오늘 완료 · "+t; $("r-stat").className="pill ok";
   }catch(e){$("r-out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
   finally{show($("r-load"),false);$("r-run").disabled=$("r-force").disabled=false;}
@@ -284,10 +296,10 @@ $("r-run").onclick=()=>radarRun(false); $("r-force").onclick=()=>radarRun(true);
 
 /* ---------------- auto run radar on new day ---------------- */
 window.addEventListener("DOMContentLoaded",()=>{
-  if(location.hash==="#set"){ const b=document.querySelector('.tabbtn[data-t="set"]'); if(b) b.click(); }
+  showSection(location.hash==="#set"?"set":"radar");
   const t=today(); const cached=ls_getJSON("csr:"+t);
   if(cached){radarRender(cached);$("r-stat").textContent="오늘 완료 · "+t;$("r-stat").className="pill ok";}
-  else{$("r-stat").textContent="새 분석 필요 · "+t;$("r-stat").className="pill bad"; if(ls_get("ok")) radarRun(false);}
+  else{$("r-stat").textContent="새 분석 필요 · "+t;$("r-stat").className="pill bad"; if(ls_get("ak")||ls_get("ok")) radarRun(false);}
 });
 </script>
 </body></html>
