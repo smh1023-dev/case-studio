@@ -119,12 +119,11 @@
       <a class="xlink" href="mydesign.html">내 디자인</a>
       <a class="xlink" href="evaluation.html">평가</a>
       <a class="xlink" href="reels.html">릴스</a>
+      <a class="xlink" href="index.html#set">설정</a>
     </nav>
   </div>
   <nav class="subnav">
     <button class="tabbtn active" data-t="radar">Radar</button>
-    <button class="tabbtn" data-t="studio">Daily Studio</button>
-    <button class="tabbtn" data-t="chat">왜? 챗</button>
     <button class="tabbtn" data-t="set">설정</button>
   </nav>
 
@@ -135,76 +134,6 @@
     <div class="bar"><span class="pill" id="r-stat">—</span><button class="btn" id="r-run">오늘 분석</button><button class="btn ghost sm" id="r-force">강제 재분석</button></div>
     <div class="loading" id="r-load"><div class="spin"></div><span>웹을 훑는 중…</span></div>
     <div id="r-out"></div>
-  </section>
-
-  <!-- ============ DAILY STUDIO ============ -->
-  <section id="studio">
-    <h2 class="sec">Daily <em>Studio</em></h2>
-    <p class="lede">오늘의 Radar를 토대로 <b>오마주(복제 아님)</b> 컨셉을 만들고 → 디자인 소재(B/T/P/O/L) + Photoshop 클릭 가이드 + HTML 초안 3시안을 생성합니다. <b>아이덴티티 입력</b>을 채우면 그에 맞춰 컨셉·문구·색·타이포가 바뀌고 "왜 그런지" 근거도 같이 나와요.</p>
-    <div class="card" style="margin-bottom:14px">
-      <div class="vh">아이덴티티 입력 <span style="font-family:var(--mono);font-weight:400;font-size:11px;color:var(--soft)">(SI Story · 비워도 됨)</span></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:8px">
-        <div><label>케이스 재질</label>
-          <select class="hist" id="si-case" style="width:100%">
-            <option value="Mirror Case">Mirror Case</option>
-            <option value="Clear Case">Clear Case</option>
-            <option value="Transparent MagSafe">Transparent MagSafe</option>
-            <option value="Frosted Case">Frosted Case</option>
-            <option value="Matte Case">Matte Case</option>
-            <option value="Glossy Case">Glossy Case</option>
-          </select></div>
-        <div><label>감정</label>
-          <select class="hist" id="si-emo" style="width:100%">
-            <option>Quiet Luxury</option><option>Calm</option><option>Healing</option><option>Confidence</option>
-            <option>Minimal</option><option>Premium</option><option>Cute</option><option>Emotional</option>
-            <option>Strong</option><option>Elegant</option><option>Modern</option><option>Playful</option>
-          </select></div>
-        <div><label>타겟 고객</label>
-          <select class="hist" id="si-target" style="width:100%">
-            <option>20s Female</option><option>20s Male</option><option>30s Professional</option>
-            <option>Couple</option><option>Gift Buyer</option><option>Minimalist</option><option>Trend Seeker</option>
-          </select></div>
-        <div><label>브랜드 키워드</label><input id="si-kw" placeholder="예: Quiet Luxury, Apple, Scandinavian"></div>
-      </div>
-      <div style="margin-top:10px"><label>감정의 의미 / 전하고 싶은 가치 (한 줄)</label>
-        <input id="si-mean" placeholder="예: 성공을 자랑하지 않아도 고급스럽고 자신감 있는 느낌"></div>
-      <div style="margin-top:10px"><label>브랜드명 / 이름 (로고에 들어갈 글자)</label>
-        <input id="si-name" placeholder="예: SI STORY (비우면 YOUR NAME)"></div>
-    </div>
-    <div class="bar">
-      <span class="pill" id="s-stat">—</span>
-      <label style="margin:0 4px 0 0">스타일</label>
-      <select class="hist" id="s-style">
-        <option value="mirror">미러 (실버·크롬)</option>
-        <option value="neon">네온 Y2K</option>
-        <option value="minimal">미니멀 블랙/크림</option>
-        <option value="bento">벤토 콜라주</option>
-        <option value="auto">자동 (랜덤)</option>
-      </select>
-      <button class="btn" id="s-run">오늘 디자인 생성</button>
-      <button class="btn ghost sm" id="s-force">재생성</button>
-    </div>
-    <div class="loading" id="s-load"><div class="spin"></div><span>디자인을 그리는 중…</span></div>
-    <div id="s-out"></div>
-  </section>
-
-  <!-- ============ DESIGN CHAT (왜? 챗) ============ -->
-  <section id="chat">
-    <h2 class="sec">왜? <em>Design Chat</em></h2>
-    <p class="lede">왜 이 색인지, 왜 이 구도인지, 왜 이 타이포인지 — OpenAI에게 물어보세요. 오늘 Daily Studio에서 만든 컨셉을 자동으로 함께 넘겨 맥락 있게 답합니다. (색채심리·레이아웃·타이포·행동심리 관점)</p>
-    <div class="bar" style="gap:8px">
-      <button class="btn ghost sm" onclick="chatAsk('이 디자인의 색 팔레트를 왜 이렇게 골랐는지 색채심리 관점에서 설명해줘')">왜 이 색?</button>
-      <button class="btn ghost sm" onclick="chatAsk('이 디자인의 구도/레이아웃을 왜 이렇게 잡았는지 설명해줘 (Z패턴·3분할·중앙집중 중 무엇이고 왜)')">왜 이 구도?</button>
-      <button class="btn ghost sm" onclick="chatAsk('이 디자인의 타이포그래피(폰트·굵기·자간)를 왜 이렇게 정했는지 설명해줘')">왜 이 타이포?</button>
-      <button class="btn ghost sm" onclick="chatAsk('이 디자인이 행동경제학(Cialdini·Kahneman) 관점에서 왜 구매·저장 욕구를 자극하는지 설명해줘')">왜 팔리나?</button>
-      <button class="btn ghost sm" onclick="chatClear()">대화 비우기</button>
-    </div>
-    <div id="chat-log" style="border:1.5px solid var(--hair);border-radius:10px;background:#fff;padding:14px;min-height:160px;max-height:460px;overflow:auto;margin:12px 0;font-size:14px;line-height:1.6"></div>
-    <div class="bar" style="gap:8px">
-      <input id="chat-in" placeholder="자유롭게 질문… (예: 미러 케이스엔 어떤 색이 고급스러워?)" style="flex:1" onkeydown="if(event.key==='Enter')chatSend()">
-      <button class="btn" id="chat-send" onclick="chatSend()">보내기</button>
-    </div>
-    <div class="loading" id="chat-load"><div class="spin"></div><span>생각 중…</span></div>
   </section>
 
   <!-- ============ SETTINGS ============ -->
@@ -297,11 +226,11 @@ async function fluxImage(prompt,portrait){
   if(!r.ok){ const m=(d&&(d.detail||d.message))||("HTTP "+r.status); throw new Error("fal.ai 오류: "+(typeof m==="string"?m:JSON.stringify(m))); }
   const img=d.images&&d.images[0]; if(!img||!img.url) throw new Error("이미지 없음"); return img.url;
 }
-async function openaiChat(messages){
+async function openaiChat(messages,max_tokens){
   const key=ls_get("ok"); if(!key) throw new Error("설정에서 OpenAI 키를 저장하세요.");
   const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-    body:JSON.stringify({model:OMODEL(),messages,max_tokens:900,temperature:0.7})});
+    body:JSON.stringify({model:OMODEL(),messages,max_tokens:max_tokens||1500,temperature:0.7})});
   const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 챗 오류");
   return d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content.trim():"(응답 없음)";
 }
@@ -315,23 +244,25 @@ function safeUrl(u){u=String(u||"");return /^https?:\/\//i.test(u)?u:null;}
 function show(elm,on){elm.classList.toggle("on",on);}
 
 /* ================= TAB 1 · RADAR ================= */
-const R_PICK=`당신은 글로벌 폰케이스 트렌드 리서처이자 Paul Rand 관점 비평가입니다. 웹검색으로 지금 잘 팔리는 폰케이스 디자인/포맷 5개를 찾으세요. CASETiFY 우선(+BURGA·Velvet Caviar·Wildflower·Casely). 각 항목 실제 URL 포함. JSON 배열만, 한국어, 각 필드 14단어 이내. 키:{"brand","name","url","composition","color","typography","symbol","why"}`;
-const R_PHRASE=`웹검색으로 2026년 현재 폰케이스/굿즈에 쓰는 유행 문구·슬로건 트렌드를 조사. JSON만, 한국어: {"trending":["3개"],"avoid":["3개"],"tip":"한 줄"}`;
+const R_PICK=`당신은 글로벌 폰케이스 트렌드 리서처이자 Paul Rand 관점 비평가입니다. 2026년 현재 잘 팔리는 프리미엄 폰케이스 디자인/포맷 5개를 브랜드별로 정리하세요. CASETiFY 우선(+BURGA·Velvet Caviar·Wildflower·Casely). url은 해당 브랜드 공식 사이트 형태(예: https://www.casetify.com)로. JSON 배열만, 한국어, 각 필드 14단어 이내. 키:{"brand","name","url","composition","color","typography","symbol","why"}`;
+const R_PHRASE=`2026년 현재 폰케이스/굿즈에 쓰는 유행 문구·슬로건 트렌드를 정리. 자기계발 클리셰(KEEP GOING 등) 말고 브랜드 카피 톤. JSON만, 한국어: {"trending":["3개"],"avoid":["3개"],"tip":"한 줄"}`;
 async function radarRun(force){
   const t=today(),k="csr:"+t;
   if(!force){const c=ls_getJSON(k);if(c){radarRender(c);$("r-stat").textContent="오늘 완료 · "+t;$("r-stat").className="pill ok";return;}}
+  if(!ls_get("ok")){ $("r-out").innerHTML='<div class="err">메인 설정에서 OpenAI 키를 먼저 저장하세요.</div>'; $("r-stat").textContent="OpenAI 키 필요 · "+t; $("r-stat").className="pill bad"; return; }
   $("r-run").disabled=$("r-force").disabled=true; show($("r-load"),true); $("r-out").innerHTML="";
   try{
-    const picks=parseJSON(await claude({user:R_PICK,useSearch:true}),"[","]");
+    const picks=parseJSON(await openaiChat([{role:"user",content:R_PICK}]),"[","]");
     if(!picks||!picks.length) throw new Error("5개 분석 해석 실패");
-    let phrases=null; try{phrases=parseJSON(await claude({user:R_PHRASE,useSearch:true}),"{","}");}catch(e){}
-    const payload={picks,phrases}; ls_setJSON(k,payload); radarRender(payload);
+    let phrases=null; try{phrases=parseJSON(await openaiChat([{role:"user",content:R_PHRASE}]),"{","}");}catch(e){}
+    const payload={picks,phrases,note:"OpenAI 분석(실시간 웹검색 아님 · 트렌드 지식 기반). 실제 신상품은 출처 링크에서 확인하세요."}; ls_setJSON(k,payload); radarRender(payload);
     $("r-stat").textContent="오늘 완료 · "+t; $("r-stat").className="pill ok";
   }catch(e){$("r-out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
   finally{show($("r-load"),false);$("r-run").disabled=$("r-force").disabled=false;}
 }
 function radarRender(p){
   let h="";const ph=p.phrases;
+  if(p.note) h+='<p class="note" style="margin:0 0 8px;color:var(--accent)">⚠ '+esc(p.note)+'</p>';
   if(ph){h+='<div class="card"><div class="vh">오늘의 트렌드 문구</div>';
     if(ph.trending)h+='<p class="why" style="margin:2px 0"><b>통하는</b> · '+ph.trending.map(esc).join(" / ")+'</p>';
     if(ph.avoid)h+='<p class="why" style="margin:2px 0;color:var(--accent)"><b>피할것</b> · '+ph.avoid.map(esc).join(" / ")+'</p>';
@@ -351,127 +282,12 @@ function radarRender(p){
 }
 $("r-run").onclick=()=>radarRun(false); $("r-force").onclick=()=>radarRun(true);
 
-/* ================= TAB 2 · DAILY STUDIO ================= */
-const STYLE_DIR={
-  mirror:"필수 스타일: 미러(거울) 케이스. 배경은 실버·크롬·메탈 반사면(거울이 주인공). 색은 무채색 위주, 포인트 색은 아주 절제(있어도 1톤). 로고/심볼/워드마크는 아주 작게 한 곳에만 배치하고 거울 반사 질감을 강조. versions 배경(bg)은 실버/크롬 계열 hex, 네온·비비드 금지. materials는 크롬/메탈/반사 질감 위주로.",
-  neon:"필수 스타일: 네온 Y2K. 흑 또는 크림 베이스 + 네온 포인트 1색(예: 네온 그린/핑크). 크롬 오브젝트·8비트 글리프·디지털 노스탤지어. 단 포인트 색은 반드시 1개만.",
-  minimal:"필수 스타일: 미니멀 블랙/크림. 흑 또는 크림 단색 베이스 + 큰 여백 + 심볼 1개 + 작은 워드마크. 패턴·추가 색 금지. Paul Rand식 극단적 절제.",
-  bento:"필수 스타일: 벤토 콜라주. 작은 라운드 타일 그리드에 심볼·모노그램·도트·미니 슬로건 배치(CASETiFY 코랩 콜라주 원리). 흑/크림 바탕 + 절제된 멀티 악센트.",
-  auto:"스타일 자유: 오늘의 트렌드에 가장 맞는 방향으로."
-};
-const S_PROMPT=(ctx,style)=>`당신은 CASETiFY 분석가 + Paul Rand 그래픽 디렉터입니다. 아래 오늘의 베스트셀러 분석을 보고 "복제하지 말고 원리만" 추출해, Y2K·트렌디하지만 절제된 퍼스널 폰케이스(심볼 + 워드마크) 디자인을 만드세요.
-[강제 스타일] ${STYLE_DIR[style]||STYLE_DIR.auto}
-[오늘의 분석]\n${ctx}\n
-JSON만 출력(한국어). 형식:
-{"concept":"한 문단 컨셉",
- "palette":["#hex","#hex","#hex"],
- "symbol":"심볼 설명",
- "symbolChar":"화면표시용 한 글자/기호 (예: ✶)",
- "slogan":"짧은 영문 슬로건",
- "versions":[{"name":"Minimal","bg":"#hex","textColor":"#hex","note":"배치/여백 한 줄"},
-             {"name":"Premium","bg":"#hex","textColor":"#hex","note":"…"},
-             {"name":"Signature","bg":"#hex","textColor":"#hex","note":"…"}],
- "materials":[{"id":"B2","name":"…","role":"…","midjourney":"…","flux":"…","transparent":false}, …총 6~8개 핵심],
- "photoshop":["1. …","2. …", … 클릭 단위 12~20단계]}`;
-async function studioRun(force){
-  const style=$("s-style").value; ls_set("s-style-pref",style);
-  const t=today(),k="std:"+t+":"+style;
-  if(!force){const c=ls_getJSON(k);if(c){studioRender(c);$("s-stat").textContent="오늘 완료 · "+styleLabel(style);$("s-stat").className="pill ok";return;}}
-  $("s-run").disabled=$("s-force").disabled=true; show($("s-load"),true); $("s-out").innerHTML="";
-  try{
-    const radar=ls_getJSON("csr:"+t);
-    const ctx=radar?JSON.stringify(radar.picks).slice(0,1400):"(오늘 Radar 없음 — 일반 트렌드 기준)";
-    const data=parseJSON(await claude({user:S_PROMPT(ctx,style),max_tokens:3500}),"{","}");
-    if(!data) throw new Error("디자인 JSON 해석 실패");
-    ls_setJSON(k,data); studioRender(data);
-    $("s-stat").textContent="오늘 완료 · "+styleLabel(style); $("s-stat").className="pill ok";
-  }catch(e){$("s-out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
-  finally{show($("s-load"),false);$("s-run").disabled=$("s-force").disabled=false;}
-}
-function studioRender(d){
-  const sym=esc(d.symbolChar||"✶"), slo=esc(d.slogan||"");
-  let h='<div class="card"><div class="vh">컨셉</div><p class="why">'+esc(d.concept)+'</p>'+
-    '<p class="note">팔레트 · '+(d.palette||[]).map(c=>'<span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:'+esc(c)+';vertical-align:-1px;margin:0 3px"></span>'+esc(c)).join(" ")+'</p>'+
-    '<p class="note">심볼 · '+esc(d.symbol)+' · 슬로건 · '+slo+'</p></div>';
-  h+='<div class="vh" style="margin-top:18px">HTML 초안 3시안</div><div class="cases">';
-  (d.versions||[]).forEach(v=>{const bg=esc(v.bg||"#222"),tc=esc(v.textColor||"#fff");
-    h+='<div><div class="case" style="background:'+bg+'"><div class="cam"></div>'+
-      '<div class="face"><div class="sym" style="font-size:54px;color:'+tc+'">'+sym+'</div>'+
-      '<div class="word" style="color:'+tc+'">YOUR NAME</div></div>'+
-      '<div class="slogan" style="color:'+tc+'">'+slo+'</div><div class="gloss"></div></div>'+
-      '<p class="vh" style="margin-top:8px">'+esc(v.name)+'</p><p class="note">'+esc(v.note)+'</p></div>';
-  });
-  h+='</div>';
-  h+='<div class="vh" style="margin-top:20px">디자인 소재 (OpenAI로 이미지 생성)</div><div class="mats" id="s-mats">';
-  (d.materials||[]).forEach((m,i)=>{h+='<div class="mat" id="smat-'+i+'"><span class="mid">'+esc(m.id)+'</span>'+
-    '<div class="mnm">'+esc(m.name)+'</div><div class="mrole">'+esc(m.role)+'</div>'+
-    '<div class="mimg" id="smimg-'+i+'">미생성</div>'+
-    '<button class="btn sm" style="margin-top:7px" onclick="genMat('+i+')">이미지 생성</button></div>';});
-  h+='</div>';
-  h+='<div class="vh" style="margin-top:20px">Photoshop 작업지시서</div><ol class="steps">'+
-    (d.photoshop||[]).map(s=>'<li>'+esc(String(s).replace(/^\d+\.\s*/,""))+'</li>').join("")+'</ol>';
-  $("s-out").innerHTML=h;
-  window.__mats=d.materials||[];
-}
-function styleLabel(s){return {mirror:"미러",neon:"네온 Y2K",minimal:"미니멀",bento:"벤토 콜라주",auto:"자동"}[s]||s;}
-async function genMat(i){
-  const m=window.__mats[i]; const box=$("smimg-"+i); if(!m)return;
-  box.textContent="생성 중… (FLUX, 10~25초)";
-  try{const prompt=(m.flux||m.midjourney||m.name)+(m.transparent?" Isolated, centered on a plain pure white background, product shot, clean edges for easy background removal.":"");
-    const url=await fluxImage(prompt,!m.transparent);
-    box.innerHTML='<img src="'+url+'">';
-    const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";a.textContent="원본 열기/저장 ↗";a.className="src";a.style.display="block";a.style.marginTop="6px";
-    $("smat-"+i).appendChild(a);
-  }catch(e){box.textContent="실패: "+e.message;}
-}
-$("s-run").onclick=()=>studioRun(false); $("s-force").onclick=()=>studioRun(true);
-
-/* ================= image upload util ================= */
-function fileToB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res({b64:String(r.result).split(",")[1],mt:file.type||"image/png",url:r.result});r.onerror=rej;r.readAsDataURL(file);});}
-function wireDrop(dropId,fileId,onPick){
-  const drop=$(dropId),file=$(fileId);
-  drop.onclick=()=>file.click();
-  drop.ondragover=e=>{e.preventDefault();}; drop.ondrop=async e=>{e.preventDefault();if(e.dataTransfer.files[0])onPick(await fileToB64(e.dataTransfer.files[0]),drop);};
-  file.onchange=async()=>{if(file.files[0])onPick(await fileToB64(file.files[0]),drop);};
-}
-
-/* ================= TAB · DESIGN CHAT (왜? · OpenAI) ================= */
-let CHAT=[];
-function chatCtx(){
-  const t=today(); const styles=["mirror","neon","minimal","bento","auto"];
-  for(const s of styles){const d=ls_getJSON("std:"+t+":"+s); if(d) return "참고 디자인 컨셉: "+JSON.stringify({concept:d.concept,palette:d.palette,symbol:d.symbol,slogan:d.slogan}).slice(0,900);}
-  return "참고 디자인 없음(일반 폰케이스 디자인 관점으로 답)";
-}
-function chatRender(){
-  const log=$("chat-log");
-  log.innerHTML=CHAT.map(m=>m.role==="user"
-    ?'<div style="text-align:right;margin:8px 0"><span style="display:inline-block;background:var(--ink);color:var(--paper);padding:8px 12px;border-radius:12px 12px 2px 12px;font-size:13.5px;max-width:80%">'+esc(m.content)+'</span></div>'
-    :'<div style="margin:8px 0"><span style="display:inline-block;background:#fff;border:1px solid var(--hair);padding:8px 12px;border-radius:12px 12px 12px 2px;font-size:13.5px;max-width:88%;white-space:pre-wrap">'+esc(m.content)+'</span></div>'
-  ).join("");
-  log.scrollTop=log.scrollHeight;
-}
-async function chatAsk(q){ $("chat-in").value=q; chatSend(); }
-function chatClear(){ CHAT=[]; chatRender(); }
-async function chatSend(){
-  const inp=$("chat-in"); const q=inp.value.trim(); if(!q)return;
-  if(!ls_get("ok")){ CHAT.push({role:"assistant",content:"설정에서 OpenAI 키를 먼저 저장하세요."}); chatRender(); return; }
-  CHAT.push({role:"user",content:q}); inp.value=""; chatRender();
-  show($("chat-load"),true); $("chat-send").disabled=true;
-  try{
-    const sys="당신은 폰케이스 브랜드의 AI 디자인 디렉터입니다. 색채심리·레이아웃·타이포·행동경제학 관점에서 '왜 그런지'를 쉽고 구체적으로 설명합니다. 한국어로 간결하게.\n"+chatCtx();
-    const msgs=[{role:"system",content:sys}].concat(CHAT.slice(-8));
-    const ans=await openaiChat(msgs);
-    CHAT.push({role:"assistant",content:ans}); chatRender();
-  }catch(e){ CHAT.push({role:"assistant",content:"오류: "+e.message}); chatRender(); }
-  finally{ show($("chat-load"),false); $("chat-send").disabled=false; }
-}
-
 /* ---------------- auto run radar on new day ---------------- */
 window.addEventListener("DOMContentLoaded",()=>{
-  const pref=ls_get("s-style-pref")||"mirror"; if($("s-style")) $("s-style").value=pref;
+  if(location.hash==="#set"){ const b=document.querySelector('.tabbtn[data-t="set"]'); if(b) b.click(); }
   const t=today(); const cached=ls_getJSON("csr:"+t);
   if(cached){radarRender(cached);$("r-stat").textContent="오늘 완료 · "+t;$("r-stat").className="pill ok";}
-  else{$("r-stat").textContent="새 분석 필요 · "+t;$("r-stat").className="pill bad"; if(ls_get("ak")) radarRun(false);}
+  else{$("r-stat").textContent="새 분석 필요 · "+t;$("r-stat").className="pill bad"; if(ls_get("ok")) radarRun(false);}
 });
 </script>
 </body></html>

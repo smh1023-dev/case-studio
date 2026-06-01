@@ -61,21 +61,22 @@
       <a href="mydesign.html">내 디자인</a>
       <a href="evaluation.html">평가</a>
       <a href="reels.html" class="active">릴스</a>
+      <a href="index.html#set">설정</a>
     </nav>
   </div>
 
   <h2 class="sec">Instagram <em>Reels</em></h2>
-  <p class="lede">목업을 올리면 유행 릴스 포맷을 참조해 <b>릴스 4편</b>(후크·대본·자막·BGM·전환) + 장면별 <b>프레임 이미지</b>(OpenAI)를 만들어줍니다. 프레임을 받아 CapCut/Canva에 넣으면 영상이 됩니다. <b>자동 영상 생성은 없습니다.</b></p>
+  <p class="lede">목업을 올리면 인스타에 바로 쓸 <b>사진 + 문구 5세트</b>를 추천합니다. 각 세트는 장면 사진(9:16, OpenAI 생성) + 그 위에 얹을 <b>한 줄 카피</b> + 캡션·해시태그로 구성돼요. 사진을 받아 편집기(CapCut/Canva)에 넣고 문구를 타이포로 얹으면 끝. <b>자동 영상 생성은 없습니다.</b></p>
 
   <div class="drop" id="drop">목업 이미지를 클릭/드롭<input type="file" id="file" accept="image/*" hidden></div>
   <input id="ctx" placeholder="(선택) 브랜드 한 줄·타깃·강조점" style="margin-top:10px;width:100%">
-  <div class="bar"><button class="btn" id="run" disabled>릴스 4편 생성</button></div>
-  <div class="loading" id="load"><div class="spin"></div><span id="loadmsg">유행 릴스 참조 중…</span></div>
+  <div class="bar"><button class="btn" id="run" disabled>사진+문구 5세트 추천</button></div>
+  <div class="loading" id="load"><div class="spin"></div><span id="loadmsg">장면·문구 기획 중…</span></div>
   <div id="out"></div>
   <div id="scripts"></div>
 
   <p class="note" style="margin-top:30px;border-top:1px solid var(--hair);padding-top:14px">
-    프레임 이미지는 메인 <b>설정</b>의 fal.ai 키(FLUX 1.1 pro ultra)를 공유합니다. 각 프레임의 <b>프레임 생성</b>으로 9:16 장면 이미지를 만들고 다운로드해 편집기에 배치하세요. 정확한 화면 문구(자막)는 편집기에서 타이포로 얹는 게 선명합니다.
+    문구·장면 기획은 메인 <b>설정</b>의 OpenAI 키를 씁니다. 각 세트의 <b>사진 생성</b>으로 9:16 장면을 만들고 다운로드해 편집기에 배치하세요. <b>화면 문구는 편집기에서 타이포로 얹는 게 가장 선명합니다</b>(이미지에 글자를 구우면 깨질 수 있어요). 사진 생성은 OpenAI(gpt-image-1, 미인증 시 dall-e-3 폴백)를 씁니다.
   </p>
 </div>
 <script>
@@ -94,15 +95,24 @@ async function openaiVision(text,image,max_tokens){
   const d=await r.json(); if(d.error) throw new Error(d.error.message||"OpenAI 오류");
   return d.choices[0].message.content.trim();
 }
-async function fluxImage(prompt){
-  const key=ls_get("falk"); if(!key) throw new Error("메인 설정에서 fal.ai 키를 저장하세요. (https://fal.ai/dashboard/keys)");
-  let r; try{ r=await fetch("https://fal.run/fal-ai/flux-pro/v1.1-ultra",{method:"POST",
-    headers:{"Content-Type":"application/json","Authorization":"Key "+key},
-    body:JSON.stringify({prompt,aspect_ratio:"9:16",num_images:1,output_format:"png",enable_safety_checker:true})}); }
-  catch(e){ throw new Error("fal.ai 연결 실패(네트워크/CORS). 키 확인 후 재시도."); }
-  let d; try{ d=await r.json(); }catch(e){ throw new Error("fal.ai 응답 해석 실패 (HTTP "+r.status+")"); }
-  if(!r.ok){ const m=(d&&(d.detail||d.message))||("HTTP "+r.status); throw new Error("fal.ai 오류: "+(typeof m==="string"?m:JSON.stringify(m))); }
-  const img=d.images&&d.images[0]; if(!img||!img.url) throw new Error("이미지 없음"); return img.url;
+async function openaiImage(prompt,size){
+  const key=ls_get("ok"); if(!key) throw new Error("메인 설정에서 OpenAI 키를 저장하세요.");
+  size=size||"1024x1536"; let gErr="";
+  try{
+    const r=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+      body:JSON.stringify({model:"gpt-image-1",prompt,size,quality:"high",n:1})});
+    const d=await r.json();
+    if(r.ok&&d.data&&d.data[0]&&d.data[0].b64_json) return "data:image/png;base64,"+d.data[0].b64_json;
+    gErr=(d.error&&d.error.message)||("HTTP "+r.status);
+  }catch(e){ gErr=e.message; }
+  const dsz=(size==="1024x1536")?"1024x1792":(size==="1536x1024")?"1792x1024":"1024x1024";
+  const r2=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:"dall-e-3",prompt,size:dsz,n:1,quality:"hd"})});
+  const d2=await r2.json();
+  if(r2.ok&&d2.data&&d2.data[0]){ if(d2.data[0].b64_json) return "data:image/png;base64,"+d2.data[0].b64_json; if(d2.data[0].url) return d2.data[0].url; }
+  throw new Error("OpenAI 이미지 생성 실패: "+((d2.error&&d2.error.message)||gErr));
 }
 
 let IMG=null;
@@ -119,54 +129,38 @@ $("run").onclick=async()=>{
   if(!IMG)return; $("run").disabled=true; show($("load"),true); $("out").innerHTML=""; $("scripts").innerHTML="";
   const ctx=$("ctx").value.trim();
   try{
-    $("loadmsg").textContent="릴스 4편 기획 중…";
-    const p1=`당신은 숏폼 콘텐츠 전략가입니다. 업로드된 폰케이스 목업을 홍보할 인스타그램 릴스 4편을 기획하세요. 지금 유행하는 릴스 포맷/편집/전환을 참조하고, 행동심리(후크 3초·Identity·Loss Aversion·Social Proof·CTA)를 적용. 컨텍스트:${ctx||"없음"}.
-JSON 배열만(한국어), 4개. 각: {"title":"제목","format":"참조 포맷","hook":"첫3초 후크","script":["비트별 대본 4~6"],"subtitles":["자막 3~5"],"shots":["샷/장면 3~5"],"bgm":"BGM/사운드 방향","transition":"전환 효과","caption":"캡션+해시태그","cta":"행동유도","framePrompt":"이 릴스 대표 9:16 프레임 이미지 영문 프롬프트(폰케이스 중심, 글자 최소)"}`;
-    const reels=parseJSON(await openaiVision(p1,IMG),"[","]");
-    if(!reels||!reels.length)throw new Error("릴스 JSON 해석 실패");
-    renderReels(reels);
-    $("loadmsg").textContent="15/30/60초 대본 작성 중…";
-    const p2=`위 릴스 컨셉을 바탕으로 같은 제품의 릴스 대본을 길이별로 작성. JSON만(한국어): {"s15":"15초 대본(씬/멘트/자막 포함)","s30":"30초 대본","s60":"60초 대본"}. 핵심 메시지: YOUR LOGO. YOUR STORY. / YOUR IDENTITY. DESIGNED. / NOT JUST A CASE.`;
-    const sc=parseJSON(await openaiVision(p2,IMG,2500),"{","}");
-    if(sc)renderScripts(sc);
+    $("loadmsg").textContent="사진+문구 5세트 기획 중…";
+    const p1=`당신은 숏폼/인스타 콘텐츠 디렉터 + 브랜드 카피라이터입니다. 업로드된 폰케이스 목업을 홍보할 "사진 + 문구" 5세트를 추천하세요. 각 세트는 인스타 피드/릴스 커버로 바로 쓸 수 있어야 합니다. 문구는 자기계발 클리셰(KEEP GOING 등) 금지, 브랜드 카피 톤(예: LESS BUT BETTER, FOR THE FEW, OWN THE EDGE). 행동심리(후크·Identity·Loss Aversion·Social Proof) 반영. 컨텍스트:${ctx||"없음"}.
+JSON 배열만(한국어 설명, 문구는 영문 ALL CAPS), 정확히 5개. 각: {"scene":"장면 한 줄 설명(예: 창가에서 손에 든 컷)","copy":"화면에 얹을 한 줄 카피(영문 1~4단어)","why":"이 사진+문구가 왜 통하는지 한 줄","caption":"인스타 캡션 + 해시태그 5개","imgPrompt":"이 장면의 9:16 세로 사진 영문 프롬프트 — 이 폰케이스를 든/놓은 photorealistic lifestyle scene, premium, no text, no watermark"}`;
+    const sets=parseJSON(await openaiVision(p1,IMG),"[","]");
+    if(!sets||!sets.length)throw new Error("5세트 JSON 해석 실패");
+    renderSets(sets);
   }catch(e){$("out").innerHTML='<div class="err">'+esc(e.message)+'</div>';}
   finally{show($("load"),false);$("run").disabled=false;}
 };
-function renderReels(arr){
-  window.__reels=arr;
+function renderSets(arr){
+  window.__sets=arr;
   let h='<div class="grid">';
-  arr.slice(0,4).forEach((r,i)=>{
-    h+='<div class="reel"><div class="idx">REEL '+(i+1)+'</div><div class="rt">'+esc(r.title)+'</div>'+
-       '<div class="meta">포맷 · '+esc(r.format)+'</div>'+
-       '<div class="frame"><div class="fimg" id="fimg-'+i+'">프레임 미생성</div>'+
-       '<button class="btn sm" style="margin-top:6px" onclick="genFrame('+i+')">프레임 생성</button></div>'+
-       '<div class="hook">HOOK · '+esc(r.hook)+'</div>'+
-       '<div class="blk"><h5>대본</h5>'+(r.script||[]).map(s=>'<p>'+esc(s)+'</p>').join("")+'</div>'+
-       '<div class="blk"><h5>자막</h5><ul>'+(r.subtitles||[]).map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>'+
-       '<div class="blk"><h5>샷</h5><ul>'+(r.shots||[]).map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>'+
-       '<div class="blk"><h5>BGM</h5><p>'+esc(r.bgm)+'</p></div>'+
-       '<div class="blk"><h5>전환</h5><p>'+esc(r.transition)+'</p></div>'+
-       '<div class="blk"><h5>캡션</h5><p>'+esc(r.caption)+'</p></div>'+
-       '<div class="blk"><h5>CTA</h5><p>'+esc(r.cta)+'</p></div></div>';
+  arr.slice(0,5).forEach((s,i)=>{
+    h+='<div class="reel"><div class="idx">세트 '+(i+1)+' / 05</div>'+
+       '<div class="frame"><div class="fimg" id="fimg-'+i+'">사진 미생성</div>'+
+       '<button class="btn sm" style="margin-top:6px" onclick="genFrame('+i+')">사진 생성</button></div>'+
+       '<div class="rt" style="margin-top:10px">“'+esc(s.copy)+'”</div>'+
+       '<div class="meta">장면 · '+esc(s.scene)+'</div>'+
+       '<div class="blk"><h5>왜 통하나</h5><p>'+esc(s.why)+'</p></div>'+
+       '<div class="blk"><h5>캡션 · 해시태그</h5><p>'+esc(s.caption)+'</p></div></div>';
   });
   h+='</div>'; $("out").innerHTML=h;
 }
 async function genFrame(i){
-  const r=window.__reels[i],box=$("fimg-"+i); if(!r)return;
+  const s=window.__sets[i],box=$("fimg-"+i); if(!s)return;
   box.textContent="생성 중…";
-  try{const url=await fluxImage(r.framePrompt||("premium phone case social media reel frame, vertical 9:16, "+(r.title||"")));
+  try{const url=await openaiImage(s.imgPrompt||("premium phone case lifestyle scene, vertical 9:16, "+(s.scene||"")),"1024x1536");
     box.innerHTML='<img src="'+url+'">';
     const card=box.closest(".frame");
-    const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";a.textContent="원본 열기/저장 ↗";a.style.cssText="display:block;margin-top:6px;font-family:var(--disp);font-weight:700;font-size:12px;color:var(--ink);border-bottom:2px solid var(--accent);text-decoration:none;width:fit-content";
+    const a=document.createElement("a");a.href=url;a.download="reel-set-"+(i+1)+".png";a.textContent="다운로드 ↓";a.style.cssText="display:block;margin-top:6px;font-family:var(--disp);font-weight:700;font-size:12px;color:var(--ink);border-bottom:2px solid var(--accent);text-decoration:none;width:fit-content";
     card.appendChild(a);
   }catch(e){box.textContent="실패: "+e.message;}
-}
-function renderScripts(sc){
-  let h='<div class="scripts"><h2 class="sec" style="font-size:22px">대본 <em>15 / 30 / 60초</em></h2>';
-  if(sc.s15)h+='<div class="scriptcard"><h4>15초</h4><p>'+esc(sc.s15)+'</p></div>';
-  if(sc.s30)h+='<div class="scriptcard"><h4>30초</h4><p>'+esc(sc.s30)+'</p></div>';
-  if(sc.s60)h+='<div class="scriptcard"><h4>60초</h4><p>'+esc(sc.s60)+'</p></div>';
-  h+='</div>'; $("scripts").innerHTML=h;
 }
 </script>
 </body></html>
