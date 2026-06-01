@@ -1149,8 +1149,25 @@ async function composeMockup(printUrl, view){
 }
 
 /* 목업 7장: Front·Perspective=업로드 목업 정밀합성, Hand/Desk/Lifestyle/Pocket/Macro=OpenAI(참조 유지) */
+function deviceLook(M){
+  // 기종 외형을 구체 묘사 → 생성형이 '다른 폰'을 그리지 않도록
+  const label=(M&&M.label)||"smartphone";
+  const isIP=/iphone/i.test(label), isGal=/galaxy|갤럭시/i.test(label);
+  let cam="a rectangular rear camera module";
+  if(isIP){
+    if(/1[5-9]\s*pro|17\s*pro|16\s*pro|15\s*pro/i.test(label)) cam="a large square rear camera bump in the top-left corner with THREE lenses arranged in a triangle, titanium frame, flat straight edges";
+    else if(/1[5-9]|16|17|18/i.test(label)) cam="a square rear camera bump in the top-left corner with TWO diagonal lenses, flat aluminum frame, flat straight edges";
+    else cam="a square rear camera bump top-left, flat straight edges (modern iPhone)";
+  } else if(isGal){
+    if(/ultra/i.test(label)) cam="individual separate round camera lenses (no bump housing) in the top-left corner, very subtle curved edges, large flat display";
+    else cam="a vertical pill-shaped camera island top-left with separate round lenses, slim frame";
+  }
+  return label+", a modern smartphone with "+cam+". It MUST be clearly recognizable as a "+label+", not a generic phone.";
+}
 async function genMockups(){
-  const dev=(window.__model&&window.__model.label)||"the selected smartphone";
+  const M=window.__model||null;
+  const dev=(M&&M.label)||"the selected smartphone";
+  const devLook=deviceLook(M);
   const btn=$("mockBtn"); btn.disabled=true; show($("mockLoad"),true); $("mockOut").innerHTML=""; $("mockStat").textContent="생성 중";
   const labels=["Front 제품컷","Perspective (측면)","Hand","Desk","Lifestyle","Pocket","Macro Detail"];
   labels.forEach((s,i)=>{ const c=document.createElement("div"); c.className="mat"; c.id="mk-"+i;
@@ -1178,13 +1195,13 @@ async function genMockups(){
   // ── 3~7) Hand / Desk / Lifestyle / Pocket / Macro (OpenAI: Front·측면 합성본을 참조해 실제 디자인 + 선택 기종 유지) ──
   if(!ls_get("ok")){ $("mockStat").textContent="Front·Perspective 완료 · 나머지는 OpenAI 키 필요"; show($("mockLoad"),false); btn.disabled=false; return; }
   const refs=[window.__frontMockupUrl, window.__sideMockupUrl].filter(Boolean);
-  const keep="Keep the case artwork EXACTLY as in the reference image (same colors, shapes, composition). The phone must clearly look like a "+dev+". Photorealistic, no added text, no watermark.";
+  const keep="Keep the case artwork EXACTLY as in the reference image (same colors, shapes, composition). IMPORTANT: the phone is "+devLook+" Match the exact phone shape, edges and rear camera layout. Photorealistic, no added text, no watermark.";
   const shots=[ // [card idx, 파일명, 프롬프트, 사이즈]
-    [2,"mockup-hand.png","Photograph: a person's hand holding a "+dev+" fitted with THIS EXACT phone case (from the reference). By a bright window, soft daylight, shallow depth of field 50mm f/1.8, candid lifestyle. "+keep,"1024x1536"],
-    [3,"mockup-desk.png","Top-down flat-lay photograph of a "+dev+" with THIS EXACT phone case (from the reference) on a minimal light-wood desk beside a ceramic coffee cup and a notebook. Soft morning light, realistic shadows, editorial. "+keep,"1024x1024"],
-    [4,"mockup-lifestyle.png","Cinematic photograph: a person in a cozy sunlit cafe holding a "+dev+" with THIS EXACT phone case (from the reference). Warm background bokeh, 35mm candid lifestyle. "+keep,"1024x1536"],
-    [5,"mockup-pocket.png","Street-style photograph: a "+dev+" with THIS EXACT phone case (from the reference) slipping halfway out of a denim jacket pocket. Natural daylight, candid, shallow depth of field. "+keep,"1024x1536"],
-    [6,"mockup-macro.png","Studio macro close-up of a "+dev+" with THIS EXACT phone case (from the reference), showing the edge, camera cutout and premium material texture. Soft studio light, shallow depth of field, product macro. "+keep,"1536x1024"]
+    [2,"mockup-hand.png","Photograph: a person's hand holding "+devLook+" fitted with THIS EXACT phone case (from the reference). By a bright window, soft daylight, shallow depth of field 50mm f/1.8, candid lifestyle. "+keep,"1024x1536"],
+    [3,"mockup-desk.png","Top-down flat-lay photograph of "+devLook+" with THIS EXACT phone case (from the reference) on a minimal light-wood desk beside a ceramic coffee cup and a notebook. Soft morning light, realistic shadows, editorial. "+keep,"1024x1024"],
+    [4,"mockup-lifestyle.png","Cinematic photograph: a person in a cozy sunlit cafe holding "+devLook+" with THIS EXACT phone case (from the reference). Warm background bokeh, 35mm candid lifestyle. "+keep,"1024x1536"],
+    [5,"mockup-pocket.png","Street-style photograph: "+devLook+" with THIS EXACT phone case (from the reference) slipping halfway out of a denim jacket pocket. Natural daylight, candid, shallow depth of field. "+keep,"1024x1536"],
+    [6,"mockup-macro.png","Studio macro close-up of "+devLook+" with THIS EXACT phone case (from the reference), showing the edge, camera cutout and premium material texture. Soft studio light, shallow depth of field, product macro. "+keep,"1536x1024"]
   ];
   for(let i=0;i<shots.length;i++){
     const idx=shots[i][0];
