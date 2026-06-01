@@ -828,6 +828,35 @@ function render(d){
      '<li>파일명: 기종_재질_디자인명_300dpi.pdf 형태로 저장해 보관.</li>'+
      '</ol>';
   h+='</div>';
+
+  // ── 8 · Pacdora 목업 작업 지시서 (판매용 이미지) ──
+  h+='<div class="card"><div class="vh">8 · Pacdora 목업 지시서 <small>판매용 이미지 · 칼선 PDF와 별개</small></div>'+
+     '<p class="note" style="margin-bottom:10px">인쇄용(7번)과 달리, 여기선 <b>고객에게 보여줄 예쁜 목업</b>을 Pacdora에서 수동으로 만듭니다. 먼저 위 5번의 <b>📱 Pacdora용 평면 PNG</b> 버튼으로 평면 디자인(세로 1:2·칼선/카메라홀 없음)을 받으세요.</p>';
+  h+='<div class="vlabel" style="font-size:12px">① 케이스 목업 고르기</div>'+
+     '<ol class="steps">'+
+       '<li>pacdora.com 로그인(유료 플랜=워터마크 없음) → 검색창에 기종 입력: <b>'+esc((window.__model&&window.__model.label)||"iPhone 17 Pro")+' case</b>.</li>'+
+       '<li><b>뒷면이 잘 보이는</b> 목업 선택. ✅ 정면~45° 사선 / ❌ 앞면(화면)만·옆면만·너무 먼 것.</li>'+
+     '</ol>';
+  h+='<div class="vlabel" style="font-size:12px;margin-top:10px">② 디자인 업로드 + 가림 체크(중요)</div>'+
+     '<ol class="steps">'+
+       '<li>왼쪽 <b>Upload</b> → 5번에서 받은 평면 PNG 선택 → 케이스 뒷면에 입힘.</li>'+
+       '<li>메인 문구가 <b>카메라 구멍에 안 먹혔는지</b> / <b>좌우로 안 잘렸는지</b> / 썸네일 크기로도 읽히는지 확인. 먹히면 디자인을 살짝 아래로·작게.</li>'+
+     '</ol>';
+  h+='<div class="vlabel" style="font-size:12px;margin-top:10px">③ Scene 3장(같은 디자인, 분위기만)</div>'+
+     '<ol class="steps">'+
+       '<li><b>제품컷</b> — 검색: minimal studio / soft shadow (상세페이지 메인)</li>'+
+       '<li><b>라이프스타일</b> — clean desk / marble / cafe table (인스타 피드)</li>'+
+       '<li><b>광고컷</b> — luxury product shot / street fashion (릴스 썸네일)</li>'+
+       '<li>Scene 바꿀 때마다 ②의 가림 체크 다시(각도 틀어질 수 있음).</li>'+
+     '</ol>';
+  h+='<div class="vlabel" style="font-size:12px;margin-top:10px">④ Export + 파일명</div>'+
+     '<ol class="steps">'+
+       '<li>Export(📷) → <b>PNG</b> · 2K/4K · 비율(피드 1:1 또는 4:5 / 릴스 9:16) · 워터마크 없는지 확인 → 다운로드.</li>'+
+       '<li>파일명: <b>기종_디자인명_scene01.png</b> (예: '+esc(((window.__model&&window.__model.key)||"iphone17pro")+"_design_scene01.png")+') → scene02, scene03.</li>'+
+     '</ol>';
+  h+='<p class="note" style="margin-top:8px;color:var(--ok)">✓ 체크: 뒷면이 주인공 · 문구 안 가림 · 디자인이 이미지의 30%↑ · 워터마크 없음. 손에 익으면 1디자인당 5분에 3장.</p>';
+  h+='</div>';
+
   $("out").innerHTML=h; window.__mats=d.materials||[];
   bindCompose();
 }
