@@ -787,7 +787,9 @@ function render(d){
        '<p class="note" style="margin-bottom:10px">'+esc(window.__model.label)+' 작업사이즈에 맞춰: 배경(FLUX) → 로고(심볼+워드마크) → 타이포(SVG) → 칼선(미리보기) 순으로 합성합니다.</p>'+
        '<div class="bar"><label style="align-self:center">로고 위치</label>'+
          '<select class="sel" id="logoPos"><option value="none">로고 없음</option><option value="center">중앙</option><option value="bottom">하단</option><option value="topleft">좌측 상단</option><option value="pattern">패턴 반복</option><option value="magsafe">맥세이프 주변</option></select>'+
-         '<button class="btn" id="composeBtn">생성 & 합성</button><span class="pill" id="composeStat">대기</span></div>'+
+         '<button class="btn" id="composeBtn">생성 & 합성</button>'+
+         '<button class="btn ghost" id="pacdoraBtn" title="Pacdora 업로드용 세로 평면 PNG(칼선·카메라홀·블리드 없음)">📱 Pacdora용 평면 PNG</button>'+
+         '<span class="pill" id="composeStat">대기</span></div>'+
        '<div class="loading" id="composeLoad"><div class="spin"></div><span id="composeMsg">배경 생성 중… (10~25초)</span></div>'+
        '<div id="composeOut" class="formgrid" style="grid-template-columns:1fr 1fr;margin-top:12px"></div>'+
        '<div class="bar" id="exportBar" style="display:none;margin-top:10px"></div></div>';
@@ -838,9 +840,11 @@ function typoSVG(T,W,H,preview){
   const anchor= align==="left"?"start":(align==="right"?"end":"middle");
   const ax= anchor==="start"?Math.round(W*0.08):(anchor==="end"?Math.round(W*0.92):W/2);
   const lay=(T.layoutType||"center");
-  let my = lay==="top"?H*0.22 : lay==="bottom"?H*0.78 : H*0.5;
+  const pac=!!T.pacdora;  // Pacdora 업로드용: 카메라홀(상단)·좌우 잘림 방지
+  // 세로 중심: Pacdora면 52%(상단 35% 카메라영역을 확실히 피함), 아니면 기존 규칙
+  let my = pac ? H*0.52 : (lay==="top"?H*0.22 : lay==="bottom"?H*0.78 : H*0.5);
   const esc2=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-  const safeW=W*0.86;
+  const safeW = pac ? W*0.70 : W*0.86;  // Pacdora면 좌우 15%씩 더 비워 잘림 방지
   const EM=0.62; // 굵은 대문자 평균 글자폭(em)
   const widthOf=(str,fs,ls)=>{const n=Math.max(str.length,1);return n*fs*EM+ls*(n-1);};
   // 두 줄로 단어를 균형 있게 분배(폭이 비슷하도록)
@@ -971,6 +975,7 @@ JSON만: {"logoType":"combination|symbol|wordmark","fontFamily":"위 목록 중 
 /* 새 버튼 바인딩 (render 후 호출) */
 function bindCompose(){
   if($("composeBtn")) $("composeBtn").onclick=composeWithDieline;
+  if($("pacdoraBtn")) $("pacdoraBtn").onclick=exportPacdoraFlat;
   if($("mockBtn")) $("mockBtn").onclick=genMockups;
   if($("typoUpd")) $("typoUpd").onclick=()=>{
     const T=window.__typo||{}; T.mainCopy=$("typoMain").value; T.subCopy=$("typoSub").value;
@@ -1109,6 +1114,51 @@ async function composeWithDieline(){
       if($("pdfBtn")) $("pdfBtn").onclick=()=>exportPrintPDF(M);
     }
     if($("mockBtn")){ $("mockBtn").disabled=false; $("mockStat").textContent="준비됨"; }
+    $("composeStat").textContent="완료"; $("composeStat").className="pill";
+  }catch(e){ $("composeOut").innerHTML='<div class="err" style="grid-column:1/3">'+esc(e.message)+'</div>'; $("composeStat").textContent="실패"; }
+  finally{ show($("composeLoad"),false); btn.disabled=false; }
+}
+
+/* ===== Pacdora 업로드용 평면 디자인 PNG (세로 1:2 · 칼선/블리드/카메라홀 없음) ===== */
+async function exportPacdoraFlat(){
+  if(!ls_get("falk")){ $("composeStat").textContent="fal.ai 키 필요"; $("composeOut").innerHTML='<div class="err" style="grid-column:1/3">하단 이미지 엔진 설정에서 fal.ai 키를 저장하세요.</div>'; return; }
+  const btn=$("pacdoraBtn"); btn.disabled=true; show($("composeLoad"),true); $("composeStat").textContent="Pacdora용 생성 중";
+  // 세로 1:2 (1200×2400). Pacdora 케이스 뒷면 평면 디자인 비율
+  const W=1200, H=2400;
+  try{
+    $("composeMsg").textContent="배경 생성 중… (10~25초)";
+    // 상단 25%(카메라 영역)는 비우고, 메인 문구는 중앙~하단에 크게
+    const T=Object.assign({}, window.__typo||{});
+    if($("typoMain")) T.mainCopy=$("typoMain").value;
+    if($("typoSub")) T.subCopy=$("typoSub").value;
+    T.layoutType="center"; T.pacdora=true; // 카메라홀(상단 35%)·좌우 잘림 방지: 중심 52%, 안전폭 70%
+    const fluxPrompt=(window.__fluxMain||"premium minimal abstract artwork")+" Full bleed vertical phone-case BACK artwork only. ABSOLUTELY NO text, no letters, no numbers, no phone, no camera hole, no cutline, no bleed marks, no mockup, no UI. Keep the TOP 35% visually calm and nearly empty (camera area). Premium luxury minimalism, generous negative space, single focal element, use only the palette colors.";
+    const bgUrl=await fluxImage(fluxPrompt, true);
+    $("composeMsg").textContent="타이포·로고 합성 중…";
+    // 타이포: 상단 25% 비우기 위해 세이프 영역 안에서 중앙 배치(typoSVG가 길이 자동 2줄 처리)
+    const typoMarkup=typoSVG(T,W,H,false);
+    const pos=$("logoPos")?$("logoPos").value:"none"; const lg=window.__logo;
+    const matchColor=T.textColor||(lg&&lg.color)||"#14120D";
+    const matchFont =T.fontFamily||(lg&&lg.fontFamily)||"Montserrat";
+    let symImg=null, wordImg=null;
+    if(pos!=="none" && lg){
+      try{
+        if(lg.symbolUrl){ const raw=await loadImg(lg.symbolUrl,true); symImg=symbolToColor(raw,matchColor); }
+        if(lg.name && lg.type!=="symbol"){ wordImg=await loadImg(svgDataUrl(lgWordSVG(lg.name,matchFont,matchColor)),false); }
+        else if(lg.wordSVG){ wordImg=await loadImg(svgDataUrl(lg.wordSVG),false); }
+      }catch(e){}
+    }
+    const [bgImg,tyImg]=await Promise.all([ loadImg(bgUrl,true), loadImg(svgDataUrl(typoMarkup),false) ]);
+    const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const ctx=cv.getContext("2d");
+    drawCover(ctx,bgImg,W,H);
+    drawLogo(ctx,W,H,pos,symImg,wordImg);
+    ctx.drawImage(tyImg,0,0,W,H);
+    let png; try{ png=cv.toDataURL("image/png"); }
+    catch(e){ throw new Error("합성 보안 오류(canvas tainted) — 배경을 저장해 포토샵에서 합치세요."); }
+    const dev=(window.__model&&window.__model.key)||"case";
+    const fname=dev+"_pacdora_flat.png";
+    $("composeOut").innerHTML=composeCard("Pacdora 업로드용 평면 (세로 1:2)", png, fname, W+"×"+H+" · 칼선/카메라홀/블리드 없음 · 상단25% 비움");
+    $("composeOut").insertAdjacentHTML("afterbegin",'<div class="note" style="grid-column:1/3;color:var(--ok)">✓ 이 PNG를 Pacdora 케이스 <b>Upload</b>에 올리면 됩니다. (인쇄용 칼선 파일과 별개)</div>');
     $("composeStat").textContent="완료"; $("composeStat").className="pill";
   }catch(e){ $("composeOut").innerHTML='<div class="err" style="grid-column:1/3">'+esc(e.message)+'</div>'; $("composeStat").textContent="실패"; }
   finally{ show($("composeLoad"),false); btn.disabled=false; }
